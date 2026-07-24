@@ -101,15 +101,19 @@ jobs:
           build-mode: ${{ matrix.build-mode }}
 
       # Only the Swift app build is traced for extraction.
+      # Under the CodeQL tracer, xcodebuild often lists only macOS/x86_64 for "My Mac"
+      # even on macos-26-arm64. Use generic destination + force ARCHS=arm64.
       - name: Build Swift app (macOS)
         if: matrix.language == 'swift'
         run: |
           set -euo pipefail
-          xcodebuild build \
+          arch -arm64 xcodebuild build \
             -project Reqeast.xcodeproj \
             -scheme Reqeast \
-            -destination 'platform=macOS,arch=arm64' \
+            -destination 'generic/platform=macOS' \
             -derivedDataPath "$RUNNER_TEMP/DerivedData" \
+            ARCHS=arm64 \
+            ONLY_ACTIVE_ARCH=YES \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGN_IDENTITY=- \
             CODE_SIGNING_REQUIRED=NO
