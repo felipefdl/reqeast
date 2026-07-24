@@ -1,0 +1,107 @@
+# Advanced CodeQL: actions + rust (no build) + javascript-typescript on Ubuntu;
+# Swift manual build on macOS.
+#
+# Swift needs a real xcodebuild because the project uses PBXFileSystemSynchronizedRootGroup
+# (empty traditional Sources phases), which CodeQL autobuild cannot see.
+#
+# Action majors (checked 2026-07-24):
+#   actions/checkout@v7
+#   github/codeql-action@v4
+#   dtolnay/rust-toolchain@stable
+#   Swatinem/rust-cache@v2
+
+name: CodeQL
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    # Weekly Monday 06:27 UTC (offset from mqtee to spread load)
+    - cron: "27 6 * * 1"
+
+concurrency:
+  group: codeql-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  analyze:
+    name: Analyze (${{ matrix.language }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 120
+    permissions:
+      security-events: write
+      packages: read
+      actions: read
+      contents: read
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - language: actions
+            build-mode: none
+            os: ubuntu-latest
+          - language: rust
+            build-mode: none
+            os: ubuntu-latest
+          - language: javascript-typescript
+            build-mode: none
+            os: ubuntu-latest
+          - language: swift
+            build-mode: manual
+            os: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: ${{ matrix.build-mode }}
+
+      # --- Swift manual build (CodeQL traces xcodebuild) ---
+
+      - name: Install protobuf compiler
+        if: matrix.language == 'swift'
+        run: brew install protobuf
+
+      - name: Install Rust toolchain
+        if: matrix.language == 'swift'
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-darwin
+
+      - name: Cache Cargo
+        if: matrix.language == 'swift'
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: rust
+          shared-key: codeql-swift
+
+      - name: Build Rust XCFramework (macOS only)
+        if: matrix.language == 'swift'
+        env:
+          MACOS_ONLY: "1"
+        run: ./rust/build-xcframework.sh
+
+      - name: Build Swift app (macOS)
+        if: matrix.language == 'swift'
+        run: |
+          set -euo pipefail
+          xcodebuild build \
+            -project Reqeast.xcodeproj \
+            -scheme Reqeast \
+            -destination 'platform=macOS,arch=arm64' \
+            -derivedDataPath "$RUNNER_TEMP/DerivedData" \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGN_IDENTITY=- \
+            CODE_SIGNING_REQUIRED=NO
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v4
+        with:
+          category: "/language:${{ matrix.language }}"
