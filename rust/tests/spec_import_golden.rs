@@ -3,14 +3,12 @@
 use std::fs;
 
 use reqeast_core::spec_import::export_postman::export_input_from_normalized;
-use reqeast_core::{
-  export_openapi, export_postman, ExportFormat, ExportOpenApiOptions, ExportPostmanOptions,
-};
 use reqeast_core::spec_import::golden::{
-  assert_or_update_error_golden, assert_or_update_success_golden, fixtures_dir, parse_fixture,
-  result_to_json, update_goldens_enabled,
+  assert_or_update_error_golden, assert_or_update_success_golden, fixtures_dir, parse_fixture, result_to_json,
+  update_goldens_enabled,
 };
 use reqeast_core::spec_import::types::{SpecParseOptions, SpecSourceHint, parse_spec};
+use reqeast_core::{ExportFormat, ExportOpenApiOptions, ExportPostmanOptions, export_openapi, export_postman};
 
 const SUCCESS_FIXTURES: &[&str] = &[
   "petstore-2.0",
@@ -39,11 +37,7 @@ const SUCCESS_FIXTURES: &[&str] = &[
   "cyclic-ref",
 ];
 
-const ERROR_FIXTURES: &[&str] = &[
-  "remote-ref-denied",
-  "duplicate-operation-id",
-  "billion-laughs",
-];
+const ERROR_FIXTURES: &[&str] = &["remote-ref-denied", "duplicate-operation-id", "billion-laughs"];
 
 #[test]
 fn spec_import_success_goldens() {
@@ -68,24 +62,16 @@ fn petstore_export_round_trip_ac19() {
   for fixture in ["petstore-2.0", "petstore-3.0", "petstore-3.1"] {
     let imported = parse_fixture(fixture).expect("petstore should import");
     let export_input = export_input_from_normalized(&imported.project);
-    let exported = export_openapi(
-      export_input,
-      ExportFormat::Yaml,
-      ExportOpenApiOptions::default(),
-    )
-    .expect("export");
+    let exported = export_openapi(export_input, ExportFormat::Yaml, ExportOpenApiOptions::default()).expect("export");
 
-    let roundtrip = parse_spec(
-      exported,
-      SpecSourceHint::Yaml,
-      None,
-      SpecParseOptions::default(),
-    )
-    .expect("re-import");
+    let roundtrip = parse_spec(exported, SpecSourceHint::Yaml, None, SpecParseOptions::default()).expect("re-import");
 
     let imported_project = result_to_json(&imported).get("project").cloned().expect("project");
     let roundtrip_project = result_to_json(&roundtrip).get("project").cloned().expect("project");
-    assert_eq!(imported_project, roundtrip_project, "{fixture} AC19 round-trip mismatch");
+    assert_eq!(
+      imported_project, roundtrip_project,
+      "{fixture} AC19 round-trip mismatch"
+    );
   }
 }
 
@@ -94,17 +80,14 @@ fn postman_nested_export_round_trip_ac20() {
   let imported = parse_fixture("postman-nested").expect("postman-nested should import");
   let export_input = export_input_from_normalized(&imported.project);
   let exported = export_postman(export_input, ExportPostmanOptions::default()).expect("export");
-  let roundtrip = parse_spec(
-    exported,
-    SpecSourceHint::Postman,
-    None,
-    SpecParseOptions::default(),
-  )
-  .expect("re-import");
+  let roundtrip = parse_spec(exported, SpecSourceHint::Postman, None, SpecParseOptions::default()).expect("re-import");
 
   let imported_project = result_to_json(&imported).get("project").cloned().expect("project");
   let roundtrip_project = result_to_json(&roundtrip).get("project").cloned().expect("project");
-  assert_eq!(imported_project, roundtrip_project, "postman-nested AC20 round-trip mismatch");
+  assert_eq!(
+    imported_project, roundtrip_project,
+    "postman-nested AC20 round-trip mismatch"
+  );
 }
 
 #[test]

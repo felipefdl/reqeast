@@ -6,9 +6,8 @@ use indexmap::IndexMap;
 use serde_json::{Map, Value};
 
 use crate::spec_import::export_types::{
-  ExportAuthType, ExportBodyType, ExportEnvironment, ExportFormat, ExportFormDataEntry,
-  ExportHttpRequestData, ExportKeyValue, ExportOpenApiOptions, ExportOperation, ExportProjectInput,
-  SpecExportError,
+  ExportAuthType, ExportBodyType, ExportEnvironment, ExportFormDataEntry, ExportFormat, ExportHttpRequestData,
+  ExportKeyValue, ExportOpenApiOptions, ExportOperation, ExportProjectInput, SpecExportError,
 };
 
 type OpenApiPathsAndSecurity = (Map<String, Value>, Map<String, Value>);
@@ -24,10 +23,7 @@ pub fn export_openapi(
   serialize_spec(&spec, format)
 }
 
-fn build_openapi_spec(
-  input: &ExportProjectInput,
-  options: &ExportOpenApiOptions,
-) -> Result<Value, SpecExportError> {
+fn build_openapi_spec(input: &ExportProjectInput, options: &ExportOpenApiOptions) -> Result<Value, SpecExportError> {
   let mut root = Map::new();
   root.insert("openapi".into(), Value::String("3.1.0".into()));
 
@@ -64,9 +60,7 @@ fn build_openapi_spec(
       Value::Array(
         tag_names
           .iter()
-          .map(|name| {
-            Value::Object(Map::from_iter([("name".into(), Value::String(name.clone()))]))
-          })
+          .map(|name| Value::Object(Map::from_iter([("name".into(), Value::String(name.clone()))])))
           .collect(),
       ),
     );
@@ -88,10 +82,7 @@ fn build_openapi_spec(
   Ok(Value::Object(root))
 }
 
-fn collect_tag_names(
-  input: &ExportProjectInput,
-  folder_name_by_id: &HashMap<String, String>,
-) -> Vec<String> {
+fn collect_tag_names(input: &ExportProjectInput, folder_name_by_id: &HashMap<String, String>) -> Vec<String> {
   let mut seen = HashSet::new();
   let mut tags = Vec::new();
 
@@ -142,9 +133,10 @@ fn build_servers(environments: &[ExportEnvironment]) -> Vec<Value> {
         for variable in extra_vars {
           variables.insert(
             variable.key.clone(),
-            Value::Object(Map::from_iter([
-              ("default".into(), Value::String(variable.value.clone())),
-            ])),
+            Value::Object(Map::from_iter([(
+              "default".into(),
+              Value::String(variable.value.clone()),
+            )])),
           );
         }
         server.insert("variables".into(), Value::Object(variables));
@@ -192,10 +184,7 @@ fn build_paths_and_security(
 
     if let Some(folder_id) = &operation.folder_id {
       if let Some(folder_name) = folder_name_by_id.get(folder_id) {
-        op_object.insert(
-          "tags".into(),
-          Value::Array(vec![Value::String(folder_name.clone())]),
-        );
+        op_object.insert("tags".into(), Value::Array(vec![Value::String(folder_name.clone())]));
       }
     }
 
@@ -339,10 +328,7 @@ fn build_query_parameters(http: &ExportHttpRequestData) -> Result<Vec<Value>, Sp
       ("name".into(), Value::String(param.key.clone())),
       ("in".into(), Value::String("query".into())),
       ("required".into(), Value::Bool(false)),
-      (
-        "schema".into(),
-        Value::Object(schema_with_example(&param.value)?),
-      ),
+      ("schema".into(), Value::Object(schema_with_example(&param.value)?)),
     ])));
   }
 
@@ -361,10 +347,7 @@ fn build_header_parameters(http: &ExportHttpRequestData) -> Result<Vec<Value>, S
       ("name".into(), Value::String(header.key.clone())),
       ("in".into(), Value::String("header".into())),
       ("required".into(), Value::Bool(false)),
-      (
-        "schema".into(),
-        Value::Object(schema_with_example(&header.value)?),
-      ),
+      ("schema".into(), Value::Object(schema_with_example(&header.value)?)),
     ])));
   }
 
@@ -600,13 +583,7 @@ fn security_scheme_name(http: &ExportHttpRequestData) -> String {
 fn sanitize_identifier(value: &str) -> String {
   value
     .chars()
-    .map(|ch| {
-      if ch.is_ascii_alphanumeric() {
-        ch
-      } else {
-        '_'
-      }
-    })
+    .map(|ch| if ch.is_ascii_alphanumeric() { ch } else { '_' })
     .collect()
 }
 
@@ -646,7 +623,10 @@ fn security_scheme_definition(http: &ExportHttpRequestData) -> Map<String, Value
         Value::Object(Map::from_iter([(
           "clientCredentials".into(),
           Value::Object(Map::from_iter([
-            ("tokenUrl".into(), Value::String("https://example.test/oauth/token".into())),
+            (
+              "tokenUrl".into(),
+              Value::String("https://example.test/oauth/token".into()),
+            ),
             ("scopes".into(), Value::Object(Map::new())),
           ])),
         )])),
@@ -685,20 +665,11 @@ mod tests {
     for fixture in ["petstore-2.0", "petstore-3.0", "petstore-3.1"] {
       let imported = parse_fixture(fixture).expect("fixture should import");
       let export_input = export_input_from_normalized(&imported.project);
-      let exported = export_openapi(
-        export_input,
-        ExportFormat::Yaml,
-        ExportOpenApiOptions::default(),
-      )
-      .expect("export should succeed");
+      let exported = export_openapi(export_input, ExportFormat::Yaml, ExportOpenApiOptions::default())
+        .expect("export should succeed");
 
-      let roundtrip = parse_spec(
-        exported,
-        SpecSourceHint::Yaml,
-        None,
-        SpecParseOptions::default(),
-      )
-      .expect("exported spec should parse");
+      let roundtrip = parse_spec(exported, SpecSourceHint::Yaml, None, SpecParseOptions::default())
+        .expect("exported spec should parse");
 
       assert_eq!(
         project_from_result(&imported),

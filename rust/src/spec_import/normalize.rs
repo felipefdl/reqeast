@@ -4,6 +4,7 @@ use std::collections::{BTreeMap, HashSet};
 
 use roas::common::reference::RefOr;
 use roas::loader::Loader;
+use roas::v2::spec::Spec as V2Spec;
 use roas::v3_0::example::Example;
 use roas::v3_0::media_type::MediaType;
 use roas::v3_0::operation::Operation;
@@ -13,19 +14,16 @@ use roas::v3_0::schema::{ObjectSchema, Schema, SingleSchema};
 use roas::v3_0::security_scheme::{OAuth2Flows, SecurityScheme};
 use roas::v3_0::server::{Server, ServerVariable};
 use roas::v3_0::spec::Spec as V3Spec;
-use roas::v2::spec::Spec as V2Spec;
 use serde_json::Value;
 
-use crate::spec_import::bundle::{rewrite_refs_in_value, BundleContext};
+use crate::spec_import::bundle::{BundleContext, rewrite_refs_in_value};
+use crate::spec_import::fingerprint::{bundle_and_canonicalize_with_bundle, hash_bytes, validate_refs_with_bundle};
 use crate::spec_import::sanitize::{sanitize_openapi_value, sanitize_openapi_value_for_v30};
-use crate::spec_import::fingerprint::{
-  bundle_and_canonicalize_with_bundle, hash_bytes, validate_refs_with_bundle,
-};
 use crate::spec_import::types::{
   NormalizedAuth, NormalizedBody, NormalizedBodyCandidate, NormalizedEnvironment, NormalizedFolder,
-  NormalizedFormDataEntry, NormalizedKeyValue, NormalizedOperation, NormalizedParameter,
-  NormalizedProject, NormalizedSecurityScheme, OperationProtocol, ParameterLocation, SpecImportError,
-  SpecParseOptions, SpecWarning, ValueSource,
+  NormalizedFormDataEntry, NormalizedKeyValue, NormalizedOperation, NormalizedParameter, NormalizedProject,
+  NormalizedSecurityScheme, OperationProtocol, ParameterLocation, SpecImportError, SpecParseOptions, SpecWarning,
+  ValueSource,
 };
 
 const ENABLE_OPTIONAL_PARAMETERS: bool = false;
@@ -83,8 +81,7 @@ fn parse_typed_spec(value: &Value) -> Result<V3Spec, SpecImportError> {
   sanitize_openapi_value(&mut sanitized);
 
   if sanitized.get("swagger").is_some() {
-    let v2: V2Spec = serde_json::from_value(sanitized)
-      .map_err(|err| SpecImportError::ParseError(err.to_string()))?;
+    let v2: V2Spec = serde_json::from_value(sanitized).map_err(|err| SpecImportError::ParseError(err.to_string()))?;
     return Ok(v2.into());
   }
 
@@ -96,10 +93,9 @@ fn parse_typed_spec(value: &Value) -> Result<V3Spec, SpecImportError> {
   if version.starts_with("3.0") {
     serde_json::from_value(sanitized).map_err(|err| SpecImportError::ParseError(err.to_string()))
   } else if version.starts_with("3.1") {
-    let v31: roas::v3_1::spec::Spec = serde_json::from_value(sanitized.clone())
-      .map_err(|err| SpecImportError::ParseError(err.to_string()))?;
-    let mut intermediate = serde_json::to_value(v31)
-      .map_err(|err| SpecImportError::ParseError(err.to_string()))?;
+    let v31: roas::v3_1::spec::Spec =
+      serde_json::from_value(sanitized.clone()).map_err(|err| SpecImportError::ParseError(err.to_string()))?;
+    let mut intermediate = serde_json::to_value(v31).map_err(|err| SpecImportError::ParseError(err.to_string()))?;
     sanitize_openapi_value_for_v30(&mut intermediate);
     // roas v3_0::Spec only accepts 3.0.x version strings after the v3.1 round-trip.
     if let Some(obj) = intermediate.as_object_mut() {
@@ -227,16 +223,9 @@ fn normalize_security_schemes(spec: &V3Spec) -> Vec<NormalizedSecurityScheme> {
   schemes
     .iter()
     .map(|(name, scheme_ref)| {
-      let scheme = scheme_ref
-        .get_item(spec)
-        .expect("validated security scheme");
+      let scheme = scheme_ref.get_item(spec).expect("validated security scheme");
       let (scheme_type, header_name, query_name, in_location) = match scheme {
-        SecurityScheme::HTTP(http) => (
-          format!("http:{}", http.scheme),
-          None,
-          None,
-          None,
-        ),
+        SecurityScheme::HTTP(http) => (format!("http:{}", http.scheme), None, None, None),
         SecurityScheme::ApiKey(api_key) => (
           "apiKey".into(),
           if api_key.location == roas::v3_0::security_scheme::ApiKeyLocation::Header {
@@ -481,8 +470,7 @@ fn collect_operations(
       }
 
       let parameters = normalize_parameters(&merged_params, ctx, &op_ref, warnings)?;
-      let (body, body_candidates) =
-        normalize_request_body(operation.request_body.as_ref(), ctx, &op_ref, warnings)?;
+      let (body, body_candidates) = normalize_request_body(operation.request_body.as_ref(), ctx, &op_ref, warnings)?;
       let auth = normalize_operation_auth(spec, operation, &primary_key);
 
       operations.push(NormalizedOperation {
@@ -578,14 +566,18 @@ fn normalize_parameters(
     let (value, value_source) = if matches!(location, ParameterLocation::Path) {
       (format!("{{{{{name}}}}}"), ValueSource::FromExample)
     } else {
-      resolve_parameter_value(&ParameterValueInput {
-        example,
-        examples,
-        content,
-        schema,
-        op_ref,
-        required,
-      }, ctx, warnings)?
+      resolve_parameter_value(
+        &ParameterValueInput {
+          example,
+          examples,
+          content,
+          schema,
+          op_ref,
+          required,
+        },
+        ctx,
+        warnings,
+      )?
     };
 
     out.push(NormalizedParameter {
@@ -647,9 +639,7 @@ fn resolve_parameter_value(
   }
 
   if let Some(schema_ref) = input.schema {
-    if let Some((value, source)) =
-      resolve_schema_example(schema_ref, ctx, input.op_ref, warnings)?
-    {
+    if let Some((value, source)) = resolve_schema_example(schema_ref, ctx, input.op_ref, warnings)? {
       return Ok((value, source));
     }
   }
@@ -727,16 +717,9 @@ fn map_media_type_body(
   if let Some(schema_ref) = &media_type.schema {
     if let Some((value, source)) = resolve_schema_example(schema_ref, ctx, op_ref, warnings)? {
       if source == ValueSource::Synthesized {
-        push_synthesized_value_warning(
-          warnings,
-          op_ref,
-          &format!("request body ({base_ct})"),
-        );
+        push_synthesized_value_warning(warnings, op_ref, &format!("request body ({base_ct})"));
       }
-      return map_example_to_body(
-        base_ct,
-        &serde_json::from_str(&value).unwrap_or(Value::String(value)),
-      );
+      return map_example_to_body(base_ct, &serde_json::from_str(&value).unwrap_or(Value::String(value)));
     }
   }
 
@@ -783,7 +766,8 @@ fn json_object_to_fields(value: &Value) -> Vec<NormalizedKeyValue> {
     return vec![];
   };
 
-  map.iter()
+  map
+    .iter()
     .map(|(key, value)| NormalizedKeyValue {
       key: key.clone(),
       value: json_scalar_to_string(value),
@@ -797,7 +781,8 @@ fn json_object_to_form_data(value: &Value) -> Vec<NormalizedFormDataEntry> {
     return vec![];
   };
 
-  map.iter()
+  map
+    .iter()
     .map(|(key, value)| NormalizedFormDataEntry {
       key: key.clone(),
       value: json_scalar_to_string(value),
@@ -826,10 +811,7 @@ fn resolve_schema_example(
   resolve_schema_value(&schema, ctx, op_ref, warnings)
 }
 
-fn resolve_schema(
-  schema_ref: &RefOr<Schema>,
-  ctx: &mut NormalizeContext<'_>,
-) -> Result<Schema, SpecImportError> {
+fn resolve_schema(schema_ref: &RefOr<Schema>, ctx: &mut NormalizeContext<'_>) -> Result<Schema, SpecImportError> {
   match schema_ref {
     RefOr::Item(schema) => Ok(schema.clone()),
     RefOr::Ref(reference) => {
@@ -1016,7 +998,8 @@ fn resolve_single_schema_value(
       }
       if let Some(items) = &array_schema.items {
         if let Some((item_value, source)) = resolve_schema_example(items, ctx, op_ref, warnings)? {
-          let array = serde_json::json!([serde_json::from_str::<Value>(&item_value).unwrap_or(Value::String(item_value))]);
+          let array =
+            serde_json::json!([serde_json::from_str::<Value>(&item_value).unwrap_or(Value::String(item_value))]);
           return Ok(Some((serde_json::to_string(&array).unwrap_or_default(), source)));
         }
       }
@@ -1086,15 +1069,8 @@ fn resolve_object_schema_value(
   }
 }
 
-fn normalize_operation_auth(
-  spec: &V3Spec,
-  operation: &Operation,
-  primary_key: &str,
-) -> Option<NormalizedAuth> {
-  let requirements = operation
-    .security
-    .as_ref()
-    .or(spec.security.as_ref())?;
+fn normalize_operation_auth(spec: &V3Spec, operation: &Operation, primary_key: &str) -> Option<NormalizedAuth> {
+  let requirements = operation.security.as_ref().or(spec.security.as_ref())?;
 
   let first_requirement = requirements.first()?;
   if first_requirement.is_empty() {
@@ -1161,24 +1137,17 @@ fn scaffold_auth(
         oauth2_scopes: scopes,
       }
     }
-    SecurityScheme::OpenIdConnect(_) => NormalizedAuth::without_oauth2_scaffold(
-      "openIdConnect",
-      Some("Authorization".into()),
-      None,
-      "Bearer {{token}}",
-    ),
+    SecurityScheme::OpenIdConnect(_) => {
+      NormalizedAuth::without_oauth2_scaffold("openIdConnect", Some("Authorization".into()), None, "Bearer {{token}}")
+    }
   }
 }
 
-fn oauth2_flow_scaffold(
-  flows: &OAuth2Flows,
-  requested_scopes: &[String],
-) -> (String, Option<String>, Option<String>) {
+fn oauth2_flow_scaffold(flows: &OAuth2Flows, requested_scopes: &[String]) -> (String, Option<String>, Option<String>) {
   if let Some(selection) = select_oauth2_flow(flows, requested_scopes, true) {
     return selection;
   }
-  select_oauth2_flow(flows, requested_scopes, false)
-    .unwrap_or_else(|| ("clientCredentials".into(), None, None))
+  select_oauth2_flow(flows, requested_scopes, false).unwrap_or_else(|| ("clientCredentials".into(), None, None))
 }
 
 fn select_oauth2_flow(
@@ -1197,11 +1166,7 @@ fn select_oauth2_flow(
   }
   if let Some(flow) = flows.implicit.as_ref() {
     if oauth2_flow_matches(&flow.scopes, requested_scopes, require_scope_match) {
-      return Some((
-        "implicit".into(),
-        Some(flow.authorization_url.clone()),
-        None,
-      ));
+      return Some(("implicit".into(), Some(flow.authorization_url.clone()), None));
     }
   }
   if let Some(flow) = flows.password.as_ref() {
@@ -1211,11 +1176,7 @@ fn select_oauth2_flow(
   }
   if let Some(flow) = flows.client_credentials.as_ref() {
     if oauth2_flow_matches(&flow.scopes, requested_scopes, require_scope_match) {
-      return Some((
-        "clientCredentials".into(),
-        None,
-        Some(flow.token_url.clone()),
-      ));
+      return Some(("clientCredentials".into(), None, Some(flow.token_url.clone())));
     }
   }
 
@@ -1253,9 +1214,7 @@ fn map_resolve_error(err: roas::common::reference::ResolveError) -> SpecImportEr
       }
     }
     roas::common::reference::ResolveError::External { reference, source } => {
-      SpecImportError::InvalidSpec(format!(
-        "Failed to resolve external reference `{reference}`: {source}"
-      ))
+      SpecImportError::InvalidSpec(format!("Failed to resolve external reference `{reference}`: {source}"))
     }
     roas::common::reference::ResolveError::NotFound(reference) => {
       SpecImportError::InvalidSpec(format!("Unresolved $ref: {reference}"))
@@ -1387,7 +1346,12 @@ mod tests {
     });
 
     let result = normalize_openapi(spec, SpecParseOptions::default()).expect("normalize");
-    let folder_names: Vec<_> = result.project.folders.iter().map(|folder| folder.name.as_str()).collect();
+    let folder_names: Vec<_> = result
+      .project
+      .folders
+      .iter()
+      .map(|folder| folder.name.as_str())
+      .collect();
     assert_eq!(folder_names, vec!["users", "billing"]);
     assert!(
       result
@@ -1475,10 +1439,12 @@ mod tests {
     });
 
     let result = normalize_openapi(spec, SpecParseOptions::default()).expect("normalize");
-    assert!(result
-      .warnings
-      .iter()
-      .any(|warning| warning.code == "OPERATION_SERVER_IGNORED"));
+    assert!(
+      result
+        .warnings
+        .iter()
+        .any(|warning| warning.code == "OPERATION_SERVER_IGNORED")
+    );
   }
 
   #[test]

@@ -1,8 +1,6 @@
 mod fixture_server;
 
-use reqeast_core::{
-  compile_proto_bundle, invoke_unary, GrpcConfig, GrpcRpcKind, KeyValuePair,
-};
+use reqeast_core::{GrpcConfig, GrpcRpcKind, KeyValuePair, compile_proto_bundle, invoke_unary};
 
 #[test]
 fn invoke_unary_smoke_against_fixture_server() {
@@ -28,13 +26,8 @@ fn invoke_unary_smoke_against_fixture_server() {
     timeout_secs: 10,
   };
 
-  let response = invoke_unary(
-    config,
-    bundle.descriptor_bytes,
-    r#"{"name":"Reqeast"}"#.into(),
-    false,
-  )
-    .expect("invoke_unary");
+  let response =
+    invoke_unary(config, bundle.descriptor_bytes, r#"{"name":"Reqeast"}"#.into(), false).expect("invoke_unary");
 
   assert_eq!(response.status_code, 0, "expected OK status, got {:?}", response);
   assert!(response.status_message.is_empty());

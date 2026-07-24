@@ -7,9 +7,9 @@ use serde_json::Value;
 use crate::spec_import::fingerprint::{bundle_and_canonicalize, hash_bytes};
 use crate::spec_import::normalize::NormalizeOutput;
 use crate::spec_import::types::{
-  NormalizedAuth, NormalizedBody, NormalizedEnvironment, NormalizedFolder, NormalizedFormDataEntry,
-  NormalizedKeyValue, NormalizedOperation, NormalizedParameter, NormalizedProject, OperationProtocol,
-  ParameterLocation, SpecImportError, SpecWarning, ValueSource,
+  NormalizedAuth, NormalizedBody, NormalizedEnvironment, NormalizedFolder, NormalizedFormDataEntry, NormalizedKeyValue,
+  NormalizedOperation, NormalizedParameter, NormalizedProject, OperationProtocol, ParameterLocation, SpecImportError,
+  SpecWarning, ValueSource,
 };
 
 /// Returns true when the JSON value looks like an Insomnia export document.
@@ -20,11 +20,14 @@ pub fn is_insomnia_export(value: &Value) -> bool {
     return true;
   }
 
-  value.get("resources").and_then(Value::as_array).is_some_and(|resources| {
-    resources.iter().any(|resource| {
-      resource.get("_type").and_then(Value::as_str) == Some("workspace")
+  value
+    .get("resources")
+    .and_then(Value::as_array)
+    .is_some_and(|resources| {
+      resources
+        .iter()
+        .any(|resource| resource.get("_type").and_then(Value::as_str) == Some("workspace"))
     })
-  })
 }
 
 /// Normalize a parsed Insomnia export JSON document into [`NormalizedProject`].
@@ -94,9 +97,9 @@ pub fn normalize_insomnia(value: Value) -> Result<NormalizeOutput, SpecImportErr
     });
   }
 
-  let workspace = workspaces.first().ok_or_else(|| {
-    SpecImportError::InvalidSpec("Insomnia export contains no workspace".into())
-  })?;
+  let workspace = workspaces
+    .first()
+    .ok_or_else(|| SpecImportError::InvalidSpec("Insomnia export contains no workspace".into()))?;
 
   let workspace_id = workspace
     .get("_id")
@@ -118,21 +121,13 @@ pub fn normalize_insomnia(value: Value) -> Result<NormalizeOutput, SpecImportErr
   let mut folders = Vec::new();
   let mut folder_paths: HashMap<String, String> = HashMap::new();
   let mut sorted_groups: Vec<&Value> = request_groups;
-  sorted_groups.sort_by_key(|group| {
-    group
-      .get("metaSortKey")
-      .and_then(Value::as_f64)
-      .unwrap_or(0.0) as i64
-  });
+  sorted_groups.sort_by_key(|group| group.get("metaSortKey").and_then(Value::as_f64).unwrap_or(0.0) as i64);
 
   for (index, group) in sorted_groups.iter().enumerate() {
     let Some(group_id) = group.get("_id").and_then(Value::as_str) else {
       continue;
     };
-    let name = group
-      .get("name")
-      .and_then(Value::as_str)
-      .unwrap_or("Untitled");
+    let name = group.get("name").and_then(Value::as_str).unwrap_or("Untitled");
     let parent_folder_id = group
       .get("parentId")
       .and_then(Value::as_str)
@@ -203,10 +198,7 @@ fn normalize_request(
   folder_paths: &HashMap<String, String>,
   warnings: &mut Vec<SpecWarning>,
 ) -> Result<NormalizedOperation, SpecImportError> {
-  let name = request
-    .get("name")
-    .and_then(Value::as_str)
-    .unwrap_or("Untitled");
+  let name = request.get("name").and_then(Value::as_str).unwrap_or("Untitled");
 
   let method = request
     .get("method")
@@ -214,13 +206,16 @@ fn normalize_request(
     .unwrap_or("GET")
     .to_ascii_uppercase();
 
-  let raw_url = request
-    .get("url")
-    .and_then(Value::as_str)
-    .unwrap_or("/");
+  let raw_url = request.get("url").and_then(Value::as_str).unwrap_or("/");
 
-  if request.get("preRequestScript").and_then(Value::as_str).is_some_and(|text| !text.is_empty())
-    || request.get("tests").and_then(Value::as_str).is_some_and(|text| !text.is_empty())
+  if request
+    .get("preRequestScript")
+    .and_then(Value::as_str)
+    .is_some_and(|text| !text.is_empty())
+    || request
+      .get("tests")
+      .and_then(Value::as_str)
+      .is_some_and(|text| !text.is_empty())
   {
     warnings.push(SpecWarning {
       code: "SCRIPT_NOT_IMPORTED".into(),
@@ -349,10 +344,7 @@ fn normalize_path_segments(path: &str) -> String {
 fn path_variables_from_path(path: &str) -> Vec<NormalizedParameter> {
   let mut params = Vec::new();
   for segment in path.split('/') {
-    if let Some(name) = segment
-      .strip_prefix('{')
-      .and_then(|value| value.strip_suffix('}'))
-    {
+    if let Some(name) = segment.strip_prefix('{').and_then(|value| value.strip_suffix('}')) {
       params.push(NormalizedParameter {
         location: ParameterLocation::Path,
         name: name.to_owned(),
@@ -394,10 +386,7 @@ fn parse_query_string(query: &str) -> Vec<NormalizedParameter> {
     .collect()
 }
 
-fn normalize_insomnia_parameters(
-  parameters: Option<&Value>,
-  op_ref: &str,
-) -> Vec<NormalizedParameter> {
+fn normalize_insomnia_parameters(parameters: Option<&Value>, op_ref: &str) -> Vec<NormalizedParameter> {
   let Some(entries) = parameters.and_then(Value::as_array) else {
     return vec![];
   };
@@ -411,15 +400,10 @@ fn normalize_insomnia_parameters(
     if disabled {
       continue;
     }
-    let Some(name) = obj.get("name").and_then(Value::as_str).filter(|name| !name.is_empty())
-    else {
+    let Some(name) = obj.get("name").and_then(Value::as_str).filter(|name| !name.is_empty()) else {
       continue;
     };
-    let value = obj
-      .get("value")
-      .and_then(Value::as_str)
-      .unwrap_or_default()
-      .to_owned();
+    let value = obj.get("value").and_then(Value::as_str).unwrap_or_default().to_owned();
     params.push(NormalizedParameter {
       location: ParameterLocation::Query,
       name: name.to_owned(),
@@ -449,18 +433,13 @@ fn normalize_headers(headers: Option<&Value>, op_ref: &str) -> Vec<NormalizedPar
       continue;
     };
     let disabled = obj.get("disabled").and_then(Value::as_bool).unwrap_or(false);
-    let Some(key) = obj.get("name").and_then(Value::as_str).filter(|name| !name.is_empty())
-    else {
+    let Some(key) = obj.get("name").and_then(Value::as_str).filter(|name| !name.is_empty()) else {
       continue;
     };
     if key.eq_ignore_ascii_case("content-type") {
       continue;
     }
-    let value = obj
-      .get("value")
-      .and_then(Value::as_str)
-      .unwrap_or_default()
-      .to_owned();
+    let value = obj.get("value").and_then(Value::as_str).unwrap_or_default().to_owned();
     params.push(NormalizedParameter {
       location: ParameterLocation::Header,
       name: key.to_owned(),
@@ -560,11 +539,7 @@ fn key_value_entries(entries: &[Value]) -> Vec<NormalizedKeyValue> {
     let Some(key) = obj.get("name").and_then(Value::as_str) else {
       continue;
     };
-    let value = obj
-      .get("value")
-      .and_then(Value::as_str)
-      .unwrap_or_default()
-      .to_owned();
+    let value = obj.get("value").and_then(Value::as_str).unwrap_or_default().to_owned();
     fields.push(NormalizedKeyValue {
       key: key.to_owned(),
       value,
@@ -574,11 +549,7 @@ fn key_value_entries(entries: &[Value]) -> Vec<NormalizedKeyValue> {
   fields
 }
 
-fn form_data_entries(
-  entries: &[Value],
-  warnings: &mut Vec<SpecWarning>,
-  op_ref: &str,
-) -> Vec<NormalizedFormDataEntry> {
+fn form_data_entries(entries: &[Value], warnings: &mut Vec<SpecWarning>, op_ref: &str) -> Vec<NormalizedFormDataEntry> {
   let mut out = Vec::new();
   for entry in entries {
     let Some(obj) = entry.as_object() else {
@@ -610,10 +581,7 @@ fn form_data_entries(
         .to_owned(),
       is_file,
       file_name: if is_file {
-        obj
-          .get("fileName")
-          .and_then(Value::as_str)
-          .map(str::to_owned)
+        obj.get("fileName").and_then(Value::as_str).map(str::to_owned)
       } else {
         None
       },
@@ -623,11 +591,7 @@ fn form_data_entries(
   out
 }
 
-fn normalize_auth(
-  auth: Option<&Value>,
-  op_ref: &str,
-  warnings: &mut Vec<SpecWarning>,
-) -> Option<NormalizedAuth> {
+fn normalize_auth(auth: Option<&Value>, op_ref: &str, warnings: &mut Vec<SpecWarning>) -> Option<NormalizedAuth> {
   let auth_obj = auth?.as_object()?;
   if auth_obj.is_empty() {
     return None;
@@ -640,14 +604,8 @@ fn normalize_auth(
 
   match auth_type {
     "apikey" => {
-      let key = auth_obj
-        .get("key")
-        .and_then(Value::as_str)
-        .unwrap_or("X-API-Key");
-      let value = auth_obj
-        .get("value")
-        .and_then(Value::as_str)
-        .unwrap_or("{{api_key}}");
+      let key = auth_obj.get("key").and_then(Value::as_str).unwrap_or("X-API-Key");
+      let value = auth_obj.get("value").and_then(Value::as_str).unwrap_or("{{api_key}}");
       let add_to = auth_obj
         .get("addTo")
         .or_else(|| auth_obj.get("addto"))
@@ -861,14 +819,18 @@ mod tests {
     assert_eq!(result.project.folders.len(), 1);
     assert_eq!(result.project.operations.len(), 1);
     assert_eq!(result.project.operations[0].path, "/users");
-    assert!(result
-      .warnings
-      .iter()
-      .any(|warning| warning.code == "MIGRATION_FROM_INSOMNIA"));
-    assert!(result
-      .warnings
-      .iter()
-      .any(|warning| warning.code == "RESPONSE_NOT_IMPORTED"));
+    assert!(
+      result
+        .warnings
+        .iter()
+        .any(|warning| warning.code == "MIGRATION_FROM_INSOMNIA")
+    );
+    assert!(
+      result
+        .warnings
+        .iter()
+        .any(|warning| warning.code == "RESPONSE_NOT_IMPORTED")
+    );
   }
 
   #[test]

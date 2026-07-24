@@ -3,9 +3,7 @@ mod fixture_server;
 use std::sync::{Arc, Condvar, Mutex};
 use std::time::Duration;
 
-use reqeast_core::{
-  compile_proto_bundle, GrpcClient, GrpcConfig, GrpcEvent, GrpcEventHandler, GrpcRpcKind,
-};
+use reqeast_core::{GrpcClient, GrpcConfig, GrpcEvent, GrpcEventHandler, GrpcRpcKind, compile_proto_bundle};
 
 #[derive(Clone)]
 struct TestHandler {
@@ -77,10 +75,7 @@ fn streaming_config(addr: std::net::SocketAddr, method: &str, rpc_kind: GrpcRpcK
 
 impl GrpcEventHandler for TestHandler {
   fn on_event(&self, event: GrpcEvent) {
-    let terminal = matches!(
-      event,
-      GrpcEvent::Completed { .. } | GrpcEvent::Error { .. }
-    );
+    let terminal = matches!(event, GrpcEvent::Completed { .. } | GrpcEvent::Error { .. });
     self.events.lock().expect("lock").push(event);
     if terminal {
       let (lock, cvar) = &*self.done;
@@ -129,10 +124,9 @@ fn server_streaming_receives_multiple_messages() {
     "expected name echoed in stream messages, got {messages:?}"
   );
   assert!(
-    events.iter().any(|event| matches!(
-      event,
-      GrpcEvent::Completed { status_code: 0, .. }
-    )),
+    events
+      .iter()
+      .any(|event| matches!(event, GrpcEvent::Completed { status_code: 0, .. })),
     "expected OK Completed event, got {events:?}"
   );
 }
@@ -176,21 +170,22 @@ fn client_streaming_aggregates_messages_after_half_close() {
     "expected Connected event, got {events:?}"
   );
   assert!(
-    events
-      .iter()
-      .any(|event| matches!(event, GrpcEvent::StreamHalfClosed)),
+    events.iter().any(|event| matches!(event, GrpcEvent::StreamHalfClosed)),
     "expected StreamHalfClosed event, got {events:?}"
   );
-  assert_eq!(messages.len(), 1, "expected single aggregated response, got {messages:?}");
+  assert_eq!(
+    messages.len(),
+    1,
+    "expected single aggregated response, got {messages:?}"
+  );
   assert!(
     messages[0].contains("First") && messages[0].contains("Second"),
     "expected both names in aggregated response, got {messages:?}"
   );
   assert!(
-    events.iter().any(|event| matches!(
-      event,
-      GrpcEvent::Completed { status_code: 0, .. }
-    )),
+    events
+      .iter()
+      .any(|event| matches!(event, GrpcEvent::Completed { status_code: 0, .. })),
     "expected OK Completed event, got {events:?}"
   );
 }
@@ -246,10 +241,9 @@ fn bidirectional_echoes_each_message() {
     "expected echo for second message, got {messages:?}"
   );
   assert!(
-    events.iter().any(|event| matches!(
-      event,
-      GrpcEvent::Completed { status_code: 0, .. }
-    )),
+    events
+      .iter()
+      .any(|event| matches!(event, GrpcEvent::Completed { status_code: 0, .. })),
     "expected OK Completed event, got {events:?}"
   );
 }

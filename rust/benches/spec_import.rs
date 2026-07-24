@@ -16,13 +16,8 @@ fn bench_stress_500(c: &mut Criterion) {
   group.measurement_time(Duration::from_secs(5));
   group.bench_function("stress_500_parse_spec", |bencher| {
     bencher.iter(|| {
-      let result = parse_spec(
-        bytes.clone(),
-        SpecSourceHint::Yaml,
-        None,
-        SpecParseOptions::default(),
-      )
-      .expect("stress-500 should parse");
+      let result = parse_spec(bytes.clone(), SpecSourceHint::Yaml, None, SpecParseOptions::default())
+        .expect("stress-500 should parse");
       assert_eq!(result.project.operations.len(), 500);
     });
   });

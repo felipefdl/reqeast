@@ -1,8 +1,6 @@
 //! Golden fixture tests for `diff_spec` (AC18).
 
-use reqeast_core::spec_import::golden::{
-  assert_or_update_diff_golden, diff_fixtures, update_goldens_enabled,
-};
+use reqeast_core::spec_import::golden::{assert_or_update_diff_golden, diff_fixtures, update_goldens_enabled};
 
 #[test]
 fn spec_import_diff_goldens() {

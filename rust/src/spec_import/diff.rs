@@ -3,8 +3,7 @@
 use std::collections::{HashMap, HashSet};
 
 use crate::spec_import::types::{
-  NormalizedBody, NormalizedOperation, NormalizedParameter, NormalizedProject, ParameterLocation,
-  SpecImportError,
+  NormalizedBody, NormalizedOperation, NormalizedParameter, NormalizedProject, ParameterLocation, SpecImportError,
 };
 
 /// Sync-relevant field kinds aligned with Swift `hasLocalModifications` deltas.
@@ -100,9 +99,7 @@ impl<'a> OperationIndex<'a> {
       for key in &operation.alternate_keys {
         by_alternate.entry(key.clone()).or_insert(index);
       }
-      by_method_path
-        .entry(method_path_key(operation))
-        .or_insert(index);
+      by_method_path.entry(method_path_key(operation)).or_insert(index);
     }
 
     Self {
@@ -221,7 +218,13 @@ pub fn diff_spec(
     }
   }
 
-  sort_diff_lists(&mut added, &mut removed, &mut modified, &mut unchanged, &mut identity_changed);
+  sort_diff_lists(
+    &mut added,
+    &mut removed,
+    &mut modified,
+    &mut unchanged,
+    &mut identity_changed,
+  );
 
   Ok(SpecSyncDiff {
     added,
@@ -284,12 +287,7 @@ const PARAM_LOCATIONS: &[ParameterLocation] = &[
 
 const HEADER_LOCATIONS: &[ParameterLocation] = &[ParameterLocation::Header];
 
-fn push_delta_if_changed(
-  deltas: &mut Vec<SpecFieldDelta>,
-  field: SpecSyncField,
-  old_value: &str,
-  new_value: &str,
-) {
+fn push_delta_if_changed(deltas: &mut Vec<SpecFieldDelta>, field: SpecSyncField, old_value: &str, new_value: &str) {
   if old_value == new_value {
     return;
   }
@@ -365,12 +363,7 @@ fn canonical_body(body: &NormalizedBody) -> String {
       items.sort_by(|left, right| left.key.cmp(&right.key));
       let serialized = items
         .iter()
-        .map(|entry| {
-          format!(
-            "{}={}:file={}",
-            entry.key, entry.value, entry.is_file
-          )
-        })
+        .map(|entry| format!("{}={}:file={}", entry.key, entry.value, entry.is_file))
         .collect::<Vec<_>>()
         .join("|");
       format!("form:{serialized}")
@@ -426,7 +419,9 @@ mod tests {
   fn diff_detects_added_operation() {
     let old = empty_project();
     let mut new = empty_project();
-    new.operations.push(sample_operation("listPets", "GET", "/pet", "List pets"));
+    new
+      .operations
+      .push(sample_operation("listPets", "GET", "/pet", "List pets"));
 
     let diff = diff_spec(old, new, vec![], DiffOptions::default()).expect("diff");
     assert_eq!(diff.added.len(), 1);
@@ -440,7 +435,8 @@ mod tests {
   #[test]
   fn diff_detects_removed_operation() {
     let mut old = empty_project();
-    old.operations
+    old
+      .operations
       .push(sample_operation("listPets", "GET", "/pet", "List pets"));
     let new = empty_project();
 
@@ -487,8 +483,14 @@ mod tests {
     assert_eq!(diff.modified.len(), 1);
     assert_eq!(diff.modified[0].field_deltas.len(), 1);
     assert_eq!(diff.modified[0].field_deltas[0].field, SpecSyncField::Params);
-    assert_eq!(diff.modified[0].field_deltas[0].old_value, "query:limit=10:req=false:en=false");
-    assert_eq!(diff.modified[0].field_deltas[0].new_value, "query:limit=20:req=false:en=false");
+    assert_eq!(
+      diff.modified[0].field_deltas[0].old_value,
+      "query:limit=10:req=false:en=false"
+    );
+    assert_eq!(
+      diff.modified[0].field_deltas[0].new_value,
+      "query:limit=20:req=false:en=false"
+    );
     assert!(!diff.modified[0].field_deltas[0].is_conflict);
   }
 
@@ -497,9 +499,11 @@ mod tests {
     let mut old = empty_project();
     let mut new = empty_project();
 
-    old.operations
+    old
+      .operations
       .push(sample_operation("listPets", "GET", "/pet", "List pets"));
-    new.operations
+    new
+      .operations
       .push(sample_operation("listAllPets", "GET", "/pet", "List all pets"));
 
     let bindings = vec![SpecOperationBinding {
@@ -543,9 +547,11 @@ mod tests {
     let mut old = empty_project();
     let mut new = empty_project();
 
-    old.operations
+    old
+      .operations
       .push(sample_operation("legacyKey", "GET", "/pet", "List pets"));
-    new.operations
+    new
+      .operations
       .push(sample_operation("listPets", "GET", "/pet", "List pets"));
 
     let bindings = vec![SpecOperationBinding {
@@ -566,11 +572,14 @@ mod tests {
     let mut old = empty_project();
     let mut new = empty_project();
 
-    old.operations
+    old
+      .operations
       .push(sample_operation("opA", "GET", "/pet", "List pets A"));
-    old.operations
+    old
+      .operations
       .push(sample_operation("opB", "GET", "/pet", "List pets B"));
-    new.operations
+    new
+      .operations
       .push(sample_operation("listPets", "GET", "/pet", "List pets"));
 
     let bindings = vec![
@@ -595,9 +604,11 @@ mod tests {
     let mut old = empty_project();
     let mut new = empty_project();
 
-    old.operations
+    old
+      .operations
       .push(sample_operation("listPets", "GET", "/pet", "List pets"));
-    new.operations
+    new
+      .operations
       .push(sample_operation("listPets", "GET", "/pet", "List pets"));
 
     let bindings = vec![SpecOperationBinding {
@@ -683,14 +694,8 @@ mod tests {
     assert_eq!(diff.modified.len(), 1);
     assert_eq!(diff.modified[0].field_deltas.len(), 1);
     assert_eq!(diff.modified[0].field_deltas[0].field, SpecSyncField::Body);
-    assert_eq!(
-      diff.modified[0].field_deltas[0].old_value,
-      r#"json:{"name":"Fluffy"}"#
-    );
-    assert_eq!(
-      diff.modified[0].field_deltas[0].new_value,
-      r#"json:{"name":"Mittens"}"#
-    );
+    assert_eq!(diff.modified[0].field_deltas[0].old_value, r#"json:{"name":"Fluffy"}"#);
+    assert_eq!(diff.modified[0].field_deltas[0].new_value, r#"json:{"name":"Mittens"}"#);
     assert!(!diff.modified[0].field_deltas[0].is_conflict);
   }
 
@@ -699,9 +704,11 @@ mod tests {
     let mut old = empty_project();
     let mut new = empty_project();
 
-    old.operations
+    old
+      .operations
       .push(sample_operation("listPets", "GET", "/pet", "List pets"));
-    new.operations
+    new
+      .operations
       .push(sample_operation("listPets", "POST", "/pets", "List pets"));
 
     let bindings = vec![SpecOperationBinding {
@@ -714,16 +721,11 @@ mod tests {
     assert_eq!(diff.modified.len(), 1);
     assert!(diff.identity_changed.is_empty());
 
-    let fields: Vec<SpecSyncField> = diff.modified[0]
-      .field_deltas
-      .iter()
-      .map(|delta| delta.field)
-      .collect();
+    let fields: Vec<SpecSyncField> = diff.modified[0].field_deltas.iter().map(|delta| delta.field).collect();
     assert!(fields.contains(&SpecSyncField::Method));
     assert!(fields.contains(&SpecSyncField::Url));
 
-    let method_delta = diff
-      .modified[0]
+    let method_delta = diff.modified[0]
       .field_deltas
       .iter()
       .find(|delta| delta.field == SpecSyncField::Method)
@@ -731,8 +733,7 @@ mod tests {
     assert_eq!(method_delta.old_value, "GET");
     assert_eq!(method_delta.new_value, "POST");
 
-    let url_delta = diff
-      .modified[0]
+    let url_delta = diff.modified[0]
       .field_deltas
       .iter()
       .find(|delta| delta.field == SpecSyncField::Url)
@@ -746,9 +747,11 @@ mod tests {
     let mut old = empty_project();
     let mut new = empty_project();
 
-    old.operations
+    old
+      .operations
       .push(sample_operation("listPets", "GET", "/pet", "List pets"));
-    new.operations
+    new
+      .operations
       .push(sample_operation("listPets", "GET", "/pet", "List all pets"));
 
     let bindings = vec![SpecOperationBinding {
@@ -918,10 +921,8 @@ mod tests {
     let mut new = empty_project();
 
     // Removed (bindings present, missing in new) — insert unsorted.
-    old.operations
-      .push(sample_operation("rem_z", "GET", "/rem-z", "Rem Z"));
-    old.operations
-      .push(sample_operation("rem_a", "GET", "/rem-a", "Rem A"));
+    old.operations.push(sample_operation("rem_z", "GET", "/rem-z", "Rem Z"));
+    old.operations.push(sample_operation("rem_a", "GET", "/rem-a", "Rem A"));
 
     // Modified — insert unsorted.
     let mut mod_z_old = sample_operation("mod_z", "GET", "/mod-z", "Mod Z");
@@ -952,32 +953,37 @@ mod tests {
     new.operations.push(mod_a_new);
 
     // Unchanged — insert unsorted.
-    old.operations
+    old
+      .operations
       .push(sample_operation("unch_z", "GET", "/unch-z", "Unch Z"));
-    old.operations
+    old
+      .operations
       .push(sample_operation("unch_a", "GET", "/unch-a", "Unch A"));
-    new.operations
+    new
+      .operations
       .push(sample_operation("unch_z", "GET", "/unch-z", "Unch Z"));
-    new.operations
+    new
+      .operations
       .push(sample_operation("unch_a", "GET", "/unch-a", "Unch A"));
 
     // Identity changed — insert unsorted.
-    old.operations
+    old
+      .operations
       .push(sample_operation("id_z_old", "GET", "/id-z", "Id Z"));
-    old.operations
+    old
+      .operations
       .push(sample_operation("id_a_old", "GET", "/id-a", "Id A"));
-    new.operations
+    new
+      .operations
       .push(sample_operation("id_z_new", "GET", "/id-z", "Id Z"));
-    new.operations
+    new
+      .operations
       .push(sample_operation("id_a_new", "GET", "/id-a", "Id A"));
 
     // Added — no bindings, insert unsorted.
-    new.operations
-      .push(sample_operation("add_z", "GET", "/add-z", "Add Z"));
-    new.operations
-      .push(sample_operation("add_a", "GET", "/add-a", "Add A"));
-    new.operations
-      .push(sample_operation("add_m", "GET", "/add-m", "Add M"));
+    new.operations.push(sample_operation("add_z", "GET", "/add-z", "Add Z"));
+    new.operations.push(sample_operation("add_a", "GET", "/add-a", "Add A"));
+    new.operations.push(sample_operation("add_m", "GET", "/add-m", "Add M"));
 
     let bindings = vec![
       SpecOperationBinding {
@@ -1025,35 +1031,40 @@ mod tests {
     let diff = diff_spec(old, new, bindings, DiffOptions::default()).expect("diff");
 
     assert_eq!(
-      diff.added
+      diff
+        .added
         .iter()
         .map(|operation| operation.primary_key.as_str())
         .collect::<Vec<_>>(),
       vec!["add_a", "add_m", "add_z"]
     );
     assert_eq!(
-      diff.removed
+      diff
+        .removed
         .iter()
         .map(|operation| operation.primary_key.as_str())
         .collect::<Vec<_>>(),
       vec!["rem_a", "rem_z"]
     );
     assert_eq!(
-      diff.modified
+      diff
+        .modified
         .iter()
         .map(|operation| operation.primary_key.as_str())
         .collect::<Vec<_>>(),
       vec!["mod_a", "mod_z"]
     );
     assert_eq!(
-      diff.unchanged
+      diff
+        .unchanged
         .iter()
         .map(|operation| operation.primary_key.as_str())
         .collect::<Vec<_>>(),
       vec!["unch_a", "unch_z"]
     );
     assert_eq!(
-      diff.identity_changed
+      diff
+        .identity_changed
         .iter()
         .map(|change| change.old_primary_key.as_str())
         .collect::<Vec<_>>(),

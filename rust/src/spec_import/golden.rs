@@ -6,21 +6,19 @@ use std::path::{Path, PathBuf};
 use serde_json::{Map, Value};
 
 use crate::spec_import::diff::{
-  IdentityChangeDiff, MatchedOperation, OperationDiff, SpecFieldDelta, SpecOperationBinding,
-  SpecSyncDiff, SpecSyncField,
+  IdentityChangeDiff, MatchedOperation, OperationDiff, SpecFieldDelta, SpecOperationBinding, SpecSyncDiff,
+  SpecSyncField,
 };
 use crate::spec_import::types::{
-  NormalizedAuth, NormalizedBody, NormalizedEnvironment, NormalizedFolder, NormalizedFormDataEntry,
-  NormalizedKeyValue, NormalizedOperation, NormalizedParameter, NormalizedProject,
-  BindingProtocol, NormalizedBinding, NormalizedSecurityScheme, OperationProtocol,
-  ParameterLocation, SpecImportError,
-  SpecImportResult, SpecSourceHint, SpecWarning, ValueSource, parse_spec,
+  BindingProtocol, NormalizedAuth, NormalizedBinding, NormalizedBody, NormalizedEnvironment, NormalizedFolder,
+  NormalizedFormDataEntry, NormalizedKeyValue, NormalizedOperation, NormalizedParameter, NormalizedProject,
+  NormalizedSecurityScheme, OperationProtocol, ParameterLocation, SpecImportError, SpecImportResult, SpecSourceHint,
+  SpecWarning, ValueSource, parse_spec,
 };
 
 /// Root directory for shared Swift/Rust spec import fixtures.
 pub fn fixtures_dir() -> PathBuf {
-  Path::new(env!("CARGO_MANIFEST_DIR"))
-    .join("../ReqeastTests/Fixtures/SpecImport")
+  Path::new(env!("CARGO_MANIFEST_DIR")).join("../ReqeastTests/Fixtures/SpecImport")
 }
 
 pub fn fixture_input_path(name: &str) -> PathBuf {
@@ -76,9 +74,8 @@ pub fn parse_fixture(name: &str) -> Result<SpecImportResult, SpecImportError> {
         dir.display()
       ))
     })?;
-    let bytes = fs::read(&entry).map_err(|err| {
-      SpecImportError::ParseError(format!("Failed to read fixture `{}`: {err}", entry.display()))
-    })?;
+    let bytes = fs::read(&entry)
+      .map_err(|err| SpecImportError::ParseError(format!("Failed to read fixture `{}`: {err}", entry.display())))?;
     let hint = if entry.extension().and_then(|ext| ext.to_str()) == Some("json") {
       SpecSourceHint::Json
     } else {
@@ -93,16 +90,20 @@ pub fn parse_fixture(name: &str) -> Result<SpecImportResult, SpecImportError> {
   }
 
   let path = fixture_input_path(name);
-  let bytes = fs::read(&path).map_err(|err| {
-    SpecImportError::ParseError(format!("Failed to read fixture `{}`: {err}", path.display()))
-  })?;
+  let bytes = fs::read(&path)
+    .map_err(|err| SpecImportError::ParseError(format!("Failed to read fixture `{}`: {err}", path.display())))?;
   let hint = match path.extension().and_then(|ext| ext.to_str()) {
     Some("graphql") => SpecSourceHint::Graphql,
     Some("har") => SpecSourceHint::Har,
     Some("json") => SpecSourceHint::Json,
     _ => SpecSourceHint::Yaml,
   };
-  parse_spec(bytes, hint, None, crate::spec_import::types::SpecParseOptions::default())
+  parse_spec(
+    bytes,
+    hint,
+    None,
+    crate::spec_import::types::SpecParseOptions::default(),
+  )
 }
 
 /// Serialize a [`SpecImportResult`] to canonical golden JSON.
@@ -110,7 +111,10 @@ pub fn result_to_json(result: &SpecImportResult) -> Value {
   Value::Object(Map::from_iter([
     ("project".into(), project_to_json(&result.project)),
     ("warnings".into(), warnings_to_json(&result.warnings)),
-    ("content_fingerprint".into(), Value::String(result.content_fingerprint.clone())),
+    (
+      "content_fingerprint".into(),
+      Value::String(result.content_fingerprint.clone()),
+    ),
   ]))
 }
 
@@ -147,8 +151,8 @@ pub fn assert_or_update_success_golden(name: &str, result: &SpecImportResult) {
     write_golden_json(&golden_path, &actual).expect("write golden");
     return;
   }
-  let expected_text = fs::read_to_string(&golden_path)
-    .unwrap_or_else(|_| panic!("missing golden file: {}", golden_path.display()));
+  let expected_text =
+    fs::read_to_string(&golden_path).unwrap_or_else(|_| panic!("missing golden file: {}", golden_path.display()));
   let expected: Value = serde_json::from_str(&expected_text).expect("parse golden json");
   assert_json_eq(&expected, &actual, name);
 }
@@ -160,8 +164,8 @@ pub fn assert_or_update_error_golden(name: &str, err: &SpecImportError) {
     write_golden_json(&error_path, &actual).expect("write error golden");
     return;
   }
-  let expected_text = fs::read_to_string(&error_path)
-    .unwrap_or_else(|_| panic!("missing error golden file: {}", error_path.display()));
+  let expected_text =
+    fs::read_to_string(&error_path).unwrap_or_else(|_| panic!("missing error golden file: {}", error_path.display()));
   let expected: Value = serde_json::from_str(&expected_text).expect("parse error golden json");
   assert_json_eq(&expected, &actual, name);
 }
@@ -172,9 +176,7 @@ fn assert_json_eq(expected: &Value, actual: &Value, fixture: &str) {
   }
   let expected_text = serde_json::to_string_pretty(expected).expect("serialize expected");
   let actual_text = serde_json::to_string_pretty(actual).expect("serialize actual");
-  panic!(
-    "golden mismatch for fixture `{fixture}`\n--- expected\n{expected_text}\n--- actual\n{actual_text}"
-  );
+  panic!("golden mismatch for fixture `{fixture}`\n--- expected\n{expected_text}\n--- actual\n{actual_text}");
 }
 
 fn project_to_json(project: &NormalizedProject) -> Value {
@@ -206,13 +208,7 @@ fn project_to_json(project: &NormalizedProject) -> Value {
     ),
     (
       "security_schemes".into(),
-      Value::Array(
-        project
-          .security_schemes
-          .iter()
-          .map(security_scheme_to_json)
-          .collect(),
-      ),
+      Value::Array(project.security_schemes.iter().map(security_scheme_to_json).collect()),
     ),
     (
       "folders".into(),
@@ -303,13 +299,7 @@ fn operation_to_json(operation: &NormalizedOperation) -> Value {
     ("deprecated".into(), Value::Bool(operation.deprecated)),
     (
       "tags".into(),
-      Value::Array(
-        operation
-          .tags
-          .iter()
-          .map(|tag| Value::String(tag.clone()))
-          .collect(),
-      ),
+      Value::Array(operation.tags.iter().map(|tag| Value::String(tag.clone())).collect()),
     ),
     (
       "protocol".into(),
@@ -331,21 +321,11 @@ fn operation_to_json(operation: &NormalizedOperation) -> Value {
     ("body".into(), body_to_json(&operation.body)),
     (
       "body_candidates".into(),
-      Value::Array(
-        operation
-          .body_candidates
-          .iter()
-          .map(body_candidate_to_json)
-          .collect(),
-      ),
+      Value::Array(operation.body_candidates.iter().map(body_candidate_to_json).collect()),
     ),
     (
       "auth".into(),
-      operation
-        .auth
-        .as_ref()
-        .map(auth_to_json)
-        .unwrap_or(Value::Null),
+      operation.auth.as_ref().map(auth_to_json).unwrap_or(Value::Null),
     ),
     (
       "description".into(),
@@ -391,7 +371,10 @@ fn body_to_json(body: &NormalizedBody) -> Value {
     ])),
     NormalizedBody::Urlencoded { fields } => Value::Object(Map::from_iter([
       ("kind".into(), Value::String("Urlencoded".into())),
-      ("fields".into(), Value::Array(fields.iter().map(key_value_to_json).collect())),
+      (
+        "fields".into(),
+        Value::Array(fields.iter().map(key_value_to_json).collect()),
+      ),
     ])),
     NormalizedBody::FormData { entries } => Value::Object(Map::from_iter([
       ("kind".into(), Value::String("FormData".into())),
@@ -417,43 +400,52 @@ fn auth_to_json(auth: &NormalizedAuth) -> Value {
     ("scheme_type".into(), Value::String(auth.scheme_type.clone())),
     (
       "header_name".into(),
-      auth.header_name
+      auth
+        .header_name
         .as_ref()
         .map(|value| Value::String(value.clone()))
         .unwrap_or(Value::Null),
     ),
     (
       "query_name".into(),
-      auth.query_name
+      auth
+        .query_name
         .as_ref()
         .map(|value| Value::String(value.clone()))
         .unwrap_or(Value::Null),
     ),
-    ("placeholder_value".into(), Value::String(auth.placeholder_value.clone())),
+    (
+      "placeholder_value".into(),
+      Value::String(auth.placeholder_value.clone()),
+    ),
     (
       "oauth2_grant_type".into(),
-      auth.oauth2_grant_type
+      auth
+        .oauth2_grant_type
         .as_ref()
         .map(|value| Value::String(value.clone()))
         .unwrap_or(Value::Null),
     ),
     (
       "oauth2_auth_url".into(),
-      auth.oauth2_auth_url
+      auth
+        .oauth2_auth_url
         .as_ref()
         .map(|value| Value::String(value.clone()))
         .unwrap_or(Value::Null),
     ),
     (
       "oauth2_token_url".into(),
-      auth.oauth2_token_url
+      auth
+        .oauth2_token_url
         .as_ref()
         .map(|value| Value::String(value.clone()))
         .unwrap_or(Value::Null),
     ),
     (
       "oauth2_scopes".into(),
-      auth.oauth2_scopes
+      auth
+        .oauth2_scopes
         .as_ref()
         .map(|value| Value::String(value.clone()))
         .unwrap_or(Value::Null),
@@ -466,13 +458,7 @@ fn environment_to_json(environment: &NormalizedEnvironment) -> Value {
     ("name".into(), Value::String(environment.name.clone())),
     (
       "variables".into(),
-      Value::Array(
-        environment
-          .variables
-          .iter()
-          .map(key_value_to_json)
-          .collect(),
-      ),
+      Value::Array(environment.variables.iter().map(key_value_to_json).collect()),
     ),
   ]))
 }
@@ -611,13 +597,7 @@ pub fn diff_to_json(diff: &SpecSyncDiff) -> Value {
     ),
     (
       "identity_changed".into(),
-      Value::Array(
-        diff
-          .identity_changed
-          .iter()
-          .map(identity_change_to_json)
-          .collect(),
-      ),
+      Value::Array(diff.identity_changed.iter().map(identity_change_to_json).collect()),
     ),
   ]))
 }
@@ -629,8 +609,8 @@ pub fn assert_or_update_diff_golden(name: &str, diff: &SpecSyncDiff) {
     write_golden_json(&golden_path, &actual).expect("write diff golden");
     return;
   }
-  let expected_text = fs::read_to_string(&golden_path)
-    .unwrap_or_else(|_| panic!("missing diff golden file: {}", golden_path.display()));
+  let expected_text =
+    fs::read_to_string(&golden_path).unwrap_or_else(|_| panic!("missing diff golden file: {}", golden_path.display()));
   let expected: Value = serde_json::from_str(&expected_text).expect("parse diff golden json");
   assert_json_eq(&expected, &actual, name);
 }
@@ -647,14 +627,8 @@ fn operation_diff_to_json(diff: &OperationDiff) -> Value {
   Value::Object(Map::from_iter([
     ("request_id".into(), Value::String(diff.request_id.clone())),
     ("primary_key".into(), Value::String(diff.primary_key.clone())),
-    (
-      "old_operation".into(),
-      operation_to_json(&diff.old_operation),
-    ),
-    (
-      "new_operation".into(),
-      operation_to_json(&diff.new_operation),
-    ),
+    ("old_operation".into(), operation_to_json(&diff.old_operation)),
+    ("new_operation".into(), operation_to_json(&diff.new_operation)),
     (
       "field_deltas".into(),
       Value::Array(diff.field_deltas.iter().map(field_delta_to_json).collect()),
@@ -665,22 +639,10 @@ fn operation_diff_to_json(diff: &OperationDiff) -> Value {
 fn identity_change_to_json(change: &IdentityChangeDiff) -> Value {
   Value::Object(Map::from_iter([
     ("request_id".into(), Value::String(change.request_id.clone())),
-    (
-      "old_primary_key".into(),
-      Value::String(change.old_primary_key.clone()),
-    ),
-    (
-      "new_primary_key".into(),
-      Value::String(change.new_primary_key.clone()),
-    ),
-    (
-      "old_operation".into(),
-      operation_to_json(&change.old_operation),
-    ),
-    (
-      "new_operation".into(),
-      operation_to_json(&change.new_operation),
-    ),
+    ("old_primary_key".into(), Value::String(change.old_primary_key.clone())),
+    ("new_primary_key".into(), Value::String(change.new_primary_key.clone())),
+    ("old_operation".into(), operation_to_json(&change.old_operation)),
+    ("new_operation".into(), operation_to_json(&change.new_operation)),
     (
       "field_deltas".into(),
       Value::Array(change.field_deltas.iter().map(field_delta_to_json).collect()),
@@ -776,7 +738,8 @@ pub mod diff_fixtures {
   fn added_fixture() -> DiffFixture {
     let old = empty_project();
     let mut new = empty_project();
-    new.operations
+    new
+      .operations
       .push(sample_operation("createPet", "POST", "/pet", "Create pet"));
 
     DiffFixture {
@@ -802,9 +765,7 @@ pub mod diff_fixtures {
     });
     let mut new_op = old_op.clone();
     new_op.parameters[0].value = "25".into();
-    new_op.body = NormalizedBody::Json {
-      content: "{}".into(),
-    };
+    new_op.body = NormalizedBody::Json { content: "{}".into() };
 
     old.operations.push(old_op);
     new.operations.push(new_op);
@@ -825,11 +786,14 @@ pub mod diff_fixtures {
     let mut old = empty_project();
     let mut new = empty_project();
 
-    old.operations
+    old
+      .operations
       .push(sample_operation("listPets", "GET", "/pet", "List pets"));
-    old.operations
+    old
+      .operations
       .push(sample_operation("getPet", "GET", "/pet/{id}", "Get pet"));
-    new.operations
+    new
+      .operations
       .push(sample_operation("getPet", "GET", "/pet/{id}", "Get pet"));
 
     DiffFixture {
@@ -855,9 +819,11 @@ pub mod diff_fixtures {
     let mut old = empty_project();
     let mut new = empty_project();
 
-    old.operations
+    old
+      .operations
       .push(sample_operation("listPets", "GET", "/pet", "List pets"));
-    new.operations
+    new
+      .operations
       .push(sample_operation("listAllPets", "GET", "/pet", "List all pets"));
 
     DiffFixture {

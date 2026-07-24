@@ -10,9 +10,7 @@ use crate::grpc::config::{GrpcConfig, GrpcEventHandler};
 
 pub(crate) fn grpc_runtime() -> Result<&'static Runtime, ReqeastError> {
   static RUNTIME: OnceLock<Result<Runtime, String>> = OnceLock::new();
-  let result = RUNTIME.get_or_init(|| {
-    Runtime::new().map_err(|err| format!("Failed to create gRPC runtime: {err}"))
-  });
+  let result = RUNTIME.get_or_init(|| Runtime::new().map_err(|err| format!("Failed to create gRPC runtime: {err}")));
   match result {
     Ok(runtime) => Ok(runtime),
     Err(err) => Err(ReqeastError::InternalError(err.clone())),
@@ -81,10 +79,7 @@ impl GrpcClient {
   }
 
   pub fn send_message(&self, body: String, body_is_hex: bool) -> Result<(), ReqeastError> {
-    self.send_command(GrpcCommand::SendMessage {
-      body,
-      body_is_hex,
-    })
+    self.send_command(GrpcCommand::SendMessage { body, body_is_hex })
   }
 
   pub fn half_close(&self) -> Result<(), ReqeastError> {

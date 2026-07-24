@@ -8,8 +8,8 @@ use crate::spec_import::fingerprint::{bundle_and_canonicalize, hash_bytes};
 use crate::spec_import::normalize::NormalizeOutput;
 use crate::spec_import::types::{
   NormalizedAuth, NormalizedBody, NormalizedEnvironment, NormalizedFormDataEntry, NormalizedKeyValue,
-  NormalizedOperation, NormalizedParameter, NormalizedProject, OperationProtocol, ParameterLocation,
-  SpecImportError, SpecParseOptions, SpecWarning, ValueSource,
+  NormalizedOperation, NormalizedParameter, NormalizedProject, OperationProtocol, ParameterLocation, SpecImportError,
+  SpecParseOptions, SpecWarning, ValueSource,
 };
 
 const CREDENTIAL_HEADER_NAMES: &[&str] = &["cookie", "authorization", "set-cookie"];
@@ -20,7 +20,8 @@ pub fn is_har_log(value: &Value) -> bool {
     return false;
   };
 
-  log.get("version")
+  log
+    .get("version")
     .and_then(Value::as_str)
     .is_some_and(|version| version.starts_with("1."))
     && log.get("entries").and_then(Value::as_array).is_some()
@@ -29,9 +30,7 @@ pub fn is_har_log(value: &Value) -> bool {
 /// Normalize a parsed HAR 1.2 JSON document into [`NormalizedProject`].
 pub fn normalize_har(value: Value, options: SpecParseOptions) -> Result<NormalizeOutput, SpecImportError> {
   if !is_har_log(&value) {
-    return Err(SpecImportError::UnsupportedFormat(
-      "Not a HAR 1.2 log document".into(),
-    ));
+    return Err(SpecImportError::UnsupportedFormat("Not a HAR 1.2 log document".into()));
   }
 
   let log = value
@@ -42,7 +41,12 @@ pub fn normalize_har(value: Value, options: SpecParseOptions) -> Result<Normaliz
     .get("creator")
     .and_then(|creator| creator.get("name"))
     .and_then(Value::as_str)
-    .or_else(|| log.get("browser").and_then(|browser| browser.get("name")).and_then(Value::as_str))
+    .or_else(|| {
+      log
+        .get("browser")
+        .and_then(|browser| browser.get("name"))
+        .and_then(Value::as_str)
+    })
     .unwrap_or("Imported HAR Capture")
     .to_owned();
 
@@ -153,12 +157,7 @@ fn normalize_entry(
   let mut parameters = parsed_url.query_params;
   parameters.extend(parsed_url.path_params);
 
-  let header_auth = normalize_headers_and_auth(
-    request,
-    entry.get("response"),
-    options,
-    &op_ref,
-  );
+  let header_auth = normalize_headers_and_auth(request, entry.get("response"), options, &op_ref);
   parameters.extend(header_auth.headers);
   let auth = header_auth.auth;
   let credentials_stripped = header_auth.credentials_stripped;
@@ -166,8 +165,7 @@ fn normalize_entry(
   if credentials_stripped {
     warnings.push(SpecWarning {
       code: "HAR_CREDENTIALS_STRIPPED".into(),
-      message: "Sensitive Cookie, Authorization, or Set-Cookie values were removed from this request"
-        .into(),
+      message: "Sensitive Cookie, Authorization, or Set-Cookie values were removed from this request".into(),
       operation_ref: Some(op_ref.clone()),
     });
   }
@@ -299,9 +297,7 @@ fn extract_origin_from_path(path: &str) -> Option<String> {
 
 fn normalize_operation_path(path: &str) -> String {
   if let Some(origin) = extract_origin_from_path(path) {
-    let suffix = path
-      .strip_prefix(&origin)
-      .unwrap_or(path);
+    let suffix = path.strip_prefix(&origin).unwrap_or(path);
     return normalize_absolute_path(suffix);
   }
   normalize_absolute_path(path)
@@ -322,10 +318,7 @@ fn normalize_absolute_path(path: &str) -> String {
 fn path_variables_from_path(path: &str) -> Vec<NormalizedParameter> {
   let mut params = Vec::new();
   for segment in path.split('/') {
-    if let Some(name) = segment
-      .strip_prefix('{')
-      .and_then(|value| value.strip_suffix('}'))
-    {
+    if let Some(name) = segment.strip_prefix('{').and_then(|value| value.strip_suffix('}')) {
       params.push(NormalizedParameter {
         location: ParameterLocation::Path,
         name: name.to_owned(),
@@ -396,11 +389,7 @@ fn normalize_headers_and_auth(
         continue;
       }
 
-      let value = obj
-        .get("value")
-        .and_then(Value::as_str)
-        .unwrap_or_default()
-        .to_owned();
+      let value = obj.get("value").and_then(Value::as_str).unwrap_or_default().to_owned();
 
       if is_credential_header(name) {
         credentials_stripped = true;
@@ -423,7 +412,11 @@ fn normalize_headers_and_auth(
     }
   }
 
-  if request.get("cookies").and_then(Value::as_array).is_some_and(|cookies| !cookies.is_empty()) {
+  if request
+    .get("cookies")
+    .and_then(Value::as_array)
+    .is_some_and(|cookies| !cookies.is_empty())
+  {
     credentials_stripped = true;
     if options.import_har_credentials_as_placeholders && !saw_cookie_header {
       headers.push(header_param("Cookie", "{{cookie}}".into()));
@@ -576,11 +569,7 @@ fn urlencoded_fields(params: &[Value]) -> Vec<NormalizedKeyValue> {
     let Some(name) = obj.get("name").and_then(Value::as_str) else {
       continue;
     };
-    let value = obj
-      .get("value")
-      .and_then(Value::as_str)
-      .unwrap_or_default()
-      .to_owned();
+    let value = obj.get("value").and_then(Value::as_str).unwrap_or_default().to_owned();
     fields.push(NormalizedKeyValue {
       key: name.to_owned(),
       value,
@@ -590,11 +579,7 @@ fn urlencoded_fields(params: &[Value]) -> Vec<NormalizedKeyValue> {
   fields
 }
 
-fn form_data_entries(
-  params: &[Value],
-  warnings: &mut Vec<SpecWarning>,
-  op_ref: &str,
-) -> Vec<NormalizedFormDataEntry> {
+fn form_data_entries(params: &[Value], warnings: &mut Vec<SpecWarning>, op_ref: &str) -> Vec<NormalizedFormDataEntry> {
   let mut entries = Vec::new();
   for entry in params {
     let Some(obj) = entry.as_object() else {
@@ -687,27 +672,34 @@ mod tests {
     assert_eq!(result.project.operations.len(), 2);
     assert_eq!(result.project.operations[0].path, "/pets");
     let list_pets = &result.project.operations[0];
-    assert!(list_pets
-      .parameters
-      .iter()
-      .any(|param| param.location == ParameterLocation::Query && param.name == "limit"));
-    assert!(list_pets
-      .parameters
-      .iter()
-      .any(|param| param.location == ParameterLocation::Header && param.name == "Accept"));
+    assert!(
+      list_pets
+        .parameters
+        .iter()
+        .any(|param| param.location == ParameterLocation::Query && param.name == "limit")
+    );
+    assert!(
+      list_pets
+        .parameters
+        .iter()
+        .any(|param| param.location == ParameterLocation::Header && param.name == "Accept")
+    );
     assert!(!list_pets.parameters.iter().any(|param| {
       param.location == ParameterLocation::Header
-        && (param.name.eq_ignore_ascii_case("cookie")
-          || param.name.eq_ignore_ascii_case("authorization"))
+        && (param.name.eq_ignore_ascii_case("cookie") || param.name.eq_ignore_ascii_case("authorization"))
     }));
-    assert!(result
-      .warnings
-      .iter()
-      .any(|warning| warning.code == "HAR_CREDENTIALS_STRIPPED"));
-    assert!(result
-      .warnings
-      .iter()
-      .any(|warning| warning.code == "MIGRATION_FROM_HAR"));
+    assert!(
+      result
+        .warnings
+        .iter()
+        .any(|warning| warning.code == "HAR_CREDENTIALS_STRIPPED")
+    );
+    assert!(
+      result
+        .warnings
+        .iter()
+        .any(|warning| warning.code == "MIGRATION_FROM_HAR")
+    );
   }
 
   #[test]
@@ -726,17 +718,22 @@ mod tests {
       .iter()
       .filter(|param| param.location == ParameterLocation::Header)
       .collect();
-    assert!(headers.iter().any(|param| param.name == "Cookie" && param.value == "{{cookie}}"));
-    assert!(headers
-      .iter()
-      .any(|param| param.name == "Authorization" && param.value == "Bearer {{token}}"));
+    assert!(
+      headers
+        .iter()
+        .any(|param| param.name == "Cookie" && param.value == "{{cookie}}")
+    );
+    assert!(
+      headers
+        .iter()
+        .any(|param| param.name == "Authorization" && param.value == "Bearer {{token}}")
+    );
     assert!(result.project.operations[0].auth.is_some());
   }
 
   #[test]
   fn rejects_non_har_document() {
-    let err = normalize_har(json!({"openapi":"3.0.0"}), SpecParseOptions::default())
-      .expect_err("not har");
+    let err = normalize_har(json!({"openapi":"3.0.0"}), SpecParseOptions::default()).expect_err("not har");
     assert!(matches!(err, SpecImportError::UnsupportedFormat(_)));
   }
 }

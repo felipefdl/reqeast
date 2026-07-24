@@ -7,9 +7,9 @@ use serde_json::Value;
 use crate::spec_import::fingerprint::{bundle_and_canonicalize, hash_bytes};
 use crate::spec_import::normalize::NormalizeOutput;
 use crate::spec_import::types::{
-  BindingProtocol, NormalizedBinding, NormalizedBody, NormalizedEnvironment, NormalizedKeyValue,
-  NormalizedOperation, NormalizedParameter, NormalizedProject, OperationProtocol, ParameterLocation,
-  SpecImportError, SpecWarning, ValueSource,
+  BindingProtocol, NormalizedBinding, NormalizedBody, NormalizedEnvironment, NormalizedKeyValue, NormalizedOperation,
+  NormalizedParameter, NormalizedProject, OperationProtocol, ParameterLocation, SpecImportError, SpecWarning,
+  ValueSource,
 };
 
 const UNSUPPORTED_BINDINGS: &[&str] = &[
@@ -31,16 +31,13 @@ const UNSUPPORTED_BINDINGS: &[&str] = &[
 
 /// Returns true when the JSON value looks like an AsyncAPI document.
 pub fn is_asyncapi_document(value: &Value) -> bool {
-  value.get("asyncapi").is_some()
-    && (value.get("channels").is_some() || value.get("operations").is_some())
+  value.get("asyncapi").is_some() && (value.get("channels").is_some() || value.get("operations").is_some())
 }
 
 /// Normalize a parsed AsyncAPI JSON document into [`NormalizedProject`].
 pub fn normalize_asyncapi(value: Value) -> Result<NormalizeOutput, SpecImportError> {
   if !is_asyncapi_document(&value) {
-    return Err(SpecImportError::UnsupportedFormat(
-      "Not an AsyncAPI document".into(),
-    ));
+    return Err(SpecImportError::UnsupportedFormat("Not an AsyncAPI document".into()));
   }
 
   let info = value
@@ -61,10 +58,7 @@ pub fn normalize_asyncapi(value: Value) -> Result<NormalizeOutput, SpecImportErr
   let mut seen_primary_keys = HashSet::new();
 
   let default_server = default_server_url(&value);
-  let asyncapi_version = value
-    .get("asyncapi")
-    .and_then(Value::as_str)
-    .unwrap_or("2.0.0");
+  let asyncapi_version = value.get("asyncapi").and_then(Value::as_str).unwrap_or("2.0.0");
   let is_v3 = asyncapi_version.starts_with('3');
 
   if is_v3 {
@@ -262,10 +256,7 @@ fn collect_v3_operations(
       continue;
     }
 
-    let action = operation
-      .get("action")
-      .and_then(Value::as_str)
-      .unwrap_or("send");
+    let action = operation.get("action").and_then(Value::as_str).unwrap_or("send");
     let operation_type = match action {
       "receive" => "subscribe",
       _ => "publish",
@@ -284,7 +275,11 @@ fn collect_v3_operations(
           .get("messages")
           .and_then(|messages| messages.as_array())
           .and_then(|messages| messages.first())
-          .or_else(|| channel.and_then(|ch| ch.get("messages")).and_then(first_message_from_messages));
+          .or_else(|| {
+            channel
+              .and_then(|ch| ch.get("messages"))
+              .and_then(first_message_from_messages)
+          });
         let body = message_body(message);
         push_http_operation(
           operations,
@@ -330,10 +325,7 @@ enum ChannelProtocol {
   Unsupported(String),
 }
 
-fn detect_channel_protocol(
-  bindings: Option<&serde_json::Map<String, Value>>,
-  default_server: &str,
-) -> ChannelProtocol {
+fn detect_channel_protocol(bindings: Option<&serde_json::Map<String, Value>>, default_server: &str) -> ChannelProtocol {
   if let Some(bindings) = bindings {
     if bindings.contains_key("http") {
       return ChannelProtocol::Http;
@@ -522,9 +514,7 @@ fn operation_tags(operation: &Value, channel_name: &str) -> Vec<String> {
 
 fn normalize_http_parameters(operation: &Value, channel: &Value) -> Vec<NormalizedParameter> {
   let mut parameters = Vec::new();
-  let http_binding = channel
-    .get("bindings")
-    .and_then(|bindings| bindings.get("http"));
+  let http_binding = channel.get("bindings").and_then(|bindings| bindings.get("http"));
 
   if let Some(Value::Object(fields)) = http_binding
     .and_then(|binding| binding.get("query"))
@@ -693,10 +683,7 @@ fn default_server_url(value: &Value) -> String {
   let url = server.get("url").and_then(Value::as_str).unwrap_or("/");
   let protocol = server.get("protocol").and_then(Value::as_str).unwrap_or("");
 
-  if url.starts_with("http://")
-    || url.starts_with("https://")
-    || url.starts_with("ws://")
-    || url.starts_with("wss://")
+  if url.starts_with("http://") || url.starts_with("https://") || url.starts_with("ws://") || url.starts_with("wss://")
   {
     return url.to_owned();
   }
@@ -852,12 +839,26 @@ mod tests {
     let result = normalize_asyncapi(spec).expect("normalize");
     assert_eq!(result.project.title, "HTTP API");
     assert_eq!(result.project.operations.len(), 2);
-    assert!(result.project.operations.iter().any(|op| op.primary_key == "GET /users"));
-    assert!(result.project.operations.iter().any(|op| op.primary_key == "createUser"));
-    assert!(result
-      .warnings
-      .iter()
-      .any(|warning| warning.code == "UNSUPPORTED_BINDING"));
+    assert!(
+      result
+        .project
+        .operations
+        .iter()
+        .any(|op| op.primary_key == "GET /users")
+    );
+    assert!(
+      result
+        .project
+        .operations
+        .iter()
+        .any(|op| op.primary_key == "createUser")
+    );
+    assert!(
+      result
+        .warnings
+        .iter()
+        .any(|warning| warning.code == "UNSUPPORTED_BINDING")
+    );
   }
 
   #[test]

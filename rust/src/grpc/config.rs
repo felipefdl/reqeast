@@ -51,15 +51,23 @@ pub enum GrpcRpcKind {
 #[derive(Debug, Clone, uniffi::Enum)]
 pub enum GrpcEvent {
   Connected,
-  MetadataReceived { headers: Vec<KeyValuePair> },
-  MessageReceived { json: String, hex: String, truncated: bool },
+  MetadataReceived {
+    headers: Vec<KeyValuePair>,
+  },
+  MessageReceived {
+    json: String,
+    hex: String,
+    truncated: bool,
+  },
   StreamHalfClosed,
   Completed {
     status_code: i32,
     status_message: String,
     trailers: Vec<KeyValuePair>,
   },
-  Error { error: String },
+  Error {
+    error: String,
+  },
 }
 
 #[derive(Debug, Clone, uniffi::Record)]

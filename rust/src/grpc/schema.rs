@@ -5,7 +5,7 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::sync::OnceLock;
 
-use include_dir::{include_dir, Dir, DirEntry};
+use include_dir::{Dir, DirEntry, include_dir};
 use prost::Message;
 use prost_reflect::{DescriptorPool, MethodDescriptor};
 use prost_types::FileDescriptorSet;
@@ -18,17 +18,18 @@ use crate::grpc::limits::{MAX_DESCRIPTOR_DEPTH, MAX_PROTO_BUNDLE_BYTES, MAX_PROT
 static EMBEDDED_WELL_KNOWN: Dir<'_> = include_dir!("$CARGO_MANIFEST_DIR/assets/protobuf");
 /// Compiles user `.proto` entry files into a `FileDescriptorSet` with well-known imports.
 #[uniffi::export]
-pub fn compile_proto_bundle(
-  root_path: String,
-  entry_files: Vec<String>,
-) -> Result<CompiledProtoBundle, ReqeastError> {
+pub fn compile_proto_bundle(root_path: String, entry_files: Vec<String>) -> Result<CompiledProtoBundle, ReqeastError> {
   if entry_files.is_empty() {
-    return Err(ReqeastError::InvalidConfig("At least one entry .proto file is required".into()));
+    return Err(ReqeastError::InvalidConfig(
+      "At least one entry .proto file is required".into(),
+    ));
   }
 
   let root = PathBuf::from(&root_path);
   if !root.is_dir() {
-    return Err(ReqeastError::InvalidConfig(format!("Proto root path not found: {root_path}")));
+    return Err(ReqeastError::InvalidConfig(format!(
+      "Proto root path not found: {root_path}"
+    )));
   }
 
   let user_files = collect_user_proto_files(&root, &entry_files)?;
@@ -36,8 +37,7 @@ pub fn compile_proto_bundle(
     .map_err(|_| ReqeastError::InvalidConfig("Too many .proto files in bundle".into()))?;
 
   let well_known = well_known_include_path()?;
-  let descriptor_set =
-    protox::compile(&entry_files, [&root, well_known]).map_err(map_protox_error)?;
+  let descriptor_set = protox::compile(&entry_files, [&root, well_known]).map_err(map_protox_error)?;
 
   let descriptor_bytes = descriptor_set.encode_to_vec();
   let content_fingerprint = fingerprint_descriptor_set(&descriptor_set);
@@ -115,7 +115,9 @@ fn well_known_include_path() -> Result<&'static Path, ReqeastError> {
   });
   match path {
     Ok(value) => Ok(value.as_path()),
-    Err(err) => Err(ReqeastError::InternalError(format!("Failed to extract well-known protos: {err}"))),
+    Err(err) => Err(ReqeastError::InternalError(format!(
+      "Failed to extract well-known protos: {err}"
+    ))),
   }
 }
 
@@ -147,7 +149,9 @@ fn collect_user_proto_files(root: &Path, entry_files: &[String]) -> Result<HashS
   for entry in entry_files {
     let path = root.join(entry);
     if !path.is_file() {
-      return Err(ReqeastError::InvalidConfig(format!("Entry .proto file not found: {entry}")));
+      return Err(ReqeastError::InvalidConfig(format!(
+        "Entry .proto file not found: {entry}"
+      )));
     }
     enqueue_user_proto(root, &path, 0, &mut seen, &mut queue, &mut total_bytes)?;
   }
@@ -240,7 +244,10 @@ fn is_well_known_import(import: &str) -> bool {
 fn resolve_user_import(root: &Path, from: &Path, import: &str) -> Result<PathBuf, ReqeastError> {
   let candidates = [
     root.join(import),
-    from.parent().map(|parent| parent.join(import)).unwrap_or_else(|| root.join(import)),
+    from
+      .parent()
+      .map(|parent| parent.join(import))
+      .unwrap_or_else(|| root.join(import)),
   ];
 
   for candidate in candidates {
@@ -293,8 +300,8 @@ mod tests {
   #[test]
   fn compile_single_proto_with_well_known_import() {
     let root = env!("CARGO_MANIFEST_DIR");
-    let bundle = compile_proto_bundle(format!("{root}/tests/fixtures/grpc"), vec!["hello.proto".into()])
-      .expect("compile");
+    let bundle =
+      compile_proto_bundle(format!("{root}/tests/fixtures/grpc"), vec!["hello.proto".into()]).expect("compile");
     assert!(!bundle.descriptor_bytes.is_empty());
     assert!(!bundle.content_fingerprint.is_empty());
     let services = list_grpc_services(bundle.descriptor_bytes).expect("list");
@@ -307,8 +314,8 @@ mod tests {
   #[test]
   fn resolve_method_finds_say_hello() {
     let root = env!("CARGO_MANIFEST_DIR");
-    let bundle = compile_proto_bundle(format!("{root}/tests/fixtures/grpc"), vec!["hello.proto".into()])
-      .expect("compile");
+    let bundle =
+      compile_proto_bundle(format!("{root}/tests/fixtures/grpc"), vec!["hello.proto".into()]).expect("compile");
     let pool = decode_descriptor_pool(&bundle.descriptor_bytes).expect("pool");
     let (method, kind) = resolve_method(&pool, "helloworld.Greeter", "SayHello").expect("resolve");
     assert_eq!(method.name(), "SayHello");

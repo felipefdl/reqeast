@@ -32,10 +32,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      # Pin via @stable; components match `just lint-rust` / `just fmt-rust`.
-      # Project MSRV is 1.88 (edition 2024); stable on ubuntu-latest is newer.
+      # Pin to crate MSRV (Cargo.toml rust-version = "1.88"). Avoids newer clippy
+      # lints (e.g. collapsible_if on 1.97) failing CI while local toolchains drift.
       - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
+        uses: dtolnay/rust-toolchain@1.88.0
         with:
           components: rustfmt, clippy
 
@@ -47,11 +47,12 @@ jobs:
       - name: cargo fmt
         run: cargo fmt --all -- --check
 
+      # Match `just lint-rust` / `just test-rust` (default features).
       - name: cargo clippy
-        run: cargo clippy --all-targets --all-features -- -D warnings
+        run: cargo clippy -- -D warnings
 
       - name: cargo test
-        run: cargo test --all-features
+        run: cargo test
 
   mcp:
     name: reqeast-mcp
@@ -71,8 +72,10 @@ jobs:
           cache: npm
           cache-dependency-path: reqeast-mcp/package-lock.json
 
+      # package.json declares "os": ["darwin"] for npm consumers; CI only typechecks
+      # the TypeScript sources, so force install on Linux runners.
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --force
 
       - name: Build
         run: npm run build

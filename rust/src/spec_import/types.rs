@@ -7,14 +7,14 @@ use serde_json::Value;
 use std::path::PathBuf;
 
 use crate::spec_import::asyncapi::{is_asyncapi_document, normalize_asyncapi};
+use crate::spec_import::bruno::{is_bruno_opencollection, normalize_bruno};
 use crate::spec_import::bundle::BundleContext;
 use crate::spec_import::fingerprint::hash_bytes;
 use crate::spec_import::graphql::{is_graphql_sdl, normalize_graphql};
-use crate::spec_import::ingress::parse_ingress;
-use crate::spec_import::normalize::{normalize_openapi, normalize_openapi_with_bundle};
-use crate::spec_import::bruno::{is_bruno_opencollection, normalize_bruno};
 use crate::spec_import::har::{is_har_log, normalize_har};
+use crate::spec_import::ingress::parse_ingress;
 use crate::spec_import::insomnia::{is_insomnia_export, normalize_insomnia};
+use crate::spec_import::normalize::{normalize_openapi, normalize_openapi_with_bundle};
 use crate::spec_import::postman::{is_postman_collection, normalize_postman};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, uniffi::Enum)]
@@ -274,8 +274,7 @@ pub fn parse_spec(
     },
     SpecFormat::Unknown => {
       return Err(SpecImportError::UnsupportedFormat(
-        "Unrecognized spec format; expected OpenAPI, Postman, Insomnia, Bruno, GraphQL SDL, HAR, or AsyncAPI"
-          .into(),
+        "Unrecognized spec format; expected OpenAPI, Postman, Insomnia, Bruno, GraphQL SDL, HAR, or AsyncAPI".into(),
       ));
     }
   };
@@ -319,10 +318,7 @@ fn detect_spec_format(value: &Value, source_hint: SpecSourceHint) -> SpecFormat 
     return SpecFormat::AsyncApi;
   }
 
-  if source_hint == SpecSourceHint::OpenApi
-    || value.get("openapi").is_some()
-    || value.get("swagger").is_some()
-  {
+  if source_hint == SpecSourceHint::OpenApi || value.get("openapi").is_some() || value.get("swagger").is_some() {
     return SpecFormat::OpenApi;
   }
 
@@ -407,10 +403,12 @@ mod tests {
     assert_eq!(result.project.title, "Insomnia Demo");
     assert_eq!(result.project.operations.len(), 1);
     assert_eq!(result.project.operations[0].primary_key, "GET /ping");
-    assert!(result
-      .warnings
-      .iter()
-      .any(|warning| warning.code == "MIGRATION_FROM_INSOMNIA"));
+    assert!(
+      result
+        .warnings
+        .iter()
+        .any(|warning| warning.code == "MIGRATION_FROM_INSOMNIA")
+    );
   }
 
   #[test]
@@ -436,10 +434,12 @@ mod tests {
     assert_eq!(result.project.title, "Bruno Demo");
     assert_eq!(result.project.operations.len(), 1);
     assert_eq!(result.project.operations[0].primary_key, "GET /ping");
-    assert!(result
-      .warnings
-      .iter()
-      .any(|warning| warning.code == "MIGRATION_FROM_BRUNO"));
+    assert!(
+      result
+        .warnings
+        .iter()
+        .any(|warning| warning.code == "MIGRATION_FROM_BRUNO")
+    );
   }
 
   #[test]
@@ -450,20 +450,17 @@ mod tests {
       }
     "#;
 
-    let result = parse_spec(
-      sdl.to_vec(),
-      SpecSourceHint::Graphql,
-      None,
-      SpecParseOptions::default(),
-    )
-    .expect("graphql parse");
+    let result =
+      parse_spec(sdl.to_vec(), SpecSourceHint::Graphql, None, SpecParseOptions::default()).expect("graphql parse");
     assert_eq!(result.project.operations.len(), 1);
     assert_eq!(result.project.operations[0].primary_key, "query ping");
     assert_eq!(result.project.operations[0].method, "POST");
-    assert!(result
-      .warnings
-      .iter()
-      .any(|warning| warning.code == "GRAPHQL_SDL_IMPORT"));
+    assert!(
+      result
+        .warnings
+        .iter()
+        .any(|warning| warning.code == "GRAPHQL_SDL_IMPORT")
+    );
   }
 
   #[test]
@@ -487,20 +484,17 @@ mod tests {
       }
     }"#;
 
-    let result = parse_spec(
-      capture.to_vec(),
-      SpecSourceHint::Har,
-      None,
-      SpecParseOptions::default(),
-    )
-    .expect("har parse");
+    let result =
+      parse_spec(capture.to_vec(), SpecSourceHint::Har, None, SpecParseOptions::default()).expect("har parse");
     assert_eq!(result.project.title, "Capture");
     assert_eq!(result.project.operations.len(), 1);
     assert_eq!(result.project.operations[0].primary_key, "GET /ping");
-    assert!(result
-      .warnings
-      .iter()
-      .any(|warning| warning.code == "HAR_CREDENTIALS_STRIPPED"));
+    assert!(
+      result
+        .warnings
+        .iter()
+        .any(|warning| warning.code == "HAR_CREDENTIALS_STRIPPED")
+    );
   }
 
   #[test]

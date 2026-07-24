@@ -21,20 +21,15 @@ use crate::grpc::limits::MAX_MESSAGE_BYTES;
 use crate::grpc::transport::build_endpoint;
 
 const REFLECTION_V1_PATH: &str = "/grpc.reflection.v1.ServerReflection/ServerReflectionInfo";
-const REFLECTION_V1ALPHA_PATH: &str =
-  "/grpc.reflection.v1alpha.ServerReflection/ServerReflectionInfo";
+const REFLECTION_V1ALPHA_PATH: &str = "/grpc.reflection.v1alpha.ServerReflection/ServerReflectionInfo";
 
 /// Fetch merged `FileDescriptorSet` bytes from a reflection-enabled gRPC server.
 #[uniffi::export]
-pub fn fetch_reflection_descriptors(
-  config: GrpcReflectionConfig,
-) -> Result<Vec<u8>, ReqeastError> {
+pub fn fetch_reflection_descriptors(config: GrpcReflectionConfig) -> Result<Vec<u8>, ReqeastError> {
   grpc_runtime()?.block_on(fetch_reflection_descriptors_async(config))
 }
 
-async fn fetch_reflection_descriptors_async(
-  config: GrpcReflectionConfig,
-) -> Result<Vec<u8>, ReqeastError> {
+async fn fetch_reflection_descriptors_async(config: GrpcReflectionConfig) -> Result<Vec<u8>, ReqeastError> {
   let endpoint = build_endpoint(
     &config.authority,
     config.use_tls,
@@ -45,11 +40,9 @@ async fn fetch_reflection_descriptors_async(
 
   match fetch_reflection_v1(channel.clone(), endpoint.uri().clone()).await {
     Ok(bytes) => Ok(bytes),
-    Err(status) if should_fallback_to_v1alpha(&status) => {
-      fetch_reflection_v1alpha(channel, endpoint.uri().clone())
-        .await
-        .map_err(map_grpc_status)
-    }
+    Err(status) if should_fallback_to_v1alpha(&status) => fetch_reflection_v1alpha(channel, endpoint.uri().clone())
+      .await
+      .map_err(map_grpc_status),
     Err(status) => Err(map_grpc_status(status)),
   }
 }
@@ -99,14 +92,8 @@ where
   Req: prost::Message + Send + Sync + 'static,
   Resp: prost::Message + Default + Send + Sync + 'static,
 {
-  let list_response = send_reflection_request(
-    &channel,
-    &origin,
-    path,
-    list_services_request(),
-    take_message_response,
-  )
-  .await?;
+  let list_response =
+    send_reflection_request(&channel, &origin, path, list_services_request(), take_message_response).await?;
 
   let services = match list_response {
     ReflectionMessageResponse::ListServices(services) => services,
@@ -165,8 +152,7 @@ where
     .parse::<PathAndQuery>()
     .map_err(|err| Status::internal(format!("invalid reflection path: {err}")))?;
   let codec = ProstCodec::<Req, Resp>::default();
-  let mut client = Grpc::with_origin(channel.clone(), origin.clone())
-    .max_decoding_message_size(MAX_MESSAGE_BYTES);
+  let mut client = Grpc::with_origin(channel.clone(), origin.clone()).max_decoding_message_size(MAX_MESSAGE_BYTES);
   client.ready().await.map_err(|err| Status::from_error(err.into()))?;
 
   let (request_tx, request_rx) = tokio::sync::mpsc::channel(1);
@@ -197,15 +183,13 @@ enum ReflectionMessageResponse {
 fn reflection_v1_list_services_request() -> reflection_v1::ServerReflectionRequest {
   reflection_v1::ServerReflectionRequest {
     host: String::new(),
-    message_request: Some(
-      reflection_v1::server_reflection_request::MessageRequest::ListServices(String::new()),
-    ),
+    message_request: Some(reflection_v1::server_reflection_request::MessageRequest::ListServices(
+      String::new(),
+    )),
   }
 }
 
-fn reflection_v1_file_containing_symbol_request(
-  symbol: &str,
-) -> reflection_v1::ServerReflectionRequest {
+fn reflection_v1_file_containing_symbol_request(symbol: &str) -> reflection_v1::ServerReflectionRequest {
   reflection_v1::ServerReflectionRequest {
     host: String::new(),
     message_request: Some(
@@ -217,45 +201,33 @@ fn reflection_v1_file_containing_symbol_request(
 fn reflection_v1_take_message_response(
   response: reflection_v1::ServerReflectionResponse,
 ) -> Option<ReflectionMessageResponse> {
-  parse_reflection_response(
-    response.message_response.map(|message| match message {
-      reflection_v1::server_reflection_response::MessageResponse::ListServicesResponse(list) => {
-        ReflectionParse::ListServices(
-          list.service.into_iter().map(|service| service.name).collect(),
-        )
-      }
-      reflection_v1::server_reflection_response::MessageResponse::FileDescriptorResponse(files) => {
-        ReflectionParse::FileDescriptors(files.file_descriptor_proto)
-      }
-      reflection_v1::server_reflection_response::MessageResponse::ErrorResponse(error) => {
-        ReflectionParse::Error {
-          code: Code::from_i32(error.error_code),
-          message: error.error_message,
-        }
-      }
-      _ => ReflectionParse::Unsupported,
-    }),
-  )
+  parse_reflection_response(response.message_response.map(|message| match message {
+    reflection_v1::server_reflection_response::MessageResponse::ListServicesResponse(list) => {
+      ReflectionParse::ListServices(list.service.into_iter().map(|service| service.name).collect())
+    }
+    reflection_v1::server_reflection_response::MessageResponse::FileDescriptorResponse(files) => {
+      ReflectionParse::FileDescriptors(files.file_descriptor_proto)
+    }
+    reflection_v1::server_reflection_response::MessageResponse::ErrorResponse(error) => ReflectionParse::Error {
+      code: Code::from_i32(error.error_code),
+      message: error.error_message,
+    },
+    _ => ReflectionParse::Unsupported,
+  }))
 }
 
 fn reflection_v1alpha_list_services_request() -> reflection_v1alpha::ServerReflectionRequest {
   reflection_v1alpha::ServerReflectionRequest {
     host: String::new(),
-    message_request: Some(
-      reflection_v1alpha::server_reflection_request::MessageRequest::ListServices(String::new()),
-    ),
+    message_request: Some(reflection_v1alpha::server_reflection_request::MessageRequest::ListServices(String::new())),
   }
 }
 
-fn reflection_v1alpha_file_containing_symbol_request(
-  symbol: &str,
-) -> reflection_v1alpha::ServerReflectionRequest {
+fn reflection_v1alpha_file_containing_symbol_request(symbol: &str) -> reflection_v1alpha::ServerReflectionRequest {
   reflection_v1alpha::ServerReflectionRequest {
     host: String::new(),
     message_request: Some(
-      reflection_v1alpha::server_reflection_request::MessageRequest::FileContainingSymbol(
-        symbol.into(),
-      ),
+      reflection_v1alpha::server_reflection_request::MessageRequest::FileContainingSymbol(symbol.into()),
     ),
   }
 }
@@ -263,25 +235,19 @@ fn reflection_v1alpha_file_containing_symbol_request(
 fn reflection_v1alpha_take_message_response(
   response: reflection_v1alpha::ServerReflectionResponse,
 ) -> Option<ReflectionMessageResponse> {
-  parse_reflection_response(
-    response.message_response.map(|message| match message {
-      reflection_v1alpha::server_reflection_response::MessageResponse::ListServicesResponse(list) => {
-        ReflectionParse::ListServices(
-          list.service.into_iter().map(|service| service.name).collect(),
-        )
-      }
-      reflection_v1alpha::server_reflection_response::MessageResponse::FileDescriptorResponse(files) => {
-        ReflectionParse::FileDescriptors(files.file_descriptor_proto)
-      }
-      reflection_v1alpha::server_reflection_response::MessageResponse::ErrorResponse(error) => {
-        ReflectionParse::Error {
-          code: Code::from_i32(error.error_code),
-          message: error.error_message,
-        }
-      }
-      _ => ReflectionParse::Unsupported,
-    }),
-  )
+  parse_reflection_response(response.message_response.map(|message| match message {
+    reflection_v1alpha::server_reflection_response::MessageResponse::ListServicesResponse(list) => {
+      ReflectionParse::ListServices(list.service.into_iter().map(|service| service.name).collect())
+    }
+    reflection_v1alpha::server_reflection_response::MessageResponse::FileDescriptorResponse(files) => {
+      ReflectionParse::FileDescriptors(files.file_descriptor_proto)
+    }
+    reflection_v1alpha::server_reflection_response::MessageResponse::ErrorResponse(error) => ReflectionParse::Error {
+      code: Code::from_i32(error.error_code),
+      message: error.error_message,
+    },
+    _ => ReflectionParse::Unsupported,
+  }))
 }
 
 enum ReflectionParse {
@@ -303,9 +269,8 @@ fn parse_reflection_response(parsed: Option<ReflectionParse>) -> Option<Reflecti
 fn merge_file_descriptor_bytes(file_bytes: &[Vec<u8>]) -> Result<Vec<u8>, ReqeastError> {
   let mut by_name: HashMap<String, FileDescriptorProto> = HashMap::new();
   for bytes in file_bytes {
-    let file = FileDescriptorProto::decode(bytes.as_slice()).map_err(|err| {
-      ReqeastError::InvalidConfig(format!("Invalid FileDescriptorProto from reflection: {err}"))
-    })?;
+    let file = FileDescriptorProto::decode(bytes.as_slice())
+      .map_err(|err| ReqeastError::InvalidConfig(format!("Invalid FileDescriptorProto from reflection: {err}")))?;
     if let Some(name) = file.name.clone() {
       by_name.insert(name, file);
     }
@@ -321,9 +286,8 @@ fn merge_file_descriptor_bytes(file_bytes: &[Vec<u8>]) -> Result<Vec<u8>, Reqeas
     file: by_name.into_values().collect(),
   };
   set.file.sort_by(|left, right| left.name.cmp(&right.name));
-  DescriptorPool::from_file_descriptor_set(set.clone()).map_err(|err| {
-    ReqeastError::InvalidConfig(format!("Invalid reflection descriptor pool: {err}"))
-  })?;
+  DescriptorPool::from_file_descriptor_set(set.clone())
+    .map_err(|err| ReqeastError::InvalidConfig(format!("Invalid reflection descriptor pool: {err}")))?;
   Ok(set.encode_to_vec())
 }
 
@@ -345,7 +309,8 @@ mod tests {
     let bundle = compile_proto_bundle(format!("{root}/tests/fixtures/grpc"), vec!["hello.proto".into()])
       .expect("compile hello fixture");
     let set = FileDescriptorSet::decode(bundle.descriptor_bytes.as_slice()).expect("decode set");
-    set.file
+    set
+      .file
       .into_iter()
       .map(|file| {
         let mut bytes = Vec::new();
@@ -388,8 +353,12 @@ mod tests {
 
   #[test]
   fn should_fallback_on_unimplemented_and_not_found() {
-    assert!(should_fallback_to_v1alpha(&Status::unimplemented("reflection v1 missing")));
-    assert!(should_fallback_to_v1alpha(&Status::not_found("reflection service not found")));
+    assert!(should_fallback_to_v1alpha(&Status::unimplemented(
+      "reflection v1 missing"
+    )));
+    assert!(should_fallback_to_v1alpha(&Status::not_found(
+      "reflection service not found"
+    )));
     assert!(!should_fallback_to_v1alpha(&Status::invalid_argument("bad request")));
   }
 

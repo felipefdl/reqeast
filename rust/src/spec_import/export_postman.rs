@@ -5,26 +5,21 @@ use std::collections::{HashMap, HashSet};
 use serde_json::{Map, Value, json};
 
 use crate::spec_import::export_types::{
-  ExportAuthType, ExportBodyType, ExportEnvironment, ExportFolder, ExportFormDataEntry,
-  ExportHttpRequestData, ExportKeyValue, ExportOperation, ExportPostmanOptions, ExportProjectInput,
-  SpecExportError,
+  ExportAuthType, ExportBodyType, ExportEnvironment, ExportFolder, ExportFormDataEntry, ExportHttpRequestData,
+  ExportKeyValue, ExportOperation, ExportPostmanOptions, ExportProjectInput, SpecExportError,
 };
 use crate::spec_import::types::{
-  NormalizedAuth, NormalizedBody, NormalizedFormDataEntry, NormalizedKeyValue, NormalizedOperation,
-  NormalizedProject, ParameterLocation,
+  NormalizedAuth, NormalizedBody, NormalizedFormDataEntry, NormalizedKeyValue, NormalizedOperation, NormalizedProject,
+  ParameterLocation,
 };
 
-const POSTMAN_SCHEMA: &str =
-  "https://schema.getpostman.com/json/collection/v2.1.0/collection.json";
+const POSTMAN_SCHEMA: &str = "https://schema.getpostman.com/json/collection/v2.1.0/collection.json";
 
 const SENSITIVE_HEADERS: &[&str] = &["authorization", "cookie", "x-api-key"];
 
 /// Serializes a project slice to Postman Collection v2.1 JSON bytes.
 #[uniffi::export]
-pub fn export_postman(
-  input: ExportProjectInput,
-  options: ExportPostmanOptions,
-) -> Result<Vec<u8>, SpecExportError> {
+pub fn export_postman(input: ExportProjectInput, options: ExportPostmanOptions) -> Result<Vec<u8>, SpecExportError> {
   let collection = build_collection(&input, &options)?;
   serde_json::to_vec_pretty(&collection)
     .map_err(|err| SpecExportError::InvalidInput(format!("Failed to serialize Postman collection: {err}")))
@@ -92,10 +87,7 @@ fn normalized_operation_to_export(operation: &NormalizedOperation, sort_order: u
 }
 
 fn strip_deprecated_prefix(name: &str) -> String {
-  name
-    .strip_prefix("[Deprecated] ")
-    .unwrap_or(name)
-    .to_owned()
+  name.strip_prefix("[Deprecated] ").unwrap_or(name).to_owned()
 }
 
 fn normalized_http_from_operation(operation: &NormalizedOperation) -> ExportHttpRequestData {
@@ -235,10 +227,7 @@ fn apply_normalized_auth(http: &mut ExportHttpRequestData, auth: &NormalizedAuth
 }
 
 fn token_without_prefix(value: &str, prefix: &str) -> String {
-  value
-    .strip_prefix(prefix)
-    .unwrap_or(value)
-    .to_owned()
+  value.strip_prefix(prefix).unwrap_or(value).to_owned()
 }
 
 fn parse_basic_placeholder(value: &str, http: &mut ExportHttpRequestData) {
@@ -252,10 +241,7 @@ fn parse_basic_placeholder(value: &str, http: &mut ExportHttpRequestData) {
   }
 }
 
-fn build_collection(
-  input: &ExportProjectInput,
-  options: &ExportPostmanOptions,
-) -> Result<Value, SpecExportError> {
+fn build_collection(input: &ExportProjectInput, options: &ExportPostmanOptions) -> Result<Value, SpecExportError> {
   let operations: Vec<_> = input
     .operations
     .iter()
@@ -283,11 +269,7 @@ fn build_collection(
   collection.insert("info".into(), Value::Object(info));
   collection.insert(
     "item".into(),
-    Value::Array(build_items(
-      &input.folders,
-      &operations,
-      collection_auth.is_some(),
-    )?),
+    Value::Array(build_items(&input.folders, &operations, collection_auth.is_some())?),
   );
 
   if options.include_environments {
@@ -370,12 +352,7 @@ fn build_items(
     ops.sort_by_key(|operation| operation.sort_order);
   }
 
-  build_mixed_items(
-    None,
-    &children_by_parent,
-    &operations_by_folder,
-    has_collection_auth,
-  )
+  build_mixed_items(None, &children_by_parent, &operations_by_folder, has_collection_auth)
 }
 
 fn build_mixed_items(
@@ -415,10 +392,7 @@ fn build_mixed_items(
   Ok(mixed.into_iter().map(|(_, item)| item).collect())
 }
 
-fn build_request_item(
-  operation: &ExportOperation,
-  has_collection_auth: bool,
-) -> Result<Value, SpecExportError> {
+fn build_request_item(operation: &ExportOperation, has_collection_auth: bool) -> Result<Value, SpecExportError> {
   let mut request = Map::new();
   request.insert(
     "method".into(),
@@ -677,10 +651,7 @@ fn path_segments_and_variables(path: &str) -> (Vec<Value>, Vec<Value>) {
     if segment.is_empty() {
       continue;
     }
-    if let Some(name) = segment
-      .strip_prefix("{{")
-      .and_then(|value| value.strip_suffix("}}"))
-    {
+    if let Some(name) = segment.strip_prefix("{{").and_then(|value| value.strip_suffix("}}")) {
       segments.push(Value::String(format!(":{name}")));
       if seen_variables.insert(name.to_owned()) {
         variables.push(json!({
@@ -837,11 +808,13 @@ mod tests {
 
     let bytes = export_postman(input, ExportPostmanOptions::default()).expect("export");
     let value: Value = serde_json::from_slice(&bytes).expect("json");
-    assert!(value
-      .get("info")
-      .and_then(|info| info.get("schema"))
-      .and_then(Value::as_str)
-      .is_some_and(|schema| schema.contains("postman")));
+    assert!(
+      value
+        .get("info")
+        .and_then(|info| info.get("schema"))
+        .and_then(Value::as_str)
+        .is_some_and(|schema| schema.contains("postman"))
+    );
   }
 
   #[test]
@@ -897,13 +870,8 @@ mod tests {
     let imported = parse_fixture("postman-nested").expect("import");
     let export_input = export_input_from_normalized(&imported.project);
     let exported = export_postman(export_input, ExportPostmanOptions::default()).expect("export");
-    let roundtrip = parse_spec(
-      exported,
-      SpecSourceHint::Postman,
-      None,
-      SpecParseOptions::default(),
-    )
-    .expect("re-import");
+    let roundtrip =
+      parse_spec(exported, SpecSourceHint::Postman, None, SpecParseOptions::default()).expect("re-import");
 
     assert_eq!(
       project_from_result(&imported),
@@ -920,13 +888,8 @@ mod tests {
     let value: Value = serde_json::from_slice(&exported).expect("json");
     assert!(value.get("auth").is_some());
 
-    let roundtrip = parse_spec(
-      exported,
-      SpecSourceHint::Postman,
-      None,
-      SpecParseOptions::default(),
-    )
-    .expect("re-import");
+    let roundtrip =
+      parse_spec(exported, SpecSourceHint::Postman, None, SpecParseOptions::default()).expect("re-import");
 
     assert_eq!(
       project_from_result(&imported),

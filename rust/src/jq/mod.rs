@@ -2,8 +2,8 @@ use crate::error::ReqeastError;
 use jaq_core::data;
 use jaq_core::load::{Arena, Error as LoadError, File, Loader};
 use jaq_core::{Compiler, Ctx, Vars, defs, funs, unwrap_valr};
-use jaq_json::read;
 use jaq_json::Val;
+use jaq_json::read;
 
 mod limits;
 #[cfg(test)]

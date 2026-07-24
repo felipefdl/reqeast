@@ -1,8 +1,8 @@
 //! GraphQL SDL normalization into the spec import normalized IR.
 
 use graphql_parser::schema::{
-  parse_schema, Definition, Document, Field, InputValue, ObjectType, ObjectTypeExtension, Type,
-  TypeDefinition, TypeExtension, Value,
+  Definition, Document, Field, InputValue, ObjectType, ObjectTypeExtension, Type, TypeDefinition, TypeExtension, Value,
+  parse_schema,
 };
 
 use crate::spec_import::fingerprint::hash_bytes;
@@ -10,8 +10,8 @@ use crate::spec_import::limits::MAX_SPEC_BYTES;
 use crate::spec_import::normalize::NormalizeOutput;
 use crate::spec_import::types::{
   NormalizedBody, NormalizedEnvironment, NormalizedFolder, NormalizedKeyValue, NormalizedOperation,
-  NormalizedParameter, NormalizedProject, OperationProtocol, ParameterLocation, SpecImportError,
-  SpecWarning, ValueSource,
+  NormalizedParameter, NormalizedProject, OperationProtocol, ParameterLocation, SpecImportError, SpecWarning,
+  ValueSource,
 };
 
 const DEFAULT_QUERY_TYPE: &str = "Query";
@@ -192,12 +192,20 @@ fn collect_object_fields(document: &Document<'static, String>, type_name: &str) 
   let mut fields = Vec::new();
   for definition in &document.definitions {
     match definition {
-      Definition::TypeDefinition(TypeDefinition::Object(ObjectType { name, fields: object_fields, .. }))
+      Definition::TypeDefinition(TypeDefinition::Object(ObjectType {
+        name,
+        fields: object_fields,
+        ..
+      }))
         if name == type_name =>
       {
         fields.extend(object_fields.iter().cloned());
       }
-      Definition::TypeExtension(TypeExtension::Object(ObjectTypeExtension { name, fields: object_fields, .. }))
+      Definition::TypeExtension(TypeExtension::Object(ObjectTypeExtension {
+        name,
+        fields: object_fields,
+        ..
+      }))
         if name == type_name =>
       {
         fields.extend(object_fields.iter().cloned());
@@ -234,13 +242,9 @@ fn normalize_field_operation(
   let query_document = build_operation_document(operation_type, &field_name, field)?;
   let variables_json = build_variables_json(&parameters);
   let body_content = if variables_json == "{}" {
-    format!(
-      "{{\n  \"query\": {query_document}\n}}"
-    )
+    format!("{{\n  \"query\": {query_document}\n}}")
   } else {
-    format!(
-      "{{\n  \"query\": {query_document},\n  \"variables\": {variables_json}\n}}"
-    )
+    format!("{{\n  \"query\": {query_document},\n  \"variables\": {variables_json}\n}}")
   };
 
   let operation = NormalizedOperation {
@@ -255,9 +259,7 @@ fn normalize_field_operation(
     binding: None,
     folder_id: Some(folder_id.to_owned()),
     parameters,
-    body: NormalizedBody::Json {
-      content: body_content,
-    },
+    body: NormalizedBody::Json { content: body_content },
     body_candidates: vec![],
     auth: None,
     description: field.description.clone(),
@@ -320,11 +322,7 @@ fn graphql_value_to_string(value: &Value<'static, String>) -> String {
     Value::Enum(name) => name.clone(),
     Value::Variable(name) => format!("{{{{{name}}}}}"),
     Value::List(items) => {
-      let entries = items
-        .iter()
-        .map(graphql_value_to_string)
-        .collect::<Vec<_>>()
-        .join(", ");
+      let entries = items.iter().map(graphql_value_to_string).collect::<Vec<_>>().join(", ");
       format!("[{entries}]")
     }
     Value::Object(fields) => {
@@ -368,9 +366,8 @@ fn build_operation_document(
 
   let selection_set = selection_set_for_type(&field.field_type);
   let operation_name = to_title_case(field_name);
-  let document = format!(
-    "{operation_type} {operation_name}{variable_list} {{ {field_name}{argument_section} {selection_set} }}"
-  );
+  let document =
+    format!("{operation_type} {operation_name}{variable_list} {{ {field_name}{argument_section} {selection_set} }}");
   Ok(serde_json::to_string(&document).expect("graphql query document should serialize"))
 }
 
@@ -399,10 +396,7 @@ fn is_scalar_type(value_type: &Type<'static, String>) -> bool {
     Type::NonNullType(inner) => is_scalar_type(inner),
     Type::ListType(_) => false,
     Type::NamedType(name) => {
-      matches!(
-        name.as_str(),
-        "String" | "ID" | "Int" | "Float" | "Boolean"
-      )
+      matches!(name.as_str(), "String" | "ID" | "Int" | "Float" | "Boolean")
     }
   }
 }
@@ -466,21 +460,27 @@ mod tests {
   fn normalize_graphql_maps_query_and_mutation_fields() {
     let output = normalize_graphql(SIMPLE_SDL.as_bytes()).expect("graphql normalize");
     assert_eq!(output.project.operations.len(), 3);
-    assert!(output
-      .project
-      .operations
-      .iter()
-      .any(|op| op.primary_key == "query user"));
-    assert!(output
-      .project
-      .operations
-      .iter()
-      .any(|op| op.primary_key == "mutation createUser"));
+    assert!(
+      output
+        .project
+        .operations
+        .iter()
+        .any(|op| op.primary_key == "query user")
+    );
+    assert!(
+      output
+        .project
+        .operations
+        .iter()
+        .any(|op| op.primary_key == "mutation createUser")
+    );
     assert_eq!(output.project.folders.len(), 2);
-    assert!(output
-      .warnings
-      .iter()
-      .any(|warning| warning.code == "GRAPHQL_SDL_IMPORT"));
+    assert!(
+      output
+        .warnings
+        .iter()
+        .any(|warning| warning.code == "GRAPHQL_SDL_IMPORT")
+    );
   }
 
   #[test]

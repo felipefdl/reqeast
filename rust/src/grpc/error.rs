@@ -1,6 +1,6 @@
 use tonic::Code;
 
-use crate::error::{map_connect_error, ReqeastError};
+use crate::error::{ReqeastError, map_connect_error};
 
 /// Map a tonic gRPC status to `ReqeastError` for FFI callers.
 pub(crate) fn map_grpc_status(status: tonic::Status) -> ReqeastError {
@@ -8,9 +8,7 @@ pub(crate) fn map_grpc_status(status: tonic::Status) -> ReqeastError {
   match status.code() {
     Code::DeadlineExceeded | Code::Cancelled => ReqeastError::Timeout(message),
     Code::Unavailable => ReqeastError::ConnectionFailed(message),
-    Code::NotFound | Code::Unimplemented if is_reflection_status(&status) => {
-      ReqeastError::InvalidConfig(message)
-    }
+    Code::NotFound | Code::Unimplemented if is_reflection_status(&status) => ReqeastError::InvalidConfig(message),
     Code::InvalidArgument
     | Code::FailedPrecondition
     | Code::OutOfRange
@@ -48,16 +46,14 @@ fn format_status_details(details: &[u8]) -> String {
 
 fn is_reflection_status(status: &tonic::Status) -> bool {
   let message = status.message().to_ascii_lowercase();
-  message.contains("reflection")
-    || message.contains("serverreflection")
-    || message.contains("grpc.reflection")
+  message.contains("reflection") || message.contains("serverreflection") || message.contains("grpc.reflection")
 }
 
 #[cfg(test)]
 mod tests {
   use super::*;
-  use tonic::transport::Endpoint;
   use tonic::Code;
+  use tonic::transport::Endpoint;
 
   #[test]
   fn deadline_exceeded_maps_to_timeout() {

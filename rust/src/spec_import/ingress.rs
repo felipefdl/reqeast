@@ -1,9 +1,7 @@
 //! Spec ingress: format sniffing and safe JSON/YAML parsing.
 
 use crate::error::ReqeastError;
-use crate::spec_import::limits::{
-  MAX_SPEC_BYTES, MAX_YAML_ALIASES, MAX_YAML_DEPTH, MAX_YAML_NODES,
-};
+use crate::spec_import::limits::{MAX_SPEC_BYTES, MAX_YAML_ALIASES, MAX_YAML_DEPTH, MAX_YAML_NODES};
 use serde_json::Value;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -57,8 +55,8 @@ fn parse_json(bytes: &[u8]) -> Result<Value, ReqeastError> {
 fn parse_yaml(bytes: &[u8]) -> Result<Value, ReqeastError> {
   const _: () = assert!(MAX_YAML_DEPTH == 128);
 
-  let text = std::str::from_utf8(bytes)
-    .map_err(|e| ReqeastError::InvalidConfig(format!("Invalid UTF-8 in YAML spec: {e}")))?;
+  let text =
+    std::str::from_utf8(bytes).map_err(|e| ReqeastError::InvalidConfig(format!("Invalid UTF-8 in YAML spec: {e}")))?;
 
   if count_yaml_anchor_definitions(text) > MAX_YAML_ALIASES {
     return Err(ReqeastError::InvalidConfig(format!(
@@ -66,8 +64,8 @@ fn parse_yaml(bytes: &[u8]) -> Result<Value, ReqeastError> {
     )));
   }
 
-  let yaml_value: serde_yaml_ng::Value = serde_yaml_ng::from_slice(bytes)
-    .map_err(|e| ReqeastError::InvalidConfig(format!("Invalid YAML: {e}")))?;
+  let yaml_value: serde_yaml_ng::Value =
+    serde_yaml_ng::from_slice(bytes).map_err(|e| ReqeastError::InvalidConfig(format!("Invalid YAML: {e}")))?;
 
   if count_value_nodes(&yaml_value) > MAX_YAML_NODES {
     return Err(ReqeastError::InvalidConfig(format!(
@@ -122,12 +120,8 @@ fn count_value_nodes(value: &serde_yaml_ng::Value) -> usize {
     | serde_yaml_ng::Value::Bool(_)
     | serde_yaml_ng::Value::Number(_)
     | serde_yaml_ng::Value::String(_) => 1,
-    serde_yaml_ng::Value::Sequence(sequence) => {
-      1 + sequence.iter().map(count_value_nodes).sum::<usize>()
-    }
-    serde_yaml_ng::Value::Mapping(mapping) => {
-      1 + mapping.values().map(count_value_nodes).sum::<usize>()
-    }
+    serde_yaml_ng::Value::Sequence(sequence) => 1 + sequence.iter().map(count_value_nodes).sum::<usize>(),
+    serde_yaml_ng::Value::Mapping(mapping) => 1 + mapping.values().map(count_value_nodes).sum::<usize>(),
     serde_yaml_ng::Value::Tagged(tagged) => count_value_nodes(&tagged.value),
   }
 }

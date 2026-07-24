@@ -89,8 +89,7 @@ pub(crate) async fn send_async(config: HttpRequestConfig) -> Result<HttpResponse
         .unwrap_or("unknown")
         .to_string();
       return Err(ReqeastError::HttpError(format!(
-        "too many redirects ({} followed, last location: {})",
-        redirects_followed, location
+        "too many redirects ({redirects_followed} followed, last location: {location})",
       )));
     }
 

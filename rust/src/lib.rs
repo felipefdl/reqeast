@@ -4,12 +4,11 @@ pub mod grpc;
 pub mod spec_import;
 #[cfg(feature = "spec-openapi")]
 pub use spec_import::{
-  canonical_fingerprint, diff_spec, export_input_from_normalized, export_openapi, export_postman,
-  parse_spec, DiffOptions, ExportAuthType, ExportBodyType, ExportEnvironment, ExportFolder,
-  ExportFormat, ExportFormDataEntry, ExportHttpRequestData, ExportKeyValue, ExportOpenApiOptions,
-  ExportOperation, ExportPostmanOptions, ExportProjectInput, SpecExportError, SpecFieldDelta,
-  SpecImportError, SpecImportResult, SpecOperationBinding, SpecSourceHint, SpecSyncDiff,
-  SpecSyncField,
+  DiffOptions, ExportAuthType, ExportBodyType, ExportEnvironment, ExportFolder, ExportFormDataEntry, ExportFormat,
+  ExportHttpRequestData, ExportKeyValue, ExportOpenApiOptions, ExportOperation, ExportPostmanOptions,
+  ExportProjectInput, SpecExportError, SpecFieldDelta, SpecImportError, SpecImportResult, SpecOperationBinding,
+  SpecSourceHint, SpecSyncDiff, SpecSyncField, canonical_fingerprint, diff_spec, export_input_from_normalized,
+  export_openapi, export_postman, parse_spec,
 };
 mod http;
 mod jq;
@@ -22,6 +21,11 @@ mod util;
 mod ws;
 
 pub use error::ReqeastError;
+pub use grpc::{
+  CompiledProtoBundle, GrpcClient, GrpcConfig, GrpcEvent, GrpcEventHandler, GrpcMethodInfo, GrpcReflectionConfig,
+  GrpcRpcKind, GrpcServiceInfo, GrpcUnaryResponse, compile_proto_bundle, fetch_reflection_descriptors,
+  fingerprint_descriptor_bytes, hex_to_wire, invoke_unary, list_grpc_services,
+};
 pub use http::{
   HttpCertificateInfo, HttpClient, HttpRedirectEntry, HttpRequestConfig, HttpResponse, HttpSizeInfo,
   HttpTimingBreakdown,
@@ -32,12 +36,6 @@ pub use tcp::{TcpClient, TcpConfig, TcpEvent, TcpEventHandler};
 pub use types::{HttpBody, HttpMethod, KeyValuePair};
 pub use udp::{UdpClient, UdpConfig, UdpEvent, UdpEventHandler};
 pub use ws::{WsClient, WsConfig, WsEvent, WsEventHandler};
-pub use grpc::{
-  compile_proto_bundle, fetch_reflection_descriptors, fingerprint_descriptor_bytes, hex_to_wire,
-  invoke_unary, list_grpc_services, CompiledProtoBundle, GrpcClient, GrpcConfig, GrpcEvent,
-  GrpcEventHandler, GrpcMethodInfo, GrpcReflectionConfig, GrpcRpcKind, GrpcServiceInfo,
-  GrpcUnaryResponse,
-};
 
 use tracing_subscriber::{EnvFilter, fmt, prelude::*};
 

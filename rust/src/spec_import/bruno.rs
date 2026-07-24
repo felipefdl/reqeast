@@ -7,9 +7,9 @@ use serde_json::Value;
 use crate::spec_import::fingerprint::{bundle_and_canonicalize, hash_bytes};
 use crate::spec_import::normalize::NormalizeOutput;
 use crate::spec_import::types::{
-  NormalizedAuth, NormalizedBody, NormalizedEnvironment, NormalizedFolder, NormalizedFormDataEntry,
-  NormalizedKeyValue, NormalizedOperation, NormalizedParameter, NormalizedProject, OperationProtocol,
-  ParameterLocation, SpecImportError, SpecWarning, ValueSource,
+  NormalizedAuth, NormalizedBody, NormalizedEnvironment, NormalizedFolder, NormalizedFormDataEntry, NormalizedKeyValue,
+  NormalizedOperation, NormalizedParameter, NormalizedProject, OperationProtocol, ParameterLocation, SpecImportError,
+  SpecWarning, ValueSource,
 };
 
 /// Returns true when the JSON value looks like a Bruno OpenCollection document.
@@ -144,13 +144,7 @@ fn collect_items(
       continue;
     }
 
-    let operation = normalize_http_item(
-      name,
-      item,
-      parent_folder_id,
-      collection_auth,
-      warnings,
-    )?;
+    let operation = normalize_http_item(name, item, parent_folder_id, collection_auth, warnings)?;
     if !seen_primary_keys.insert(operation.primary_key.clone()) {
       return Err(SpecImportError::InvalidSpec(format!(
         "Duplicate request identity: {}",
@@ -187,10 +181,7 @@ fn normalize_http_item(
     .unwrap_or("GET")
     .to_ascii_uppercase();
 
-  let raw_url = http
-    .get("url")
-    .and_then(Value::as_str)
-    .unwrap_or("/");
+  let raw_url = http.get("url").and_then(Value::as_str).unwrap_or("/");
 
   if item.get("runtime").is_some() {
     warnings.push(SpecWarning {
@@ -209,22 +200,16 @@ fn normalize_http_item(
   parameters.extend(normalize_headers(http.get("headers"), &op_ref));
 
   let body = normalize_body(http.get("body"), &op_ref, warnings)?;
-  let auth = normalize_auth(
-    http.get("auth").or(collection_auth),
-    &op_ref,
-    warnings,
-  );
+  let auth = normalize_auth(http.get("auth").or(collection_auth), &op_ref, warnings);
 
-  let description = item
-    .get("docs")
-    .and_then(docs_text)
-    .or_else(|| {
-      item.get("info")
-        .and_then(|info| info.get("description"))
-        .and_then(Value::as_str)
-        .filter(|text| !text.is_empty())
-        .map(str::to_owned)
-    });
+  let description = item.get("docs").and_then(docs_text).or_else(|| {
+    item
+      .get("info")
+      .and_then(|info| info.get("description"))
+      .and_then(Value::as_str)
+      .filter(|text| !text.is_empty())
+      .map(str::to_owned)
+  });
 
   Ok(NormalizedOperation {
     primary_key: op_ref,
@@ -237,12 +222,7 @@ fn normalize_http_item(
       .get("info")
       .and_then(|info| info.get("tags"))
       .and_then(Value::as_array)
-      .map(|tags| {
-        tags.iter()
-          .filter_map(Value::as_str)
-          .map(str::to_owned)
-          .collect()
-      })
+      .map(|tags| tags.iter().filter_map(Value::as_str).map(str::to_owned).collect())
       .unwrap_or_default(),
     protocol: OperationProtocol::Http,
     binding: None,
@@ -288,11 +268,7 @@ fn parse_url(raw: &str, params: Option<&Value>) -> Result<ParsedUrl, SpecImportE
       let Some(name) = obj.get("name").and_then(Value::as_str) else {
         continue;
       };
-      let value = obj
-        .get("value")
-        .and_then(Value::as_str)
-        .unwrap_or_default()
-        .to_owned();
+      let value = obj.get("value").and_then(Value::as_str).unwrap_or_default().to_owned();
       let param_type = obj
         .get("type")
         .and_then(Value::as_str)
@@ -396,10 +372,7 @@ fn normalize_path_segments(path: &str) -> String {
 fn path_variables_from_path(path: &str) -> Vec<NormalizedParameter> {
   let mut params = Vec::new();
   for segment in path.split('/') {
-    if let Some(name) = segment
-      .strip_prefix('{')
-      .and_then(|value| value.strip_suffix('}'))
-    {
+    if let Some(name) = segment.strip_prefix('{').and_then(|value| value.strip_suffix('}')) {
       params.push(NormalizedParameter {
         location: ParameterLocation::Path,
         name: name.to_owned(),
@@ -457,18 +430,13 @@ fn normalize_headers(headers: Option<&Value>, op_ref: &str) -> Vec<NormalizedPar
       continue;
     };
     let disabled = obj.get("disabled").and_then(Value::as_bool).unwrap_or(false);
-    let Some(key) = obj.get("name").and_then(Value::as_str).filter(|name| !name.is_empty())
-    else {
+    let Some(key) = obj.get("name").and_then(Value::as_str).filter(|name| !name.is_empty()) else {
       continue;
     };
     if key.eq_ignore_ascii_case("content-type") {
       continue;
     }
-    let value = obj
-      .get("value")
-      .and_then(Value::as_str)
-      .unwrap_or_default()
-      .to_owned();
+    let value = obj.get("value").and_then(Value::as_str).unwrap_or_default().to_owned();
     params.push(NormalizedParameter {
       location: ParameterLocation::Header,
       name: key.to_owned(),
@@ -575,11 +543,7 @@ fn bruno_form_fields(data: Option<&Value>) -> Vec<NormalizedKeyValue> {
         let key = obj.get("name").and_then(Value::as_str)?;
         Some(NormalizedKeyValue {
           key: key.to_owned(),
-          value: obj
-            .get("value")
-            .and_then(Value::as_str)
-            .unwrap_or_default()
-            .to_owned(),
+          value: obj.get("value").and_then(Value::as_str).unwrap_or_default().to_owned(),
           enabled: true,
         })
       })
@@ -655,11 +619,7 @@ fn bruno_multipart_entries(
   out
 }
 
-fn normalize_auth(
-  auth: Option<&Value>,
-  op_ref: &str,
-  warnings: &mut Vec<SpecWarning>,
-) -> Option<NormalizedAuth> {
+fn normalize_auth(auth: Option<&Value>, op_ref: &str, warnings: &mut Vec<SpecWarning>) -> Option<NormalizedAuth> {
   let auth_obj = auth?.as_object()?;
   let auth_type = auth_obj.get("type").and_then(Value::as_str).unwrap_or("none");
   if auth_type == "none" || auth_type == "inherit" {
@@ -668,18 +628,9 @@ fn normalize_auth(
 
   match auth_type {
     "apikey" => {
-      let key = auth_obj
-        .get("key")
-        .and_then(Value::as_str)
-        .unwrap_or("X-API-Key");
-      let value = auth_obj
-        .get("value")
-        .and_then(Value::as_str)
-        .unwrap_or("{{api_key}}");
-      let placement = auth_obj
-        .get("placement")
-        .and_then(Value::as_str)
-        .unwrap_or("header");
+      let key = auth_obj.get("key").and_then(Value::as_str).unwrap_or("X-API-Key");
+      let value = auth_obj.get("value").and_then(Value::as_str).unwrap_or("{{api_key}}");
+      let placement = auth_obj.get("placement").and_then(Value::as_str).unwrap_or("header");
       let (header_name, query_name) = if placement == "query" {
         (None, Some(key.to_owned()))
       } else {
@@ -765,10 +716,7 @@ fn normalize_environments(environments: Option<&Value>) -> Vec<NormalizedEnviron
         let Some(var_obj) = variable.as_object() else {
           continue;
         };
-        let enabled = var_obj
-          .get("enabled")
-          .and_then(Value::as_bool)
-          .unwrap_or(true);
+        let enabled = var_obj.get("enabled").and_then(Value::as_bool).unwrap_or(true);
         if !enabled {
           continue;
         }
@@ -883,14 +831,18 @@ mod tests {
     assert_eq!(result.project.folders.len(), 1);
     assert_eq!(result.project.operations.len(), 1);
     assert_eq!(result.project.operations[0].path, "/users");
-    assert!(result
-      .warnings
-      .iter()
-      .any(|warning| warning.code == "MIGRATION_FROM_BRUNO"));
-    assert!(result
-      .warnings
-      .iter()
-      .any(|warning| warning.code == "SCRIPT_NOT_IMPORTED"));
+    assert!(
+      result
+        .warnings
+        .iter()
+        .any(|warning| warning.code == "MIGRATION_FROM_BRUNO")
+    );
+    assert!(
+      result
+        .warnings
+        .iter()
+        .any(|warning| warning.code == "SCRIPT_NOT_IMPORTED")
+    );
     assert!(result.project.operations[0].auth.is_some());
   }
 

@@ -4,7 +4,7 @@ use serde_json::Value;
 use sha2::{Digest, Sha256};
 use std::collections::BTreeMap;
 
-use crate::spec_import::bundle::{is_remote_reference, BundleContext};
+use crate::spec_import::bundle::{BundleContext, is_remote_reference};
 use crate::spec_import::limits::MAX_REF_DEPTH;
 
 /// SHA-256 hex digest of canonical resolved spec bytes.
@@ -19,10 +19,7 @@ pub fn bundle_and_canonicalize(root: &Value) -> Result<Vec<u8>, String> {
 }
 
 /// Bundle `$ref`s including local bundle files when `bundle` is present.
-pub fn bundle_and_canonicalize_with_bundle(
-  root: &Value,
-  bundle: Option<&BundleContext>,
-) -> Result<Vec<u8>, String> {
+pub fn bundle_and_canonicalize_with_bundle(root: &Value, bundle: Option<&BundleContext>) -> Result<Vec<u8>, String> {
   let bundled = bundle_refs(root, bundle)?;
   let canonical = sort_value(&bundled);
   serde_json::to_vec(&canonical).map_err(|err| format!("Failed to serialize canonical spec: {err}"))
@@ -41,9 +38,7 @@ fn bundle_value(
   bundle: Option<&BundleContext>,
 ) -> Result<Value, String> {
   if depth > MAX_REF_DEPTH {
-    return Err(format!(
-      "$ref resolution exceeds maximum depth of {MAX_REF_DEPTH}"
-    ));
+    return Err(format!("$ref resolution exceeds maximum depth of {MAX_REF_DEPTH}"));
   }
 
   match value {
@@ -58,10 +53,7 @@ fn bundle_value(
 
       let mut out = BTreeMap::new();
       for (key, child) in map {
-        out.insert(
-          key.clone(),
-          bundle_value(root, child, depth, resolving, bundle)?,
-        );
+        out.insert(key.clone(), bundle_value(root, child, depth, resolving, bundle)?);
       }
       Ok(Value::Object(out.into_iter().collect()))
     }
@@ -103,8 +95,9 @@ fn resolve_and_bundle(
     let external = ctx.load_external_value(reference)?;
     let fragment = reference.split_once('#').map(|(_, fragment)| fragment);
     let target = match fragment {
-      Some(fragment) if !fragment.is_empty() => resolve_json_pointer_in_value(&external, fragment)
-        .ok_or_else(|| format!("Unresolved $ref: {reference}"))?,
+      Some(fragment) if !fragment.is_empty() => {
+        resolve_json_pointer_in_value(&external, fragment).ok_or_else(|| format!("Unresolved $ref: {reference}"))?
+      }
       _ => &external,
     };
     let bundled = bundle_value(root, target, depth + 1, resolving, bundle)?;
@@ -114,8 +107,7 @@ fn resolve_and_bundle(
 
   resolving.push(reference.to_owned());
 
-  let target = resolve_json_pointer(root, reference)
-    .ok_or_else(|| format!("Unresolved $ref: {reference}"))?;
+  let target = resolve_json_pointer(root, reference).ok_or_else(|| format!("Unresolved $ref: {reference}"))?;
 
   let bundled = bundle_value(root, target, depth + 1, resolving, bundle)?;
   resolving.pop();

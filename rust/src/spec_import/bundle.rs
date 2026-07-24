@@ -69,10 +69,7 @@ impl BundleContext {
 
   /// Configure a loader with the bundle entry preloaded and a scoped file fetcher.
   pub fn configure_loader(&self, loader: &mut Loader, value: Value) -> Result<(), SpecImportError> {
-    loader.register_fetcher(
-      "file://",
-      BundleFileFetcher::with_yaml(self.root.clone()),
-    );
+    loader.register_fetcher("file://", BundleFileFetcher::with_yaml(self.root.clone()));
     loader
       .preload_resource(self.entry_uri.as_str(), value)
       .map_err(map_loader_error)?;
@@ -92,8 +89,8 @@ impl BundleContext {
     let resource_uri = resolve_reference_to_file_uri(reference, Some(&self.entry_uri))?;
     let path = file_uri_to_path(&resource_uri)?;
     ensure_within_bundle(&self.root, &path)?;
-    let bytes = std::fs::read(&path)
-      .map_err(|err| format!("Failed to read bundle file `{}`: {err}", path.display()))?;
+    let bytes =
+      std::fs::read(&path).map_err(|err| format!("Failed to read bundle file `{}`: {err}", path.display()))?;
     parse_bundle_body(&resource_uri, &bytes)
   }
 }
@@ -171,18 +168,12 @@ fn ensure_within_bundle(bundle_root: &Path, target: &Path) -> Result<(), String>
     .map_err(|err| format!("Invalid bundle file `{}`: {err}", target.display()))?;
 
   if !canonical_target.starts_with(&canonical_root) {
-    return Err(format!(
-      "External $ref escapes bundle root: {}",
-      target.display()
-    ));
+    return Err(format!("External $ref escapes bundle root: {}", target.display()));
   }
 
   for component in target.components() {
     if matches!(component, Component::ParentDir) {
-      return Err(format!(
-        "External $ref escapes bundle root: {}",
-        target.display()
-      ));
+      return Err(format!("External $ref escapes bundle root: {}", target.display()));
     }
   }
 
@@ -192,13 +183,12 @@ fn ensure_within_bundle(bundle_root: &Path, target: &Path) -> Result<(), String>
 fn parse_bundle_body(uri: &Url, bytes: &[u8]) -> Result<Value, String> {
   let path = uri.path().to_ascii_lowercase();
   if path.ends_with(".yaml") || path.ends_with(".yml") {
-    let yaml_value: serde_yaml_ng::Value = serde_yaml_ng::from_slice(bytes)
-      .map_err(|err| format!("Invalid YAML in `{}`: {err}", uri.as_str()))?;
+    let yaml_value: serde_yaml_ng::Value =
+      serde_yaml_ng::from_slice(bytes).map_err(|err| format!("Invalid YAML in `{}`: {err}", uri.as_str()))?;
     serde_json::to_value(yaml_value)
       .map_err(|err| format!("YAML to JSON conversion failed for `{}`: {err}", uri.as_str()))
   } else {
-    serde_json::from_slice(bytes)
-      .map_err(|err| format!("Invalid JSON in `{}`: {err}", uri.as_str()))
+    serde_json::from_slice(bytes).map_err(|err| format!("Invalid JSON in `{}`: {err}", uri.as_str()))
   }
 }
 
@@ -213,10 +203,7 @@ mod tests {
   use std::time::{SystemTime, UNIX_EPOCH};
 
   fn temp_bundle_dir(name: &str) -> PathBuf {
-    let nanos = SystemTime::now()
-      .duration_since(UNIX_EPOCH)
-      .expect("clock")
-      .as_nanos();
+    let nanos = SystemTime::now().duration_since(UNIX_EPOCH).expect("clock").as_nanos();
     let dir = std::env::temp_dir().join(format!("reqeast-bundle-{name}-{nanos}"));
     fs::create_dir_all(&dir).expect("create temp bundle dir");
     dir

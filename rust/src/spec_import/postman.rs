@@ -7,9 +7,9 @@ use serde_json::Value;
 use crate::spec_import::fingerprint::{bundle_and_canonicalize, hash_bytes};
 use crate::spec_import::normalize::NormalizeOutput;
 use crate::spec_import::types::{
-  NormalizedAuth, NormalizedBody, NormalizedEnvironment, NormalizedFolder, NormalizedFormDataEntry,
-  NormalizedKeyValue, NormalizedOperation, NormalizedParameter, NormalizedProject, OperationProtocol,
-  ParameterLocation, SpecImportError, SpecWarning, ValueSource,
+  NormalizedAuth, NormalizedBody, NormalizedEnvironment, NormalizedFolder, NormalizedFormDataEntry, NormalizedKeyValue,
+  NormalizedOperation, NormalizedParameter, NormalizedProject, OperationProtocol, ParameterLocation, SpecImportError,
+  SpecWarning, ValueSource,
 };
 
 /// Returns true when the JSON value looks like a Postman Collection v2.1 document.
@@ -39,9 +39,7 @@ pub fn normalize_postman(value: Value) -> Result<NormalizeOutput, SpecImportErro
     .unwrap_or("Imported Collection")
     .to_owned();
 
-  let description = info
-    .get("description")
-    .and_then(description_text);
+  let description = info.get("description").and_then(description_text);
 
   let collection_auth = value.get("auth");
   let environments = normalize_collection_variables(value.get("variable"));
@@ -118,11 +116,7 @@ fn normalize_collection_variables(variables: Option<&Value>) -> Vec<NormalizedEn
     let Some(key) = obj.get("key").and_then(Value::as_str) else {
       continue;
     };
-    let value = obj
-      .get("value")
-      .and_then(Value::as_str)
-      .unwrap_or_default()
-      .to_owned();
+    let value = obj.get("value").and_then(Value::as_str).unwrap_or_default().to_owned();
     pairs.push(NormalizedKeyValue {
       key: key.to_owned(),
       value,
@@ -172,19 +166,10 @@ fn collect_items(
   warnings: &mut Vec<SpecWarning>,
 ) -> Result<(), SpecImportError> {
   for (index, item) in items.iter().enumerate() {
-    let name = item
-      .get("name")
-      .and_then(Value::as_str)
-      .unwrap_or("Untitled");
+    let name = item.get("name").and_then(Value::as_str).unwrap_or("Untitled");
 
     if item.get("request").is_some() {
-      let operation = normalize_request_item(
-        name,
-        item,
-        parent_folder_id,
-        collection_auth,
-        warnings,
-      )?;
+      let operation = normalize_request_item(name, item, parent_folder_id, collection_auth, warnings)?;
       if !seen_primary_keys.insert(operation.primary_key.clone()) {
         return Err(SpecImportError::InvalidSpec(format!(
           "Duplicate request identity: {}",
@@ -246,7 +231,11 @@ fn normalize_request_item(
   let parsed_url = parse_request_url(request.get("url"))?;
   let op_ref = format!("{method} {}", parsed_url.path);
 
-  if item.get("response").and_then(Value::as_array).is_some_and(|responses| !responses.is_empty()) {
+  if item
+    .get("response")
+    .and_then(Value::as_array)
+    .is_some_and(|responses| !responses.is_empty())
+  {
     warnings.push(SpecWarning {
       code: "RESPONSE_NOT_IMPORTED".into(),
       message: "Postman response examples are not imported".into(),
@@ -259,11 +248,7 @@ fn normalize_request_item(
   parameters.extend(normalize_headers(request.get("header"), &op_ref));
 
   let body = normalize_body(request.get("body"), request.get("header"), &op_ref, warnings)?;
-  let auth = normalize_auth(
-    request.get("auth").or(collection_auth),
-    &op_ref,
-    warnings,
-  );
+  let auth = normalize_auth(request.get("auth").or(collection_auth), &op_ref, warnings);
 
   let description = request.get("description").and_then(description_text);
 
@@ -343,20 +328,14 @@ fn parse_url_object(obj: &serde_json::Map<String, Value>) -> Result<ParsedUrl, S
       let Some(variable_obj) = variable.as_object() else {
         continue;
       };
-      let disabled = variable_obj
-        .get("disabled")
-        .and_then(Value::as_bool)
-        .unwrap_or(false);
+      let disabled = variable_obj.get("disabled").and_then(Value::as_bool).unwrap_or(false);
       if disabled {
         continue;
       }
       let Some(key) = variable_obj.get("key").and_then(Value::as_str) else {
         continue;
       };
-      let value = variable_obj
-        .get("value")
-        .and_then(Value::as_str)
-        .unwrap_or_default();
+      let value = variable_obj.get("value").and_then(Value::as_str).unwrap_or_default();
       path_params.push(NormalizedParameter {
         location: ParameterLocation::Path,
         name: key.to_owned(),
@@ -434,10 +413,7 @@ fn normalize_absolute_path(path: &str) -> String {
 fn path_variables_from_path(path: &str) -> Vec<NormalizedParameter> {
   let mut params = Vec::new();
   for segment in path.split('/') {
-    if let Some(name) = segment
-      .strip_prefix('{')
-      .and_then(|value| value.strip_suffix('}'))
-    {
+    if let Some(name) = segment.strip_prefix('{').and_then(|value| value.strip_suffix('}')) {
       params.push(NormalizedParameter {
         location: ParameterLocation::Path,
         name: name.to_owned(),
@@ -497,11 +473,7 @@ fn normalize_query_array(query: &[Value]) -> Vec<NormalizedParameter> {
     let Some(key) = obj.get("key").and_then(Value::as_str) else {
       continue;
     };
-    let value = obj
-      .get("value")
-      .and_then(Value::as_str)
-      .unwrap_or_default()
-      .to_owned();
+    let value = obj.get("value").and_then(Value::as_str).unwrap_or_default().to_owned();
     params.push(NormalizedParameter {
       location: ParameterLocation::Query,
       name: key.to_owned(),
@@ -535,11 +507,7 @@ fn normalize_headers(headers: Option<&Value>, op_ref: &str) -> Vec<NormalizedPar
     if key.eq_ignore_ascii_case("content-type") {
       continue;
     }
-    let value = obj
-      .get("value")
-      .and_then(Value::as_str)
-      .unwrap_or_default()
-      .to_owned();
+    let value = obj.get("value").and_then(Value::as_str).unwrap_or_default().to_owned();
     params.push(NormalizedParameter {
       location: ParameterLocation::Header,
       name: key.to_owned(),
@@ -568,10 +536,7 @@ fn normalize_body(
     return Ok(NormalizedBody::None);
   };
 
-  let mode = body_obj
-    .get("mode")
-    .and_then(Value::as_str)
-    .unwrap_or("raw");
+  let mode = body_obj.get("mode").and_then(Value::as_str).unwrap_or("raw");
 
   match mode {
     "raw" => {
@@ -588,10 +553,7 @@ fn normalize_body(
       if content_type.contains("json") {
         Ok(NormalizedBody::Json { content })
       } else {
-        Ok(NormalizedBody::Raw {
-          content,
-          content_type,
-        })
+        Ok(NormalizedBody::Raw { content, content_type })
       }
     }
     "urlencoded" => {
@@ -619,14 +581,8 @@ fn normalize_body(
         .get("graphql")
         .and_then(Value::as_object)
         .map(|graphql| {
-          let query = graphql
-            .get("query")
-            .and_then(Value::as_str)
-            .unwrap_or_default();
-          let variables = graphql
-            .get("variables")
-            .and_then(Value::as_str)
-            .unwrap_or_default();
+          let query = graphql.get("query").and_then(Value::as_str).unwrap_or_default();
+          let variables = graphql.get("variables").and_then(Value::as_str).unwrap_or_default();
           if variables.is_empty() {
             query.to_owned()
           } else {
@@ -697,11 +653,7 @@ fn key_value_entries(entries: Option<&Value>) -> Vec<NormalizedKeyValue> {
     let Some(key) = obj.get("key").and_then(Value::as_str) else {
       continue;
     };
-    let value = obj
-      .get("value")
-      .and_then(Value::as_str)
-      .unwrap_or_default()
-      .to_owned();
+    let value = obj.get("value").and_then(Value::as_str).unwrap_or_default().to_owned();
     fields.push(NormalizedKeyValue {
       key: key.to_owned(),
       value,
@@ -764,11 +716,7 @@ fn form_data_entries(
   out
 }
 
-fn normalize_auth(
-  auth: Option<&Value>,
-  op_ref: &str,
-  warnings: &mut Vec<SpecWarning>,
-) -> Option<NormalizedAuth> {
+fn normalize_auth(auth: Option<&Value>, op_ref: &str, warnings: &mut Vec<SpecWarning>) -> Option<NormalizedAuth> {
   let auth_obj = auth?.as_object()?;
   let auth_type = auth_obj.get("type").and_then(Value::as_str).unwrap_or("noauth");
   if auth_type == "noauth" {
@@ -803,8 +751,14 @@ fn normalize_auth(
         None,
         format!(
           "Basic {}:{}",
-          entries.get("username").cloned().unwrap_or_else(|| "{{username}}".into()),
-          entries.get("password").cloned().unwrap_or_else(|| "{{password}}".into())
+          entries
+            .get("username")
+            .cloned()
+            .unwrap_or_else(|| "{{username}}".into()),
+          entries
+            .get("password")
+            .cloned()
+            .unwrap_or_else(|| "{{password}}".into())
         ),
       ))
     }
@@ -828,10 +782,7 @@ fn normalize_auth(
 fn auth_entries(entries: Option<&Value>) -> Option<(String, String, String)> {
   let map = auth_entries_map(entries);
   let key_name = map.get("key").cloned().unwrap_or_else(|| "X-API-Key".into());
-  let value = map
-    .get("value")
-    .cloned()
-    .unwrap_or_else(|| "{{api_key}}".into());
+  let value = map.get("value").cloned().unwrap_or_else(|| "{{api_key}}".into());
   let location = map.get("in").cloned().unwrap_or_else(|| "header".into());
   Some((key_name, value, location))
 }
@@ -849,11 +800,7 @@ fn auth_entries_map(entries: Option<&Value>) -> BTreeMap<String, String> {
     let Some(key) = obj.get("key").and_then(Value::as_str) else {
       continue;
     };
-    let value = obj
-      .get("value")
-      .and_then(Value::as_str)
-      .unwrap_or_default()
-      .to_owned();
+    let value = obj.get("value").and_then(Value::as_str).unwrap_or_default().to_owned();
     map.insert(key.to_owned(), value);
   }
   map
@@ -906,11 +853,16 @@ mod tests {
     assert_eq!(result.project.operations.len(), 1);
     assert_eq!(result.project.operations[0].method, "GET");
     assert_eq!(result.project.operations[0].path, "/users");
-    assert_eq!(result.project.environments[0].variables[0].value, "https://api.example.com");
-    assert!(result
-      .warnings
-      .iter()
-      .any(|warning| warning.code == "RESPONSE_NOT_IMPORTED"));
+    assert_eq!(
+      result.project.environments[0].variables[0].value,
+      "https://api.example.com"
+    );
+    assert!(
+      result
+        .warnings
+        .iter()
+        .any(|warning| warning.code == "RESPONSE_NOT_IMPORTED")
+    );
   }
 
   #[test]

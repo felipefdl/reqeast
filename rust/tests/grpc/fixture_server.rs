@@ -22,10 +22,7 @@ struct GreeterService;
 
 #[tonic::async_trait]
 impl Greeter for GreeterService {
-  async fn say_hello(
-    &self,
-    request: Request<HelloRequest>,
-  ) -> Result<Response<HelloResponse>, Status> {
+  async fn say_hello(&self, request: Request<HelloRequest>) -> Result<Response<HelloResponse>, Status> {
     let name = request.into_inner().name;
     Ok(Response::new(HelloResponse {
       message: format!("Hello, {name}!"),
@@ -34,10 +31,7 @@ impl Greeter for GreeterService {
 
   type StreamHelloStream = std::pin::Pin<Box<dyn tokio_stream::Stream<Item = Result<HelloResponse, Status>> + Send>>;
 
-  async fn stream_hello(
-    &self,
-    request: Request<HelloRequest>,
-  ) -> Result<Response<Self::StreamHelloStream>, Status> {
+  async fn stream_hello(&self, request: Request<HelloRequest>) -> Result<Response<Self::StreamHelloStream>, Status> {
     let name = request.into_inner().name;
     let messages = (1..=3).map(move |index| {
       Ok(HelloResponse {
@@ -105,12 +99,8 @@ pub fn spawn() -> (SocketAddr, FixtureServerGuard) {
   let join = thread::spawn(move || {
     let runtime = tokio::runtime::Runtime::new().expect("fixture server runtime");
     runtime.block_on(async move {
-      let listener = TcpListener::bind("127.0.0.1:0")
-        .await
-        .expect("bind fixture server");
-      let addr = listener
-        .local_addr()
-        .expect("fixture server listen address");
+      let listener = TcpListener::bind("127.0.0.1:0").await.expect("bind fixture server");
+      let addr = listener.local_addr().expect("fixture server listen address");
       addr_tx.send(addr).expect("fixture server address");
 
       let (stop_tx, stop_rx) = oneshot::channel::<()>();
