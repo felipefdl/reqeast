@@ -1,0 +1,78 @@
+# Phase 1 CI: Rust core + reqeast-mcp (no Xcode / Swift; needs Xcode 26.4+ runners later).
+#
+# Action majors (checked 2026-07-23 against GitHub releases / maintainer READMEs):
+#   actions/checkout@v7          (latest: v7.0.1)
+#   actions/setup-node@v7        (latest: v7.0.0)
+#   dtolnay/rust-toolchain@stable  (maintainer example uses checkout@v7)
+#   Swatinem/rust-cache@v2       (latest: v2.9.1)
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  rust:
+    name: Rust
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: rust
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      # Pin via @stable; components match `just lint-rust` / `just fmt-rust`.
+      # Project MSRV is 1.88 (edition 2024); stable on ubuntu-latest is newer.
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: rust -> target
+
+      - name: cargo fmt
+        run: cargo fmt --all -- --check
+
+      - name: cargo clippy
+        run: cargo clippy --all-targets --all-features -- -D warnings
+
+      - name: cargo test
+        run: cargo test --all-features
+
+  mcp:
+    name: reqeast-mcp
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: reqeast-mcp
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      # package.json engines: node >= 18. Use current Node 22 LTS.
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: reqeast-mcp/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
