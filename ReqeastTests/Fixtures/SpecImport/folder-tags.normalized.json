@@ -1,0 +1,123 @@
+{
+  "project": {
+    "title": "Folder Tags API",
+    "description": null,
+    "version": "1.0.0",
+    "icon_url": null,
+    "security_schemes": [],
+    "folders": [
+      {
+        "id": "tag:users",
+        "parent_id": null,
+        "name": "users",
+        "sort_hint": 0
+      },
+      {
+        "id": "tag:billing",
+        "parent_id": null,
+        "name": "billing",
+        "sort_hint": 1
+      }
+    ],
+    "operations": [
+      {
+        "primary_key": "listInvoices",
+        "alternate_keys": [],
+        "name": "List invoices",
+        "method": "GET",
+        "path": "/invoices",
+        "deprecated": false,
+        "tags": [
+          "billing"
+        ],
+        "protocol": "Http",
+        "binding": null,
+        "folder_id": "tag:billing",
+        "parameters": [],
+        "body": {
+          "kind": "None"
+        },
+        "body_candidates": [],
+        "auth": null,
+        "description": null
+      },
+      {
+        "primary_key": "listUsers",
+        "alternate_keys": [],
+        "name": "List users",
+        "method": "GET",
+        "path": "/users",
+        "deprecated": false,
+        "tags": [
+          "users"
+        ],
+        "protocol": "Http",
+        "binding": null,
+        "folder_id": "tag:users",
+        "parameters": [],
+        "body": {
+          "kind": "None"
+        },
+        "body_candidates": [],
+        "auth": null,
+        "description": null
+      },
+      {
+        "primary_key": "getUser",
+        "alternate_keys": [],
+        "name": "Get user",
+        "method": "GET",
+        "path": "/users/{id}",
+        "deprecated": false,
+        "tags": [
+          "users",
+          "admin"
+        ],
+        "protocol": "Http",
+        "binding": null,
+        "folder_id": "tag:users",
+        "parameters": [
+          {
+            "location": "Path",
+            "name": "id",
+            "value": "{{id}}",
+            "required": true,
+            "enabled": true,
+            "value_source": "FromExample"
+          }
+        ],
+        "body": {
+          "kind": "None"
+        },
+        "body_candidates": [],
+        "auth": null,
+        "description": null
+      }
+    ],
+    "environments": [
+      {
+        "name": "Default",
+        "variables": [
+          {
+            "key": "base_url",
+            "value": "/",
+            "enabled": true
+          }
+        ]
+      }
+    ]
+  },
+  "warnings": [
+    {
+      "code": "UNUSED_DECLARED_TAG",
+      "message": "Declared tag 'admin' has no operations; folder skipped",
+      "operation_ref": null
+    },
+    {
+      "code": "MULTIPLE_TAGS",
+      "message": "Multiple tags found; using primary tag 'users', ignoring: admin",
+      "operation_ref": "get /users/{id}"
+    }
+  ],
+  "content_fingerprint": "1d5d847ca0ef8195369a09678a8716c5ce10c06c8aa78d1e6f9b9abc8a6cdc22"
+}

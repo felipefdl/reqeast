@@ -1,0 +1,65 @@
+# Xcode
+xcuserdata/
+*.xcscmblueprint
+*.xccheckout
+DerivedData/
+build/
+*.moved-aside
+*.pbxuser
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# Xcode workspace - keep shared data, ignore user data
+project.xcworkspace/xcuserdata/
+
+# Rust
+rust/target/
+
+# ReqeastCore - built XCFramework (regenerated via `just build-rust`)
+ReqeastCore/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Local agent / editor tooling
+.claude/
+.superpowers/
+.worktrees/
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Secrets / credentials
+*.env
+*.env.*
+!*.env.example
+
+# Node.js (curlconverter bundling)
+scripts/curlconverter/node_modules/
+scripts/curlconverter/package-lock.json
+
+# Screenshots (generated output)
+screenshots/
+
+# Fastlane
+fastlane/screenshots/
+fastlane/screenshots-mac/
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/test_output/
+
+# Misc
+*.log
+Thumbs.db
+.firecrawl/
+.playwright-mcp/

@@ -1,0 +1,176 @@
+{
+  "project": {
+    "title": "Auth Schemes API",
+    "description": null,
+    "version": "1.0.0",
+    "icon_url": "https://auth.example.test/favicon.ico",
+    "security_schemes": [
+      {
+        "name": "apiKeyHeader",
+        "scheme_type": "apiKey",
+        "description": "API key in header",
+        "header_name": "X-API-Key",
+        "query_name": null,
+        "in_location": "header"
+      },
+      {
+        "name": "apiKeyQuery",
+        "scheme_type": "apiKey",
+        "description": "API key in query",
+        "header_name": null,
+        "query_name": "api_key",
+        "in_location": "query"
+      },
+      {
+        "name": "bearerAuth",
+        "scheme_type": "http:Bearer",
+        "description": "JWT bearer token",
+        "header_name": null,
+        "query_name": null,
+        "in_location": null
+      },
+      {
+        "name": "oauth2",
+        "scheme_type": "oauth2",
+        "description": "OAuth2 client credentials",
+        "header_name": null,
+        "query_name": null,
+        "in_location": null
+      },
+      {
+        "name": "openId",
+        "scheme_type": "openIdConnect",
+        "description": null,
+        "header_name": null,
+        "query_name": null,
+        "in_location": null
+      }
+    ],
+    "folders": [],
+    "operations": [
+      {
+        "primary_key": "getApiKey",
+        "alternate_keys": [],
+        "name": "API key protected",
+        "method": "GET",
+        "path": "/api-key",
+        "deprecated": false,
+        "tags": [],
+        "protocol": "Http",
+        "binding": null,
+        "folder_id": null,
+        "parameters": [],
+        "body": {
+          "kind": "None"
+        },
+        "body_candidates": [],
+        "auth": {
+          "scheme_type": "apiKey",
+          "header_name": "X-API-Key",
+          "query_name": null,
+          "placeholder_value": "{{apiKeyHeader}}",
+          "oauth2_grant_type": null,
+          "oauth2_auth_url": null,
+          "oauth2_token_url": null,
+          "oauth2_scopes": null
+        },
+        "description": null
+      },
+      {
+        "primary_key": "postOAuth",
+        "alternate_keys": [],
+        "name": "OAuth protected",
+        "method": "POST",
+        "path": "/oauth",
+        "deprecated": false,
+        "tags": [],
+        "protocol": "Http",
+        "binding": null,
+        "folder_id": null,
+        "parameters": [],
+        "body": {
+          "kind": "None"
+        },
+        "body_candidates": [],
+        "auth": {
+          "scheme_type": "oauth2",
+          "header_name": "Authorization",
+          "query_name": null,
+          "placeholder_value": "Bearer {{token}}",
+          "oauth2_grant_type": "clientCredentials",
+          "oauth2_auth_url": null,
+          "oauth2_token_url": "https://auth.example.test/oauth/token",
+          "oauth2_scopes": "write"
+        },
+        "description": null
+      },
+      {
+        "primary_key": "getProtected",
+        "alternate_keys": [],
+        "name": "Bearer protected",
+        "method": "GET",
+        "path": "/protected",
+        "deprecated": false,
+        "tags": [],
+        "protocol": "Http",
+        "binding": null,
+        "folder_id": null,
+        "parameters": [],
+        "body": {
+          "kind": "None"
+        },
+        "body_candidates": [],
+        "auth": {
+          "scheme_type": "http:Bearer",
+          "header_name": "Authorization",
+          "query_name": null,
+          "placeholder_value": "Bearer {{token}}",
+          "oauth2_grant_type": null,
+          "oauth2_auth_url": null,
+          "oauth2_token_url": null,
+          "oauth2_scopes": null
+        },
+        "description": null
+      },
+      {
+        "primary_key": "getPublic",
+        "alternate_keys": [],
+        "name": "Public endpoint",
+        "method": "GET",
+        "path": "/public",
+        "deprecated": false,
+        "tags": [],
+        "protocol": "Http",
+        "binding": null,
+        "folder_id": null,
+        "parameters": [],
+        "body": {
+          "kind": "None"
+        },
+        "body_candidates": [],
+        "auth": null,
+        "description": null
+      }
+    ],
+    "environments": [
+      {
+        "name": "Server 1",
+        "variables": [
+          {
+            "key": "base_url",
+            "value": "https://auth.example.test",
+            "enabled": true
+          }
+        ]
+      }
+    ]
+  },
+  "warnings": [
+    {
+      "code": "NO_TAGS",
+      "message": "Spec has no tags; operations import into the project root",
+      "operation_ref": null
+    }
+  ],
+  "content_fingerprint": "38d18db27de232a7a68c2af4d29a33d29eecd9557e103042f9437f794eb44541"
+}

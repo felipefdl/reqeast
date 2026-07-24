@@ -1,0 +1,168 @@
+{
+  "environments": [
+    {
+      "id": "5a7292a3-d0e5-4dad-9631-012b3ecb5bf1",
+      "isActive": true,
+      "name": "Default",
+      "variables": [
+        {
+          "enabled": true,
+          "key": "base_url",
+          "value": "/"
+        }
+      ]
+    }
+  ],
+  "folders": [
+    {
+      "id": "cb5a5851-e94e-41d8-85cc-25c32d46c548",
+      "name": "api/v1/billing/invoices"
+    },
+    {
+      "id": "572a2002-c6ea-49c8-a8a6-710423c4e163",
+      "name": "api/v1/billing/invoices/payments"
+    },
+    {
+      "id": "735febbc-6fdf-4a0d-acfb-77dea8b1bcbb",
+      "name": "api/v1/users"
+    }
+  ],
+  "project": {
+    "id": "73139480-4a68-4d34-bf7f-d201c05ea827",
+    "name": "Folder Paths API"
+  },
+  "requests": [
+    {
+      "folderId": "cb5a5851-e94e-41d8-85cc-25c32d46c548",
+      "http": {
+        "authApiKeyLocation": "header",
+        "authApiKeyName": "",
+        "authApiKeyValue": "",
+        "authOAuth2AuthURL": "",
+        "authOAuth2GrantType": "",
+        "authOAuth2Scopes": "",
+        "authOAuth2TokenURL": "",
+        "authPassword": "",
+        "authToken": "",
+        "authType": "none",
+        "authUsername": "",
+        "binaryFileName": "",
+        "bodyContent": "",
+        "bodyFormData": [],
+        "bodyFormDataEntries": [],
+        "bodyType": "none",
+        "headers": [],
+        "method": "GET",
+        "params": [],
+        "rawContentType": "text",
+        "url": "{{base_url}}/api/v1/billing/invoices"
+      },
+      "id": "364317a2-4faa-4c94-a9a7-4de3d5c91ec9",
+      "name": "List invoices",
+      "sortOrder": 0,
+      "specIdentity": {
+        "alternateKeys": [],
+        "primaryKey": "listInvoices"
+      }
+    },
+    {
+      "folderId": "572a2002-c6ea-49c8-a8a6-710423c4e163",
+      "http": {
+        "authApiKeyLocation": "header",
+        "authApiKeyName": "",
+        "authApiKeyValue": "",
+        "authOAuth2AuthURL": "",
+        "authOAuth2GrantType": "",
+        "authOAuth2Scopes": "",
+        "authOAuth2TokenURL": "",
+        "authPassword": "",
+        "authToken": "",
+        "authType": "none",
+        "authUsername": "",
+        "binaryFileName": "",
+        "bodyContent": "",
+        "bodyFormData": [],
+        "bodyFormDataEntries": [],
+        "bodyType": "none",
+        "headers": [],
+        "method": "POST",
+        "params": [],
+        "rawContentType": "text",
+        "url": "{{base_url}}/api/v1/billing/invoices/{{id}}/payments"
+      },
+      "id": "e21955fe-575e-449b-bfc0-af9e81608544",
+      "name": "Record payment",
+      "sortOrder": 1,
+      "specIdentity": {
+        "alternateKeys": [],
+        "primaryKey": "recordPayment"
+      }
+    },
+    {
+      "folderId": "735febbc-6fdf-4a0d-acfb-77dea8b1bcbb",
+      "http": {
+        "authApiKeyLocation": "header",
+        "authApiKeyName": "",
+        "authApiKeyValue": "",
+        "authOAuth2AuthURL": "",
+        "authOAuth2GrantType": "",
+        "authOAuth2Scopes": "",
+        "authOAuth2TokenURL": "",
+        "authPassword": "",
+        "authToken": "",
+        "authType": "none",
+        "authUsername": "",
+        "binaryFileName": "",
+        "bodyContent": "",
+        "bodyFormData": [],
+        "bodyFormDataEntries": [],
+        "bodyType": "none",
+        "headers": [],
+        "method": "GET",
+        "params": [],
+        "rawContentType": "text",
+        "url": "{{base_url}}/api/v1/users"
+      },
+      "id": "cfe55f90-a16e-4aca-b98c-8ae37c40bc0b",
+      "name": "List users",
+      "sortOrder": 2,
+      "specIdentity": {
+        "alternateKeys": [],
+        "primaryKey": "listUsers"
+      }
+    },
+    {
+      "folderId": "735febbc-6fdf-4a0d-acfb-77dea8b1bcbb",
+      "http": {
+        "authApiKeyLocation": "header",
+        "authApiKeyName": "",
+        "authApiKeyValue": "",
+        "authOAuth2AuthURL": "",
+        "authOAuth2GrantType": "",
+        "authOAuth2Scopes": "",
+        "authOAuth2TokenURL": "",
+        "authPassword": "",
+        "authToken": "",
+        "authType": "none",
+        "authUsername": "",
+        "binaryFileName": "",
+        "bodyContent": "",
+        "bodyFormData": [],
+        "bodyFormDataEntries": [],
+        "bodyType": "none",
+        "headers": [],
+        "method": "GET",
+        "params": [],
+        "rawContentType": "text",
+        "url": "{{base_url}}/api/v1/users/{{id}}"
+      },
+      "id": "e755bc8a-13d5-4cab-8d06-3186778f7d24",
+      "name": "Get user",
+      "sortOrder": 3,
+      "specIdentity": {
+        "alternateKeys": [],
+        "primaryKey": "getUser"
+      }
+    }
+  ]
+}

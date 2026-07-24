@@ -1,0 +1,19 @@
+openapi: 3.0.0
+info:
+  title: Duplicate Operation ID
+  version: 1.0.0
+paths:
+  /alpha:
+    get:
+      summary: Alpha
+      operationId: duplicateOp
+      responses:
+        "200":
+          description: ok
+  /beta:
+    post:
+      summary: Beta
+      operationId: duplicateOp
+      responses:
+        "200":
+          description: ok

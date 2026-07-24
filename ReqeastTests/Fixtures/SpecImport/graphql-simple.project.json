@@ -1,0 +1,172 @@
+{
+  "environments": [
+    {
+      "id": "11a81e10-a73a-409f-91e5-b80dac182007",
+      "isActive": true,
+      "name": "Default",
+      "variables": [
+        {
+          "enabled": true,
+          "key": "base_url",
+          "value": "https://api.example.com/graphql"
+        }
+      ]
+    }
+  ],
+  "folders": [
+    {
+      "id": "f1a13462-cb6e-4215-9e41-432451ee8edd",
+      "name": "Query"
+    },
+    {
+      "id": "03c60521-0364-46f8-877e-0b955f1ea4a3",
+      "name": "Mutation"
+    }
+  ],
+  "project": {
+    "id": "195857b8-ce8a-4d77-9cb2-1230fddc2a19",
+    "name": "Imported GraphQL Schema"
+  },
+  "requests": [
+    {
+      "folderId": "f1a13462-cb6e-4215-9e41-432451ee8edd",
+      "http": {
+        "authApiKeyLocation": "header",
+        "authApiKeyName": "",
+        "authApiKeyValue": "",
+        "authOAuth2AuthURL": "",
+        "authOAuth2GrantType": "",
+        "authOAuth2Scopes": "",
+        "authOAuth2TokenURL": "",
+        "authPassword": "",
+        "authToken": "",
+        "authType": "none",
+        "authUsername": "",
+        "binaryFileName": "",
+        "bodyContent": "{\n  \"query\" : \"query User($id: ID!) { user(id: $id) { __typename } }\",\n  \"variables\" : {\n    \"id\" : \"\"\n  }\n}",
+        "bodyFormData": [],
+        "bodyFormDataEntries": [],
+        "bodyType": "json",
+        "headers": [
+          {
+            "enabled": true,
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "method": "POST",
+        "params": [
+          {
+            "enabled": true,
+            "key": "id",
+            "value": ""
+          }
+        ],
+        "rawContentType": "text",
+        "url": "{{base_url}}"
+      },
+      "id": "e3891587-1a98-41b9-ba8e-4a67bfd2b99f",
+      "name": "Fetch a user by ID",
+      "sortOrder": 0,
+      "specIdentity": {
+        "alternateKeys": [],
+        "primaryKey": "query user"
+      }
+    },
+    {
+      "folderId": "f1a13462-cb6e-4215-9e41-432451ee8edd",
+      "http": {
+        "authApiKeyLocation": "header",
+        "authApiKeyName": "",
+        "authApiKeyValue": "",
+        "authOAuth2AuthURL": "",
+        "authOAuth2GrantType": "",
+        "authOAuth2Scopes": "",
+        "authOAuth2TokenURL": "",
+        "authPassword": "",
+        "authToken": "",
+        "authType": "none",
+        "authUsername": "",
+        "binaryFileName": "",
+        "bodyContent": "{\n  \"query\" : \"query Users($limit: Int) { users(limit: $limit) { __typename } }\",\n  \"variables\" : {\n    \"limit\" : 10\n  }\n}",
+        "bodyFormData": [],
+        "bodyFormDataEntries": [],
+        "bodyType": "json",
+        "headers": [
+          {
+            "enabled": true,
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "method": "POST",
+        "params": [
+          {
+            "enabled": true,
+            "key": "limit",
+            "value": "10"
+          }
+        ],
+        "rawContentType": "text",
+        "url": "{{base_url}}"
+      },
+      "id": "336c71e5-9204-4475-8c13-a3188ada0144",
+      "name": "List users with optional limit",
+      "sortOrder": 1,
+      "specIdentity": {
+        "alternateKeys": [],
+        "primaryKey": "query users"
+      }
+    },
+    {
+      "folderId": "03c60521-0364-46f8-877e-0b955f1ea4a3",
+      "http": {
+        "authApiKeyLocation": "header",
+        "authApiKeyName": "",
+        "authApiKeyValue": "",
+        "authOAuth2AuthURL": "",
+        "authOAuth2GrantType": "",
+        "authOAuth2Scopes": "",
+        "authOAuth2TokenURL": "",
+        "authPassword": "",
+        "authToken": "",
+        "authType": "none",
+        "authUsername": "",
+        "binaryFileName": "",
+        "bodyContent": "{\n  \"query\" : \"mutation CreateUser($name: String!, $email: String!) { createUser(name: $name, email: $email) { __typename } }\",\n  \"variables\" : {\n    \"email\" : \"\",\n    \"name\" : \"\"\n  }\n}",
+        "bodyFormData": [],
+        "bodyFormDataEntries": [],
+        "bodyType": "json",
+        "headers": [
+          {
+            "enabled": true,
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "method": "POST",
+        "params": [
+          {
+            "enabled": true,
+            "key": "name",
+            "value": ""
+          },
+          {
+            "enabled": true,
+            "key": "email",
+            "value": ""
+          }
+        ],
+        "rawContentType": "text",
+        "url": "{{base_url}}"
+      },
+      "id": "342d4020-8323-41b6-b71f-42e9852d5532",
+      "name": "Create a new user",
+      "sortOrder": 2,
+      "specIdentity": {
+        "alternateKeys": [],
+        "primaryKey": "mutation createUser"
+      }
+    }
+  ]
+}

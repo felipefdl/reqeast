@@ -1,0 +1,112 @@
+{
+  "project": {
+    "title": "Reqeast HAR Fixture",
+    "description": "Sample browser capture for AC23",
+    "version": "1.2",
+    "icon_url": null,
+    "security_schemes": [],
+    "folders": [],
+    "operations": [
+      {
+        "primary_key": "GET /pets",
+        "alternate_keys": [],
+        "name": "List pets",
+        "method": "GET",
+        "path": "/pets",
+        "deprecated": false,
+        "tags": [],
+        "protocol": "Http",
+        "binding": null,
+        "folder_id": null,
+        "parameters": [
+          {
+            "location": "Query",
+            "name": "limit",
+            "value": "5",
+            "required": false,
+            "enabled": true,
+            "value_source": "FromExample"
+          },
+          {
+            "location": "Header",
+            "name": "Accept",
+            "value": "application/json",
+            "required": false,
+            "enabled": true,
+            "value_source": "FromExample"
+          }
+        ],
+        "body": {
+          "kind": "None"
+        },
+        "body_candidates": [],
+        "auth": null,
+        "description": "List pets"
+      },
+      {
+        "primary_key": "POST /pets",
+        "alternate_keys": [],
+        "name": "Create pet",
+        "method": "POST",
+        "path": "/pets",
+        "deprecated": false,
+        "tags": [],
+        "protocol": "Http",
+        "binding": null,
+        "folder_id": null,
+        "parameters": [
+          {
+            "location": "Header",
+            "name": "X-Request-Id",
+            "value": "req-42",
+            "required": false,
+            "enabled": true,
+            "value_source": "FromExample"
+          }
+        ],
+        "body": {
+          "kind": "Json",
+          "content": "{\n  \"name\": \"Ada\"\n}"
+        },
+        "body_candidates": [],
+        "auth": null,
+        "description": "Create pet"
+      }
+    ],
+    "environments": [
+      {
+        "name": "Capture",
+        "variables": [
+          {
+            "key": "base_url",
+            "value": "https://api.example.com",
+            "enabled": true
+          }
+        ]
+      }
+    ]
+  },
+  "warnings": [
+    {
+      "code": "MIGRATION_FROM_HAR",
+      "message": "Imported from HAR capture; responses and timing metadata are not migrated",
+      "operation_ref": null
+    },
+    {
+      "code": "HAR_CREDENTIALS_STRIPPED",
+      "message": "Sensitive Cookie, Authorization, or Set-Cookie values were removed from this request",
+      "operation_ref": "GET /pets"
+    },
+    {
+      "code": "RESPONSE_NOT_IMPORTED",
+      "message": "HAR response data is not imported",
+      "operation_ref": "GET /pets"
+    },
+    {
+      "code": "RESPONSE_NOT_IMPORTED",
+      "message": "HAR response data is not imported",
+      "operation_ref": "POST /pets"
+    }
+  ],
+  "content_fingerprint": "b2efe889a5ba75a35f11dc4de47b6aa2c247810577e4198b9938b3d1cb5852ab"
+}

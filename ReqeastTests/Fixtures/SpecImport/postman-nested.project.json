@@ -1,0 +1,137 @@
+{
+  "environments": [
+    {
+      "id": "b4605e39-e56f-4a1e-b687-ee33b59c5212",
+      "isActive": true,
+      "name": "Collection",
+      "variables": [
+        {
+          "enabled": true,
+          "key": "base_url",
+          "value": "https://api.example.com"
+        }
+      ]
+    }
+  ],
+  "folders": [
+    {
+      "id": "aa6e1211-82a5-4fe3-be81-0ff0ae8d43fc",
+      "name": "Users"
+    },
+    {
+      "id": "6d770f6f-b192-4218-8769-ceee0338c322",
+      "name": "Profiles"
+    }
+  ],
+  "project": {
+    "id": "ba0dcf5c-c530-4e53-8b49-609681db7b41",
+    "name": "Nested Postman API"
+  },
+  "requests": [
+    {
+      "folderId": "aa6e1211-82a5-4fe3-be81-0ff0ae8d43fc",
+      "http": {
+        "authApiKeyLocation": "header",
+        "authApiKeyName": "",
+        "authApiKeyValue": "",
+        "authOAuth2AuthURL": "",
+        "authOAuth2GrantType": "",
+        "authOAuth2Scopes": "",
+        "authOAuth2TokenURL": "",
+        "authPassword": "",
+        "authToken": "",
+        "authType": "none",
+        "authUsername": "",
+        "binaryFileName": "",
+        "bodyContent": "",
+        "bodyFormData": [],
+        "bodyFormDataEntries": [],
+        "bodyType": "none",
+        "headers": [],
+        "method": "GET",
+        "params": [
+          {
+            "enabled": true,
+            "key": "limit",
+            "value": "10"
+          }
+        ],
+        "rawContentType": "text",
+        "url": "{{base_url}}/users"
+      },
+      "id": "134f5987-e99b-4a55-ad73-399d5c6f7e96",
+      "name": "List users",
+      "sortOrder": 0,
+      "specIdentity": {
+        "alternateKeys": [],
+        "primaryKey": "GET /users"
+      }
+    },
+    {
+      "folderId": "6d770f6f-b192-4218-8769-ceee0338c322",
+      "http": {
+        "authApiKeyLocation": "header",
+        "authApiKeyName": "",
+        "authApiKeyValue": "",
+        "authOAuth2AuthURL": "",
+        "authOAuth2GrantType": "",
+        "authOAuth2Scopes": "",
+        "authOAuth2TokenURL": "",
+        "authPassword": "",
+        "authToken": "",
+        "authType": "none",
+        "authUsername": "",
+        "binaryFileName": "",
+        "bodyContent": "",
+        "bodyFormData": [],
+        "bodyFormDataEntries": [],
+        "bodyType": "none",
+        "headers": [],
+        "method": "GET",
+        "params": [],
+        "rawContentType": "text",
+        "url": "{{base_url}}/users/{{userId}}/profile"
+      },
+      "id": "13aacf38-179e-4805-94ca-25ae58e878db",
+      "name": "Get profile",
+      "sortOrder": 1,
+      "specIdentity": {
+        "alternateKeys": [],
+        "primaryKey": "GET /users/{userId}/profile"
+      }
+    },
+    {
+      "folderId": null,
+      "http": {
+        "authApiKeyLocation": "header",
+        "authApiKeyName": "",
+        "authApiKeyValue": "",
+        "authOAuth2AuthURL": "",
+        "authOAuth2GrantType": "",
+        "authOAuth2Scopes": "",
+        "authOAuth2TokenURL": "",
+        "authPassword": "",
+        "authToken": "",
+        "authType": "none",
+        "authUsername": "",
+        "binaryFileName": "",
+        "bodyContent": "{\n  \"name\": \"Ada\"\n}",
+        "bodyFormData": [],
+        "bodyFormDataEntries": [],
+        "bodyType": "json",
+        "headers": [],
+        "method": "POST",
+        "params": [],
+        "rawContentType": "text",
+        "url": "{{base_url}}/users"
+      },
+      "id": "0a4ca13f-c549-41e2-96a2-893e091bb632",
+      "name": "Create user",
+      "sortOrder": 2,
+      "specIdentity": {
+        "alternateKeys": [],
+        "primaryKey": "POST /users"
+      }
+    }
+  ]
+}

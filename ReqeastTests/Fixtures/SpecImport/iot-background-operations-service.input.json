@@ -1,0 +1,3916 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "IoT Background Operations Service API",
+    "version": "0.0.1"
+  },
+  "servers": [
+    {
+      "url": "https://internal.api.com",
+      "description": "Production server"
+    }
+  ],
+  "security": [
+    {
+      "BearerAuth": []
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "BackgroundOperationType": {
+        "type": "string",
+        "enum": [
+          "provision_subscriptions",
+          "send_bulk_sms",
+          "suspend_subscriptions",
+          "change_rate_plan_at_billing_cycle"
+        ],
+        "description": "Type of background operation",
+        "examples": [
+          "provision_subscriptions"
+        ]
+      },
+      "BackgroundOperationStatus": {
+        "type": "string",
+        "enum": [
+          "pending",
+          "setting_up",
+          "executing",
+          "completed",
+          "completed_partially",
+          "failed",
+          "cancelling",
+          "cancelled"
+        ],
+        "description": "Lifecycle status of the background operation. Transitions: pending → setting_up → executing → completed / completed_partially / failed / cancelling → cancelled",
+        "examples": [
+          "executing"
+        ]
+      },
+      "BackgroundOperationVisibility": {
+        "type": "string",
+        "enum": [
+          "customer",
+          "admin",
+          "internal"
+        ],
+        "description": "Visibility scope controlling which roles can read the operation",
+        "examples": [
+          "customer"
+        ]
+      },
+      "CancellationBehavior": {
+        "type": "string",
+        "enum": [
+          "not_cancelable",
+          "cancel_pending_work"
+        ],
+        "description": "Controls how cancellation is handled for an operation or task",
+        "examples": [
+          "cancel_pending_work"
+        ]
+      },
+      "OperationProgress": {
+        "type": [
+          "object",
+          "null"
+        ],
+        "properties": {
+          "total_tasks": {
+            "type": "integer",
+            "minimum": 0,
+            "format": "int32",
+            "description": "Total number of tasks in the operation",
+            "examples": [
+              100
+            ]
+          },
+          "completed_tasks": {
+            "type": "integer",
+            "minimum": 0,
+            "format": "int32",
+            "description": "Number of tasks that completed successfully",
+            "examples": [
+              45
+            ]
+          },
+          "failed_tasks": {
+            "type": "integer",
+            "minimum": 0,
+            "format": "int32",
+            "description": "Number of tasks that failed",
+            "examples": [
+              2
+            ]
+          },
+          "cancelled_tasks": {
+            "type": "integer",
+            "minimum": 0,
+            "format": "int32",
+            "description": "Number of tasks that were cancelled",
+            "examples": [
+              0
+            ]
+          },
+          "percent_completed": {
+            "type": "number",
+            "format": "double",
+            "description": "Percentage of tasks completed (0–100)",
+            "examples": [
+              45
+            ]
+          }
+        },
+        "required": [
+          "total_tasks",
+          "completed_tasks",
+          "failed_tasks",
+          "cancelled_tasks",
+          "percent_completed"
+        ],
+        "description": "Setup task progress counters; null when there are no setup tasks"
+      },
+      "OperationPayload": {
+        "type": "object",
+        "additionalProperties": {},
+        "description": "Operation-specific configuration payload",
+        "examples": [
+          {}
+        ]
+      },
+      "OperationMetadata": {
+        "type": "object",
+        "additionalProperties": {},
+        "description": "Arbitrary metadata attached to the operation"
+      },
+      "BackgroundTaskType": {
+        "type": "string",
+        "enum": [
+          "setup",
+          "execution"
+        ],
+        "description": "Distinguishes setup-phase tasks from execution tasks",
+        "examples": [
+          "execution"
+        ]
+      },
+      "BackgroundTaskStatus": {
+        "type": "string",
+        "enum": [
+          "pending",
+          "executing",
+          "completed",
+          "failed",
+          "cancelled"
+        ],
+        "description": "Lifecycle status of a background task. Transitions: pending → executing → completed / failed / cancelled",
+        "examples": [
+          "completed"
+        ]
+      },
+      "TaskPayload": {
+        "type": "object",
+        "additionalProperties": {},
+        "description": "Task-specific input payload",
+        "examples": [
+          {}
+        ]
+      },
+      "TaskResult": {
+        "type": "object",
+        "additionalProperties": {},
+        "description": "Task result payload; populated when the task completes",
+        "examples": [
+          {}
+        ]
+      },
+      "BackgroundTaskBase": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "examples": [
+              "bgtsk_01HK2V8F3MNQRXZ4W7Y6P3JBCF"
+            ],
+            "description": "Unique identifier for the task"
+          },
+          "operation_id": {
+            "type": "string",
+            "examples": [
+              "bgop_01HK2V8F3MNQRXZ4W7Y6P3JBCE"
+            ],
+            "description": "ID of the parent background operation"
+          },
+          "action_name": {
+            "type": "string",
+            "examples": [
+              "provision_subscription"
+            ],
+            "description": "Action this task executes"
+          },
+          "type": {
+            "$ref": "#/components/schemas/BackgroundTaskType"
+          },
+          "idempotency_key": {
+            "type": "string",
+            "description": "Idempotency key for this task"
+          },
+          "reference_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "examples": [
+              "f17d330e-dc41-4b94-abc0-261620ba6e28"
+            ],
+            "description": "External reference identifier used for callback correlation by downstream systems"
+          },
+          "setup_stage": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "examples": [
+              null
+            ],
+            "description": "Setup stage identifier; only set for type=setup tasks"
+          },
+          "status": {
+            "$ref": "#/components/schemas/BackgroundTaskStatus"
+          },
+          "cancellation_behavior": {
+            "$ref": "#/components/schemas/CancellationBehavior"
+          },
+          "retryable": {
+            "type": "boolean",
+            "examples": [
+              false
+            ],
+            "description": "Whether this task supports automatic retry on failure"
+          },
+          "retries": {
+            "type": "integer",
+            "minimum": 0,
+            "format": "int32",
+            "examples": [
+              0
+            ],
+            "description": "Number of retry attempts made so far"
+          },
+          "max_retries": {
+            "type": "integer",
+            "minimum": 0,
+            "format": "int32",
+            "examples": [
+              0
+            ],
+            "description": "Maximum number of retries allowed before the task is permanently failed"
+          },
+          "sequence_no": {
+            "type": "integer",
+            "minimum": 0,
+            "format": "int64",
+            "description": "Ordering sequence number within the operation (ascending)",
+            "examples": [
+              3
+            ]
+          },
+          "payload": {
+            "$ref": "#/components/schemas/TaskPayload"
+          },
+          "result": {
+            "$ref": "#/components/schemas/TaskResult"
+          },
+          "error_code": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "examples": [
+              null
+            ],
+            "description": "Machine-readable error code; populated when status is failed"
+          },
+          "error_message": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "examples": [
+              null
+            ],
+            "description": "Human-readable error description; populated when status is failed"
+          },
+          "started_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "examples": [
+              "2025-09-10T14:01:27.071Z"
+            ],
+            "description": "When the task started executing"
+          },
+          "completed_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "examples": [
+              "2025-09-10T14:01:27.071Z"
+            ],
+            "description": "When the task reached a terminal status"
+          },
+          "cancelled_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "examples": [
+              "2025-09-10T14:01:27.071Z"
+            ],
+            "description": "When the task was cancelled"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "examples": [
+              "2025-09-10T14:01:27.071Z"
+            ],
+            "description": "ISO 8601 date-time string"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "examples": [
+              "2025-09-10T14:01:27.071Z"
+            ],
+            "description": "ISO 8601 date-time string"
+          }
+        },
+        "required": [
+          "id",
+          "operation_id",
+          "action_name",
+          "type",
+          "idempotency_key",
+          "reference_id",
+          "setup_stage",
+          "status",
+          "cancellation_behavior",
+          "retryable",
+          "retries",
+          "max_retries",
+          "sequence_no",
+          "payload",
+          "result",
+          "error_code",
+          "error_message",
+          "created_at",
+          "updated_at"
+        ],
+        "description": "Background task entity"
+      },
+      "EmbeddedBackgroundTask": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BackgroundTaskBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "_links": {
+                "type": "object",
+                "properties": {
+                  "self": {
+                    "type": "object",
+                    "properties": {
+                      "href": {
+                        "type": "string",
+                        "format": "uri",
+                        "examples": [
+                          "https://internal.api.com/background-operations/bgop_01HK2V8F3MNQRXZ4W7Y6P3JBCE/tasks/bgtsk_01HK2V8F3MNQRXZ4W7Y6P3JBCF"
+                        ]
+                      },
+                      "title": {
+                        "type": "string",
+                        "examples": [
+                          "Background Operation Task"
+                        ],
+                        "description": "Human-readable title describing the linked resource relation"
+                      }
+                    },
+                    "required": [
+                      "href",
+                      "title"
+                    ]
+                  },
+                  "operation": {
+                    "type": "object",
+                    "properties": {
+                      "href": {
+                        "type": "string",
+                        "format": "uri",
+                        "examples": [
+                          "https://internal.api.com/background-operations/bgop_01HK2V8F3MNQRXZ4W7Y6P3JBCE"
+                        ]
+                      },
+                      "title": {
+                        "type": "string",
+                        "examples": [
+                          "Related resource"
+                        ],
+                        "description": "Human-readable title describing the linked resource relation"
+                      }
+                    },
+                    "required": [
+                      "href",
+                      "title"
+                    ],
+                    "description": "Parent background operation"
+                  },
+                  "retry": {
+                    "type": "object",
+                    "properties": {
+                      "href": {
+                        "type": "string",
+                        "format": "uri",
+                        "examples": [
+                          "https://internal.api.com/background-operations/bgop_01HK2V8F3MNQRXZ4W7Y6P3JBCE/tasks/bgtsk_01HK2V8F3MNQRXZ4W7Y6P3JBCF/retry"
+                        ]
+                      },
+                      "title": {
+                        "type": "string",
+                        "examples": [
+                          "Related resource"
+                        ],
+                        "description": "Human-readable title describing the linked resource relation"
+                      }
+                    },
+                    "required": [
+                      "href",
+                      "title"
+                    ],
+                    "description": "Retry this failed task"
+                  }
+                },
+                "required": [
+                  "self",
+                  "operation",
+                  "retry"
+                ],
+                "description": "HAL+JSON links (internal)"
+              }
+            },
+            "required": [
+              "_links"
+            ]
+          }
+        ],
+        "description": "Minimal HAL representation of a background task for embedding"
+      },
+      "OperationEventPayload": {
+        "type": "object",
+        "additionalProperties": {},
+        "description": "Event-specific context payload"
+      },
+      "OperationEventBase": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "examples": [
+              "bgev_01HK2V8F3MNQRXZ4W7Y6P3JBCG"
+            ],
+            "description": "Unique identifier for the event"
+          },
+          "event_type": {
+            "type": "string",
+            "examples": [
+              "operation.status_changed"
+            ],
+            "description": "Type of the audit event"
+          },
+          "task_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "examples": [
+              null
+            ],
+            "description": "Associated task identifier, if this event relates to a task"
+          },
+          "payload": {
+            "$ref": "#/components/schemas/OperationEventPayload"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "examples": [
+              "2025-09-10T14:01:27.071Z"
+            ],
+            "description": "ISO 8601 date-time string"
+          }
+        },
+        "required": [
+          "id",
+          "event_type",
+          "task_id",
+          "payload",
+          "created_at"
+        ],
+        "description": "Audit event for a background operation"
+      },
+      "OperationEvent": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/OperationEventBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "_links": {
+                "type": "object",
+                "properties": {
+                  "self": {
+                    "type": "object",
+                    "properties": {
+                      "href": {
+                        "type": "string",
+                        "format": "uri",
+                        "examples": [
+                          "https://internal.api.com/background-operations/bgop_01HK2V8F3MNQRXZ4W7Y6P3JBCE/events/bgev_01HK2V8F3MNQRXZ4W7Y6P3JBCG"
+                        ]
+                      },
+                      "title": {
+                        "type": "string",
+                        "examples": [
+                          "Related resource"
+                        ],
+                        "description": "Human-readable title describing the linked resource relation"
+                      }
+                    },
+                    "required": [
+                      "href",
+                      "title"
+                    ],
+                    "description": "This event"
+                  },
+                  "operation": {
+                    "type": "object",
+                    "properties": {
+                      "href": {
+                        "type": "string",
+                        "format": "uri",
+                        "examples": [
+                          "https://internal.api.com/background-operations/bgop_01HK2V8F3MNQRXZ4W7Y6P3JBCE"
+                        ]
+                      },
+                      "title": {
+                        "type": "string",
+                        "examples": [
+                          "Related resource"
+                        ],
+                        "description": "Human-readable title describing the linked resource relation"
+                      }
+                    },
+                    "required": [
+                      "href",
+                      "title"
+                    ],
+                    "description": "Parent background operation"
+                  }
+                },
+                "required": [
+                  "self",
+                  "operation"
+                ],
+                "description": "HAL+JSON links (internal)"
+              }
+            },
+            "required": [
+              "_links"
+            ]
+          }
+        ],
+        "description": "HAL representation of a background operation audit event"
+      },
+      "BackgroundOperationBase": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "examples": [
+              "bgop_01HK2V8F3MNQRXZ4W7Y6P3JBCE"
+            ],
+            "description": "Unique identifier for the background operation"
+          },
+          "type": {
+            "$ref": "#/components/schemas/BackgroundOperationType"
+          },
+          "title": {
+            "type": "string",
+            "examples": [
+              "Provision 1000 subscriptions"
+            ],
+            "description": "Human-readable description of the operation"
+          },
+          "status": {
+            "$ref": "#/components/schemas/BackgroundOperationStatus"
+          },
+          "visibility": {
+            "$ref": "#/components/schemas/BackgroundOperationVisibility"
+          },
+          "cancellation_behavior": {
+            "$ref": "#/components/schemas/CancellationBehavior"
+          },
+          "has_tasks": {
+            "type": "boolean",
+            "examples": [
+              true
+            ],
+            "description": "Whether this operation has associated tasks"
+          },
+          "wait_setup_completion_before_execution": {
+            "type": "boolean",
+            "examples": [
+              false
+            ],
+            "description": "Whether execution tasks wait for all setup tasks to complete before starting"
+          },
+          "setup_completed": {
+            "type": "boolean",
+            "examples": [
+              false
+            ],
+            "description": "Whether the setup phase has completed"
+          },
+          "setup_progress": {
+            "$ref": "#/components/schemas/OperationProgress"
+          },
+          "payload": {
+            "$ref": "#/components/schemas/OperationPayload"
+          },
+          "account_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "examples": [
+              "acc_abc123"
+            ],
+            "description": "Account identifier this operation belongs to"
+          },
+          "idempotency_key": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Idempotency key used when creating the operation"
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/OperationMetadata"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "examples": [
+              "2025-09-10T14:01:27.071Z"
+            ],
+            "description": "ISO 8601 date-time string"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "examples": [
+              "2025-09-10T14:01:27.071Z"
+            ],
+            "description": "ISO 8601 date-time string"
+          },
+          "started_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "examples": [
+              "2025-09-10T14:01:27.071Z"
+            ],
+            "description": "When the operation started executing"
+          },
+          "cancel_requested_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "examples": [
+              "2025-09-10T14:01:27.071Z"
+            ],
+            "description": "When cancellation was requested"
+          },
+          "completed_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "examples": [
+              "2025-09-10T14:01:27.071Z"
+            ],
+            "description": "When the operation reached a terminal status"
+          },
+          "cancelled_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "examples": [
+              "2025-09-10T14:01:27.071Z"
+            ],
+            "description": "When the operation was cancelled"
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "title",
+          "status",
+          "visibility",
+          "cancellation_behavior",
+          "has_tasks",
+          "wait_setup_completion_before_execution",
+          "setup_completed",
+          "setup_progress",
+          "payload",
+          "created_at",
+          "updated_at"
+        ],
+        "description": "Background operation entity"
+      },
+      "BackgroundOperation": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BackgroundOperationBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "_links": {
+                "type": "object",
+                "properties": {
+                  "self": {
+                    "type": "object",
+                    "properties": {
+                      "href": {
+                        "type": "string",
+                        "format": "uri",
+                        "examples": [
+                          "https://internal.api.com/background-operations/bgop_01HK2V8F3MNQRXZ4W7Y6P3JBCE"
+                        ]
+                      },
+                      "title": {
+                        "type": "string",
+                        "examples": [
+                          "Background Operation"
+                        ],
+                        "description": "Human-readable title describing the linked resource relation"
+                      }
+                    },
+                    "required": [
+                      "href",
+                      "title"
+                    ]
+                  },
+                  "tasks": {
+                    "type": "object",
+                    "properties": {
+                      "href": {
+                        "type": "string",
+                        "format": "uri",
+                        "examples": [
+                          "https://internal.api.com/background-operations/bgop_01HK2V8F3MNQRXZ4W7Y6P3JBCE/tasks"
+                        ]
+                      },
+                      "title": {
+                        "type": "string",
+                        "examples": [
+                          "Related resource"
+                        ],
+                        "description": "Human-readable title describing the linked resource relation"
+                      }
+                    },
+                    "required": [
+                      "href",
+                      "title"
+                    ],
+                    "description": "Child tasks for this operation"
+                  },
+                  "events": {
+                    "type": "object",
+                    "properties": {
+                      "href": {
+                        "type": "string",
+                        "format": "uri",
+                        "examples": [
+                          "https://internal.api.com/background-operations/bgop_01HK2V8F3MNQRXZ4W7Y6P3JBCE/events"
+                        ]
+                      },
+                      "title": {
+                        "type": "string",
+                        "examples": [
+                          "Related resource"
+                        ],
+                        "description": "Human-readable title describing the linked resource relation"
+                      }
+                    },
+                    "required": [
+                      "href",
+                      "title"
+                    ],
+                    "description": "Audit events for this operation"
+                  },
+                  "cancel": {
+                    "type": "object",
+                    "properties": {
+                      "href": {
+                        "type": "string",
+                        "format": "uri",
+                        "examples": [
+                          "https://internal.api.com/background-operations/bgop_01HK2V8F3MNQRXZ4W7Y6P3JBCE/cancel"
+                        ]
+                      },
+                      "title": {
+                        "type": "string",
+                        "examples": [
+                          "Related resource"
+                        ],
+                        "description": "Human-readable title describing the linked resource relation"
+                      }
+                    },
+                    "required": [
+                      "href",
+                      "title"
+                    ],
+                    "description": "Request cancellation of this operation"
+                  }
+                },
+                "required": [
+                  "self",
+                  "tasks",
+                  "events",
+                  "cancel"
+                ],
+                "description": "HAL+JSON links (internal)"
+              },
+              "_embedded": {
+                "type": "object",
+                "properties": {
+                  "tasks": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/EmbeddedBackgroundTask"
+                    },
+                    "description": "Child tasks (transcluded via Prefer: transclude=tasks)"
+                  },
+                  "events": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/OperationEvent"
+                    },
+                    "description": "Audit events for this operation (transcluded via Prefer: transclude=events)"
+                  }
+                },
+                "description": "Optionally embedded related resources"
+              }
+            },
+            "required": [
+              "_links"
+            ]
+          }
+        ],
+        "description": "HAL representation of a background operation"
+      },
+      "BackgroundOperationCreate": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/BackgroundOperationType"
+          },
+          "title": {
+            "type": "string",
+            "examples": [
+              "Provision 1000 subscriptions"
+            ],
+            "description": "Human-readable title for the operation"
+          },
+          "visibility": {
+            "$ref": "#/components/schemas/BackgroundOperationVisibility"
+          },
+          "payload": {
+            "$ref": "#/components/schemas/OperationPayload"
+          },
+          "account_id": {
+            "type": "string",
+            "examples": [
+              "acc_abc123"
+            ],
+            "description": "Account identifier this operation belongs to"
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": {},
+            "description": "Arbitrary metadata to attach to the operation",
+            "examples": [
+              {}
+            ]
+          },
+          "idempotency_key": {
+            "type": "string",
+            "format": "uuid",
+            "description": "UUID for idempotent operation creation"
+          }
+        },
+        "required": [
+          "type",
+          "title",
+          "visibility",
+          "payload"
+        ],
+        "description": "Payload to create a new background operation"
+      },
+      "CursorPaginationMeta": {
+        "type": "object",
+        "properties": {
+          "count": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100,
+            "format": "int32",
+            "description": "Number of items returned in this response",
+            "examples": [
+              20
+            ]
+          }
+        },
+        "required": [
+          "count"
+        ],
+        "description": "Cursor-based pagination metadata"
+      },
+      "BackgroundOperationCollection": {
+        "type": "object",
+        "properties": {
+          "_embedded": {
+            "type": "object",
+            "properties": {
+              "background_operations": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/BackgroundOperation"
+                },
+                "maxItems": 40,
+                "description": "Array of background_operations resources (max 100 per page)"
+              }
+            },
+            "required": [
+              "background_operations"
+            ]
+          },
+          "_links": {
+            "type": "object",
+            "properties": {
+              "self": {
+                "type": "object",
+                "properties": {
+                  "href": {
+                    "type": "string",
+                    "format": "uri",
+                    "examples": [
+                      "https://internal.api.com/background-operations?limit=20"
+                    ]
+                  }
+                },
+                "required": [
+                  "href"
+                ]
+              },
+              "next": {
+                "type": "object",
+                "properties": {
+                  "href": {
+                    "type": "string",
+                    "format": "uri",
+                    "examples": [
+                      "https://internal.api.com/background-operations?cursor=eyJzbyI6eyJkIjoiREVTQyIsInAiOiJleHRlcm5hYifQ==&limit=20"
+                    ]
+                  }
+                },
+                "required": [
+                  "href"
+                ]
+              },
+              "prev": {
+                "type": "object",
+                "properties": {
+                  "href": {
+                    "type": "string",
+                    "format": "uri",
+                    "examples": [
+                      "https://internal.api.com/background-operations?cursor=eyJzbyI6eyJkIjoiREVTQyIsInAiOiJleHRlcm5hYifQ==&limit=20"
+                    ]
+                  }
+                },
+                "required": [
+                  "href"
+                ]
+              }
+            },
+            "required": [
+              "self"
+            ]
+          },
+          "page": {
+            "$ref": "#/components/schemas/CursorPaginationMeta"
+          }
+        },
+        "required": [
+          "_embedded",
+          "_links",
+          "page"
+        ],
+        "description": "Paginated list of background_operations"
+      },
+      "CancelOperationResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "examples": [
+              "bgop_01HK2V8F3MNQRXZ4W7Y6P3JBCE"
+            ],
+            "description": "Operation identifier"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "cancelling"
+            ],
+            "description": "Confirms the operation is transitioning to cancelled asynchronously"
+          }
+        },
+        "required": [
+          "id",
+          "status"
+        ],
+        "description": "Response returned when cancellation is accepted (202)"
+      },
+      "EmbeddedBackgroundOperation": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BackgroundOperationBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "_links": {
+                "type": "object",
+                "properties": {
+                  "self": {
+                    "type": "object",
+                    "properties": {
+                      "href": {
+                        "type": "string",
+                        "format": "uri",
+                        "examples": [
+                          "https://internal.api.com/background-operations/bgop_01HK2V8F3MNQRXZ4W7Y6P3JBCE"
+                        ]
+                      },
+                      "title": {
+                        "type": "string",
+                        "examples": [
+                          "Background Operation"
+                        ],
+                        "description": "Human-readable title describing the linked resource relation"
+                      }
+                    },
+                    "required": [
+                      "href",
+                      "title"
+                    ]
+                  },
+                  "tasks": {
+                    "type": "object",
+                    "properties": {
+                      "href": {
+                        "type": "string",
+                        "format": "uri",
+                        "examples": [
+                          "https://internal.api.com/background-operations/bgop_01HK2V8F3MNQRXZ4W7Y6P3JBCE/tasks"
+                        ]
+                      },
+                      "title": {
+                        "type": "string",
+                        "examples": [
+                          "Related resource"
+                        ],
+                        "description": "Human-readable title describing the linked resource relation"
+                      }
+                    },
+                    "required": [
+                      "href",
+                      "title"
+                    ],
+                    "description": "Child tasks for this operation"
+                  },
+                  "cancel": {
+                    "type": "object",
+                    "properties": {
+                      "href": {
+                        "type": "string",
+                        "format": "uri",
+                        "examples": [
+                          "https://internal.api.com/background-operations/bgop_01HK2V8F3MNQRXZ4W7Y6P3JBCE/cancel"
+                        ]
+                      },
+                      "title": {
+                        "type": "string",
+                        "examples": [
+                          "Related resource"
+                        ],
+                        "description": "Human-readable title describing the linked resource relation"
+                      }
+                    },
+                    "required": [
+                      "href",
+                      "title"
+                    ],
+                    "description": "Request cancellation of this operation"
+                  }
+                },
+                "required": [
+                  "self",
+                  "tasks",
+                  "cancel"
+                ],
+                "description": "HAL+JSON links (internal)"
+              }
+            },
+            "required": [
+              "_links"
+            ]
+          }
+        ],
+        "description": "Parent operation (transcluded via Prefer: transclude=operation)"
+      },
+      "BackgroundTask": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BackgroundTaskBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "_links": {
+                "type": "object",
+                "properties": {
+                  "self": {
+                    "type": "object",
+                    "properties": {
+                      "href": {
+                        "type": "string",
+                        "format": "uri",
+                        "examples": [
+                          "https://internal.api.com/background-operations/bgop_01HK2V8F3MNQRXZ4W7Y6P3JBCE/tasks/bgtsk_01HK2V8F3MNQRXZ4W7Y6P3JBCF"
+                        ]
+                      },
+                      "title": {
+                        "type": "string",
+                        "examples": [
+                          "Background Operation Task"
+                        ],
+                        "description": "Human-readable title describing the linked resource relation"
+                      }
+                    },
+                    "required": [
+                      "href",
+                      "title"
+                    ]
+                  },
+                  "operation": {
+                    "type": "object",
+                    "properties": {
+                      "href": {
+                        "type": "string",
+                        "format": "uri",
+                        "examples": [
+                          "https://internal.api.com/background-operations/bgop_01HK2V8F3MNQRXZ4W7Y6P3JBCE"
+                        ]
+                      },
+                      "title": {
+                        "type": "string",
+                        "examples": [
+                          "Related resource"
+                        ],
+                        "description": "Human-readable title describing the linked resource relation"
+                      }
+                    },
+                    "required": [
+                      "href",
+                      "title"
+                    ],
+                    "description": "Parent background operation"
+                  },
+                  "caused_by": {
+                    "type": "object",
+                    "properties": {
+                      "href": {
+                        "type": "string",
+                        "format": "uri",
+                        "examples": [
+                          "https://internal.api.com/background-operations/bgop_01HK2V8F3MNQRXZ4W7Y6P3JBCE/tasks/bgtsk_01HK2V8F3MNQRXZ4W7Y6P3JBCF"
+                        ]
+                      },
+                      "title": {
+                        "type": "string",
+                        "examples": [
+                          "Related resource"
+                        ],
+                        "description": "Human-readable title describing the linked resource relation"
+                      }
+                    },
+                    "required": [
+                      "href",
+                      "title"
+                    ],
+                    "description": "Task that triggered this one, if applicable"
+                  },
+                  "events": {
+                    "type": "object",
+                    "properties": {
+                      "href": {
+                        "type": "string",
+                        "format": "uri",
+                        "examples": [
+                          "https://internal.api.com/background-operations/bgop_01HK2V8F3MNQRXZ4W7Y6P3JBCE/tasks/bgtsk_01HK2V8F3MNQRXZ4W7Y6P3JBCF/events"
+                        ]
+                      },
+                      "title": {
+                        "type": "string",
+                        "examples": [
+                          "Related resource"
+                        ],
+                        "description": "Human-readable title describing the linked resource relation"
+                      }
+                    },
+                    "required": [
+                      "href",
+                      "title"
+                    ],
+                    "description": "Audit events for this task"
+                  },
+                  "retry": {
+                    "type": "object",
+                    "properties": {
+                      "href": {
+                        "type": "string",
+                        "format": "uri",
+                        "examples": [
+                          "https://internal.api.com/background-operations/bgop_01HK2V8F3MNQRXZ4W7Y6P3JBCE/tasks/bgtsk_01HK2V8F3MNQRXZ4W7Y6P3JBCF/retry"
+                        ]
+                      },
+                      "title": {
+                        "type": "string",
+                        "examples": [
+                          "Related resource"
+                        ],
+                        "description": "Human-readable title describing the linked resource relation"
+                      }
+                    },
+                    "required": [
+                      "href",
+                      "title"
+                    ],
+                    "description": "Retry this failed task"
+                  }
+                },
+                "required": [
+                  "self",
+                  "operation",
+                  "events",
+                  "retry"
+                ],
+                "description": "HAL+JSON links (internal)"
+              },
+              "_embedded": {
+                "type": "object",
+                "properties": {
+                  "operation": {
+                    "$ref": "#/components/schemas/EmbeddedBackgroundOperation"
+                  },
+                  "caused_by": {
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/EmbeddedBackgroundTask"
+                      },
+                      {
+                        "description": "Task that triggered this one (transcluded via Prefer: transclude=caused_by)"
+                      }
+                    ]
+                  },
+                  "events": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/OperationEvent"
+                    },
+                    "description": "Audit events for this task (transcluded via Prefer: transclude=events)"
+                  }
+                },
+                "description": "Optionally embedded related resources"
+              }
+            },
+            "required": [
+              "_links"
+            ]
+          }
+        ],
+        "description": "HAL representation of a background task"
+      },
+      "BackgroundTaskCollection": {
+        "type": "object",
+        "properties": {
+          "_embedded": {
+            "type": "object",
+            "properties": {
+              "tasks": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/BackgroundTask"
+                },
+                "maxItems": 40,
+                "description": "Array of tasks resources (max 100 per page)"
+              }
+            },
+            "required": [
+              "tasks"
+            ]
+          },
+          "_links": {
+            "type": "object",
+            "properties": {
+              "self": {
+                "type": "object",
+                "properties": {
+                  "href": {
+                    "type": "string",
+                    "format": "uri",
+                    "examples": [
+                      "https://internal.api.com/background-operations/{operation_id}/tasks?limit=20"
+                    ]
+                  }
+                },
+                "required": [
+                  "href"
+                ]
+              },
+              "next": {
+                "type": "object",
+                "properties": {
+                  "href": {
+                    "type": "string",
+                    "format": "uri",
+                    "examples": [
+                      "https://internal.api.com/background-operations/{operation_id}/tasks?cursor=eyJzbyI6eyJkIjoiREVTQyIsInAiOiJleHRlcm5hYifQ==&limit=20"
+                    ]
+                  }
+                },
+                "required": [
+                  "href"
+                ]
+              },
+              "prev": {
+                "type": "object",
+                "properties": {
+                  "href": {
+                    "type": "string",
+                    "format": "uri",
+                    "examples": [
+                      "https://internal.api.com/background-operations/{operation_id}/tasks?cursor=eyJzbyI6eyJkIjoiREVTQyIsInAiOiJleHRlcm5hYifQ==&limit=20"
+                    ]
+                  }
+                },
+                "required": [
+                  "href"
+                ]
+              }
+            },
+            "required": [
+              "self"
+            ]
+          },
+          "page": {
+            "$ref": "#/components/schemas/CursorPaginationMeta"
+          }
+        },
+        "required": [
+          "_embedded",
+          "_links",
+          "page"
+        ],
+        "description": "Paginated list of tasks"
+      },
+      "TaskRetryResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "examples": [
+              "bgtsk_01HK2V8F3MNQRXZ4W7Y6P3JBCF"
+            ],
+            "description": "Task identifier"
+          },
+          "operation_id": {
+            "type": "string",
+            "examples": [
+              "bgop_01HK2V8F3MNQRXZ4W7Y6P3JBCE"
+            ],
+            "description": "Parent operation identifier"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending"
+            ],
+            "description": "Confirms the task has been reset to pending for retry"
+          },
+          "retries": {
+            "type": "integer",
+            "minimum": 0,
+            "format": "int32",
+            "examples": [
+              1
+            ],
+            "description": "Updated retry count after this retry attempt"
+          }
+        },
+        "required": [
+          "id",
+          "operation_id",
+          "status",
+          "retries"
+        ],
+        "description": "Response returned when a task retry is accepted (202)"
+      },
+      "TaskOperationEventCollection": {
+        "type": "object",
+        "properties": {
+          "_embedded": {
+            "type": "object",
+            "properties": {
+              "events": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/OperationEvent"
+                },
+                "maxItems": 40,
+                "description": "Array of events resources (max 100 per page)"
+              }
+            },
+            "required": [
+              "events"
+            ]
+          },
+          "_links": {
+            "type": "object",
+            "properties": {
+              "self": {
+                "type": "object",
+                "properties": {
+                  "href": {
+                    "type": "string",
+                    "format": "uri",
+                    "examples": [
+                      "https://internal.api.com/background-operations/{operation_id}/tasks/{task_id}/events?limit=20"
+                    ]
+                  }
+                },
+                "required": [
+                  "href"
+                ]
+              },
+              "next": {
+                "type": "object",
+                "properties": {
+                  "href": {
+                    "type": "string",
+                    "format": "uri",
+                    "examples": [
+                      "https://internal.api.com/background-operations/{operation_id}/tasks/{task_id}/events?cursor=eyJzbyI6eyJkIjoiREVTQyIsInAiOiJleHRlcm5hYifQ==&limit=20"
+                    ]
+                  }
+                },
+                "required": [
+                  "href"
+                ]
+              },
+              "prev": {
+                "type": "object",
+                "properties": {
+                  "href": {
+                    "type": "string",
+                    "format": "uri",
+                    "examples": [
+                      "https://internal.api.com/background-operations/{operation_id}/tasks/{task_id}/events?cursor=eyJzbyI6eyJkIjoiREVTQyIsInAiOiJleHRlcm5hYifQ==&limit=20"
+                    ]
+                  }
+                },
+                "required": [
+                  "href"
+                ]
+              }
+            },
+            "required": [
+              "self"
+            ]
+          },
+          "page": {
+            "$ref": "#/components/schemas/CursorPaginationMeta"
+          }
+        },
+        "required": [
+          "_embedded",
+          "_links",
+          "page"
+        ],
+        "description": "Paginated list of events"
+      },
+      "OperationCallbackInput": {
+        "type": "object",
+        "properties": {
+          "reference_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Reference identifier for the task or operation being reported on",
+            "examples": [
+              "f17d330e-dc41-4b94-abc0-261620ba6e28"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "completed",
+              "updated",
+              "failed",
+              "cancelled"
+            ],
+            "description": "Reported status from the downstream system"
+          },
+          "payload": {
+            "type": "object",
+            "additionalProperties": {},
+            "description": "Arbitrary JSON payload from the downstream system",
+            "examples": [
+              {
+                "order_id": "f17d330e-dc41-4b94-abc0-261620ba6e28"
+              }
+            ]
+          }
+        },
+        "required": [
+          "reference_id",
+          "status"
+        ],
+        "description": "Payload sent by a downstream system to report the outcome of a task or operation"
+      },
+      "OperationEventCollection": {
+        "type": "object",
+        "properties": {
+          "_embedded": {
+            "type": "object",
+            "properties": {
+              "events": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/OperationEvent"
+                },
+                "maxItems": 40,
+                "description": "Array of events resources (max 100 per page)"
+              }
+            },
+            "required": [
+              "events"
+            ]
+          },
+          "_links": {
+            "type": "object",
+            "properties": {
+              "self": {
+                "type": "object",
+                "properties": {
+                  "href": {
+                    "type": "string",
+                    "format": "uri",
+                    "examples": [
+                      "https://internal.api.com/background-operations/{operation_id}/events?limit=20"
+                    ]
+                  }
+                },
+                "required": [
+                  "href"
+                ]
+              },
+              "next": {
+                "type": "object",
+                "properties": {
+                  "href": {
+                    "type": "string",
+                    "format": "uri",
+                    "examples": [
+                      "https://internal.api.com/background-operations/{operation_id}/events?cursor=eyJzbyI6eyJkIjoiREVTQyIsInAiOiJleHRlcm5hYifQ==&limit=20"
+                    ]
+                  }
+                },
+                "required": [
+                  "href"
+                ]
+              },
+              "prev": {
+                "type": "object",
+                "properties": {
+                  "href": {
+                    "type": "string",
+                    "format": "uri",
+                    "examples": [
+                      "https://internal.api.com/background-operations/{operation_id}/events?cursor=eyJzbyI6eyJkIjoiREVTQyIsInAiOiJleHRlcm5hYifQ==&limit=20"
+                    ]
+                  }
+                },
+                "required": [
+                  "href"
+                ]
+              }
+            },
+            "required": [
+              "self"
+            ]
+          },
+          "page": {
+            "$ref": "#/components/schemas/CursorPaginationMeta"
+          }
+        },
+        "required": [
+          "_embedded",
+          "_links",
+          "page"
+        ],
+        "description": "Paginated list of events"
+      }
+    },
+    "parameters": {}
+  },
+  "paths": {
+    "/background-operations": {
+      "post": {
+        "operationId": "createBackgroundOperation",
+        "tags": [
+          "Background Operations"
+        ],
+        "summary": "Create background operation",
+        "description": "Create a new background operation. Write access is restricted to internal service-to-service calls.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "description": "Optional Prefer header to transclude related resources into _embedded. Supported relations: tasks, events."
+            },
+            "required": false,
+            "description": "Optional Prefer header to transclude related resources into _embedded. Supported relations: tasks, events.",
+            "name": "prefer",
+            "in": "header"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BackgroundOperationCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Background operation created",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BackgroundOperation"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Access token is not set or invalid",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The requestor is not authorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "listBackgroundOperations",
+        "tags": [
+          "Background Operations"
+        ],
+        "summary": "List background operations",
+        "description": "Retrieve a paginated list of background operations. Results are scoped by the caller's role and visibility. Progress is hidden until setup_completed.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Filter by account ID"
+            },
+            "required": false,
+            "description": "Filter by account ID",
+            "name": "account-id",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/BackgroundOperationType"
+                },
+                {
+                  "description": "Filter by operation type"
+                }
+              ]
+            },
+            "required": false,
+            "description": "Filter by operation type",
+            "name": "type",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/BackgroundOperationStatus"
+                },
+                {
+                  "description": "Filter by operation status"
+                }
+              ]
+            },
+            "required": false,
+            "description": "Filter by operation status",
+            "name": "status",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/BackgroundOperationVisibility"
+                },
+                {
+                  "description": "Filter by visibility scope"
+                }
+              ]
+            },
+            "required": false,
+            "description": "Filter by visibility scope",
+            "name": "visibility",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "format": "int32",
+              "description": "Maximum items per page (1–100, default 20)"
+            },
+            "required": false,
+            "description": "Maximum items per page (1–100, default 20)",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Pagination cursor."
+            },
+            "required": false,
+            "description": "Pagination cursor.",
+            "name": "cursor",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Optional Prefer header to transclude related resources into _embedded. Supported relations: tasks, events."
+            },
+            "required": false,
+            "description": "Optional Prefer header to transclude related resources into _embedded. Supported relations: tasks, events.",
+            "name": "prefer",
+            "in": "header"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated list of background operations",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BackgroundOperationCollection"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Access token is not set or invalid",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The requestor is not authorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/background-operations/{operation_id}": {
+      "get": {
+        "operationId": "getBackgroundOperation",
+        "tags": [
+          "Background Operations"
+        ],
+        "summary": "Get background operation",
+        "description": "Retrieve a single background operation with full progress detail.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "description": "Background operation identifier"
+            },
+            "required": true,
+            "description": "Background operation identifier",
+            "name": "operation_id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Optional Prefer header to transclude related resources into _embedded. Supported relations: tasks, events."
+            },
+            "required": false,
+            "description": "Optional Prefer header to transclude related resources into _embedded. Supported relations: tasks, events.",
+            "name": "prefer",
+            "in": "header"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Background operation details",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BackgroundOperation"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Access token is not set or invalid",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The requestor is not authorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/background-operations/{operation_id}/cancel": {
+      "post": {
+        "operationId": "cancelBackgroundOperation",
+        "tags": [
+          "Background Operations"
+        ],
+        "summary": "Cancel background operation",
+        "description": "Request cancellation of a background operation. The transition to cancelled is asynchronous; poll GET /{operation_id} until status is cancelled. Returns 409 if the operation is already in a terminal state or is not cancelable.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "description": "Background operation identifier"
+            },
+            "required": true,
+            "description": "Background operation identifier",
+            "name": "operation_id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Cancellation request accepted",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CancelOperationResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Access token is not set or invalid",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The requestor is not authorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Operation is already in a terminal state or cancellation_behavior is not_cancelable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/background-operations/{operation_id}/tasks": {
+      "get": {
+        "operationId": "listBackgroundOperationTasks",
+        "tags": [
+          "Background Operation Tasks"
+        ],
+        "summary": "List operation tasks",
+        "description": "Retrieve a paginated list of child tasks for an operation, ordered by sequence_no ascending.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "description": "Background operation identifier"
+            },
+            "required": true,
+            "description": "Background operation identifier",
+            "name": "operation_id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/BackgroundTaskType"
+                },
+                {
+                  "description": "Filter by task type (setup or execution)"
+                }
+              ]
+            },
+            "required": false,
+            "description": "Filter by task type (setup or execution)",
+            "name": "type",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Filter by action name"
+            },
+            "required": false,
+            "description": "Filter by action name",
+            "name": "action-name",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/BackgroundTaskStatus"
+                },
+                {
+                  "description": "Filter by task status"
+                }
+              ]
+            },
+            "required": false,
+            "description": "Filter by task status",
+            "name": "status",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "format": "int32",
+              "description": "Maximum items per page (1–100, default 20)"
+            },
+            "required": false,
+            "description": "Maximum items per page (1–100, default 20)",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Pagination cursor."
+            },
+            "required": false,
+            "description": "Pagination cursor.",
+            "name": "cursor",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Optional Prefer header to transclude related resources into _embedded. Supported relations: operation, caused_by, events."
+            },
+            "required": false,
+            "description": "Optional Prefer header to transclude related resources into _embedded. Supported relations: operation, caused_by, events.",
+            "name": "prefer",
+            "in": "header"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated list of operation tasks",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BackgroundTaskCollection"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Access token is not set or invalid",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The requestor is not authorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/background-operations/{operation_id}/tasks/{task_id}": {
+      "get": {
+        "operationId": "getBackgroundOperationTask",
+        "tags": [
+          "Background Operation Tasks"
+        ],
+        "summary": "Get operation task",
+        "description": "Retrieve a single child task by ID.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "description": "Background operation identifier"
+            },
+            "required": true,
+            "description": "Background operation identifier",
+            "name": "operation_id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Task identifier"
+            },
+            "required": true,
+            "description": "Task identifier",
+            "name": "task_id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Optional Prefer header to transclude related resources into _embedded. Supported relations: operation, caused_by, events."
+            },
+            "required": false,
+            "description": "Optional Prefer header to transclude related resources into _embedded. Supported relations: operation, caused_by, events.",
+            "name": "prefer",
+            "in": "header"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Task details",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BackgroundTask"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Access token is not set or invalid",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The requestor is not authorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/background-operations/{operation_id}/tasks/{task_id}/retry": {
+      "post": {
+        "operationId": "retryBackgroundOperationTask",
+        "tags": [
+          "Background Operation Tasks"
+        ],
+        "summary": "Retry failed task",
+        "description": "Manually retry a failed task. The task must be in failed status and retryable = true. Increments retries, resets status to pending, and publishes a new Kafka message via the outbox. Returns 409 if retries >= max_retries or the parent operation is already in a terminal state.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "description": "Background operation identifier"
+            },
+            "required": true,
+            "description": "Background operation identifier",
+            "name": "operation_id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Task identifier"
+            },
+            "required": true,
+            "description": "Task identifier",
+            "name": "task_id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Retry accepted; task reset to pending",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskRetryResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Access token is not set or invalid",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The requestor is not authorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Task is not retryable, retries >= max_retries, task is not in failed status, or parent operation is in a terminal state",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/background-operations/{operation_id}/tasks/{task_id}/events": {
+      "get": {
+        "operationId": "listBackgroundOperationTaskEvents",
+        "tags": [
+          "Background Operation Tasks"
+        ],
+        "summary": "List task events",
+        "description": "Audit event history for a single task, ordered newest-first. Includes status transitions, retry attempts, and callback receipts. Paginated by event id descending.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "description": "Background operation identifier"
+            },
+            "required": true,
+            "description": "Background operation identifier",
+            "name": "operation_id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Task identifier"
+            },
+            "required": true,
+            "description": "Task identifier",
+            "name": "task_id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "format": "int32",
+              "description": "Maximum items per page (1–100, default 20)"
+            },
+            "required": false,
+            "description": "Maximum items per page (1–100, default 20)",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Pagination cursor."
+            },
+            "required": false,
+            "description": "Pagination cursor.",
+            "name": "cursor",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated list of task audit events",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskOperationEventCollection"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Access token is not set or invalid",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The requestor is not authorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/callback": {
+      "post": {
+        "operationId": "operationCallback",
+        "tags": [
+          "Background Operation Callbacks"
+        ],
+        "summary": "Report task or operation outcome",
+        "description": "Called by downstream systems to report the status of a task or operation via a reference ID.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OperationCallbackInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Callback accepted"
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Access token is not set or invalid",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The requestor is not authorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Task or operation is already in a terminal state — safe no-op",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/background-operations/{operation_id}/events": {
+      "get": {
+        "operationId": "listBackgroundOperationEvents",
+        "tags": [
+          "Background Operation Events"
+        ],
+        "summary": "List operation events",
+        "description": "Audit event history for an operation, ordered newest-first. Useful for support tooling and debugging stuck operations.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "description": "Background operation identifier"
+            },
+            "required": true,
+            "description": "Background operation identifier",
+            "name": "operation_id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "format": "int32",
+              "description": "Maximum items per page (1–100, default 20)"
+            },
+            "required": false,
+            "description": "Maximum items per page (1–100, default 20)",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Pagination cursor."
+            },
+            "required": false,
+            "description": "Pagination cursor.",
+            "name": "cursor",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated list of operation audit events",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperationEventCollection"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Access token is not set or invalid",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The requestor is not authorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "webhooks": {}
+}

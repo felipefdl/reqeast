@@ -1,0 +1,4 @@
+{
+  "kind": "ParseError",
+  "message": "Invalid configuration: Invalid YAML: repetition limit exceeded"
+}

@@ -1,0 +1,102 @@
+{
+  "project": {
+    "title": "Variables Insomnia API",
+    "description": null,
+    "version": "insomnia-v4",
+    "icon_url": null,
+    "security_schemes": [],
+    "folders": [],
+    "operations": [
+      {
+        "primary_key": "GET /health",
+        "alternate_keys": [],
+        "name": "Health",
+        "method": "GET",
+        "path": "/health",
+        "deprecated": false,
+        "tags": [],
+        "protocol": "Http",
+        "binding": null,
+        "folder_id": null,
+        "parameters": [],
+        "body": {
+          "kind": "None"
+        },
+        "body_candidates": [],
+        "auth": {
+          "scheme_type": "http:bearer",
+          "header_name": "Authorization",
+          "query_name": null,
+          "placeholder_value": "Bearer {{token}}",
+          "oauth2_grant_type": null,
+          "oauth2_auth_url": null,
+          "oauth2_token_url": null,
+          "oauth2_scopes": null
+        },
+        "description": null
+      },
+      {
+        "primary_key": "GET /search",
+        "alternate_keys": [],
+        "name": "Search",
+        "method": "GET",
+        "path": "/search",
+        "deprecated": false,
+        "tags": [],
+        "protocol": "Http",
+        "binding": null,
+        "folder_id": null,
+        "parameters": [
+          {
+            "location": "Query",
+            "name": "q",
+            "value": "reqeast",
+            "required": false,
+            "enabled": true,
+            "value_source": "FromExample"
+          }
+        ],
+        "body": {
+          "kind": "None"
+        },
+        "body_candidates": [],
+        "auth": {
+          "scheme_type": "http:bearer",
+          "header_name": "Authorization",
+          "query_name": null,
+          "placeholder_value": "Bearer {{token}}",
+          "oauth2_grant_type": null,
+          "oauth2_auth_url": null,
+          "oauth2_token_url": null,
+          "oauth2_scopes": null
+        },
+        "description": null
+      }
+    ],
+    "environments": [
+      {
+        "name": "Staging",
+        "variables": [
+          {
+            "key": "base_url",
+            "value": "https://staging.example.com",
+            "enabled": true
+          },
+          {
+            "key": "token",
+            "value": "",
+            "enabled": true
+          }
+        ]
+      }
+    ]
+  },
+  "warnings": [
+    {
+      "code": "MIGRATION_FROM_INSOMNIA",
+      "message": "Imported from Insomnia; scripts, tests, and cookie jars are not migrated",
+      "operation_ref": null
+    }
+  ],
+  "content_fingerprint": "e0f86cc43d0626bd0ef2200df932d16cb11537c1ab74033eff52033bbc0fabce"
+}

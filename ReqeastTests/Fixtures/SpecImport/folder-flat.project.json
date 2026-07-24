@@ -1,0 +1,122 @@
+{
+  "environments": [
+    {
+      "id": "e26e018e-9b4c-412d-8217-24dfa7472118",
+      "isActive": true,
+      "name": "Default",
+      "variables": [
+        {
+          "enabled": true,
+          "key": "base_url",
+          "value": "/"
+        }
+      ]
+    }
+  ],
+  "folders": [],
+  "project": {
+    "id": "3a470e1c-0554-4594-8931-a85688152a5c",
+    "name": "Folder Flat API"
+  },
+  "requests": [
+    {
+      "folderId": null,
+      "http": {
+        "authApiKeyLocation": "header",
+        "authApiKeyName": "",
+        "authApiKeyValue": "",
+        "authOAuth2AuthURL": "",
+        "authOAuth2GrantType": "",
+        "authOAuth2Scopes": "",
+        "authOAuth2TokenURL": "",
+        "authPassword": "",
+        "authToken": "",
+        "authType": "none",
+        "authUsername": "",
+        "binaryFileName": "",
+        "bodyContent": "",
+        "bodyFormData": [],
+        "bodyFormDataEntries": [],
+        "bodyType": "none",
+        "headers": [],
+        "method": "GET",
+        "params": [],
+        "rawContentType": "text",
+        "url": "{{base_url}}/health"
+      },
+      "id": "91d4c59c-5dcc-4c77-ba06-1a776c9057d4",
+      "name": "Health check",
+      "sortOrder": 0,
+      "specIdentity": {
+        "alternateKeys": [],
+        "primaryKey": "healthCheck"
+      }
+    },
+    {
+      "folderId": null,
+      "http": {
+        "authApiKeyLocation": "header",
+        "authApiKeyName": "",
+        "authApiKeyValue": "",
+        "authOAuth2AuthURL": "",
+        "authOAuth2GrantType": "",
+        "authOAuth2Scopes": "",
+        "authOAuth2TokenURL": "",
+        "authPassword": "",
+        "authToken": "",
+        "authType": "none",
+        "authUsername": "",
+        "binaryFileName": "",
+        "bodyContent": "",
+        "bodyFormData": [],
+        "bodyFormDataEntries": [],
+        "bodyType": "none",
+        "headers": [],
+        "method": "GET",
+        "params": [],
+        "rawContentType": "text",
+        "url": "{{base_url}}/metrics"
+      },
+      "id": "ab97d19c-6cfd-48cc-ab49-9dd1f5184266",
+      "name": "Metrics",
+      "sortOrder": 1,
+      "specIdentity": {
+        "alternateKeys": [],
+        "primaryKey": "getMetrics"
+      }
+    },
+    {
+      "folderId": null,
+      "http": {
+        "authApiKeyLocation": "header",
+        "authApiKeyName": "",
+        "authApiKeyValue": "",
+        "authOAuth2AuthURL": "",
+        "authOAuth2GrantType": "",
+        "authOAuth2Scopes": "",
+        "authOAuth2TokenURL": "",
+        "authPassword": "",
+        "authToken": "",
+        "authType": "none",
+        "authUsername": "",
+        "binaryFileName": "",
+        "bodyContent": "",
+        "bodyFormData": [],
+        "bodyFormDataEntries": [],
+        "bodyType": "none",
+        "headers": [],
+        "method": "GET",
+        "params": [],
+        "rawContentType": "text",
+        "url": "{{base_url}}/version"
+      },
+      "id": "92a0cc41-145e-4839-998e-1a26e2f465f0",
+      "name": "API version",
+      "sortOrder": 2,
+      "specIdentity": {
+        "alternateKeys": [],
+        "primaryKey": "getVersion"
+      }
+    }
+  ]
+}

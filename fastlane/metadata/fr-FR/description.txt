@@ -1,0 +1,57 @@
+Reqeast est un client API natif pour iPhone, iPad et Mac. Conçu avec SwiftUI et Rust. Testez HTTP, appelez gRPC, ouvrez TCP/TLS, envoyez de l'UDP, connectez WebSocket et abonnez-vous à SSE. Six protocoles dans une app.
+
+Pas d'Electron. Pas de compte cloud. Pas d'inscription. Lancement instantané. Vos données restent sur vos appareils. Sync via iCloud. Rien d'autre.
+
+HTTP
+Constructeur de requêtes GET, POST, PUT, PATCH, DELETE, HEAD et OPTIONS. Headers, query et body en JSON, formulaire, URL encodé, texte ou binaire. Huit authentifications : Bearer Token, Basic Auth, API Key, JWT Bearer, Hawk, AWS Signature V4, Akamai EdgeGrid, et d'autres à venir. Réponses avec coloration, arbre JSON, images et hex. Cookies intégrés. HTTP/1.1 et HTTP/2.
+
+gRPC
+RPC unary et streaming. Server reflection, bibliothèque proto locale multi-fichiers, mode message hex. Bundles proto synchronisés via iCloud.
+
+WebSocket
+Connexions persistantes bidirectionnelles en temps réel. Headers, sous-protocole, auto-ping et TLS avec mode non sécurisé pour le dev.
+
+Server-Sent Events
+Abonnez-vous aux endpoints SSE et suivez les flux en temps réel. Type et ID d'événement avec historique complet.
+
+TCP et TLS
+Connexions TCP brutes ou sessions TLS. Modes persistant et one-shot. UTF-8, hex, base64, fins de ligne configurables. Historique par session.
+
+UDP
+Envoyez et recevez des datagrammes avec port et timeout. Mêmes encodages que TCP.
+
+Environnements
+Variables par projet avec la syntaxe {{variable}}. URLs, headers, body, auth. Secrets dans Keychain. Changement instantané.
+
+Extraits de code
+Code de requête en 10 langages : cURL, HTTP raw, Python, Node.js, JavaScript Fetch, Java, Go, C#, Swift et Rust.
+
+Import
+Collez cURL, HTTPie ou wget pour créer des requêtes. Importez des specs : OpenAPI, Postman, Insomnia, Bruno, HAR, AsyncAPI et GraphQL SDL depuis presse-papiers, fichier, URL, bundle multi-fichiers ou Git. Liez un projet à une spec distante, examinez les changements et appliquez sans perdre vos modifications locales. Apple Intelligence sur l'appareil en repli.
+
+Organisation des projets
+Requêtes regroupées par projet avec icônes et couleurs. Dossiers de projet et de requêtes. Historique avec restauration complète.
+
+Synchronisation iCloud
+Projets, requêtes et environnements se synchronisent entre iPhone, iPad et Mac via iCloud. Identifiants via Keychain.
+
+Apple Shortcuts
+Six actions pour HTTP, gRPC, TCP, UDP, WebSocket et SSE. Automatisez via Shortcuts, Siri ou d'autres outils. Variables et paramètres à l'exécution.
+
+jq Filter
+Filtrez et transformez le JSON avec jq dans la vue de réponse. Guillemets optionnels sur les strings.
+
+Export
+Exportez tous les projets dans un fichier. Partagez ou sauvegardez localement. Exportez un projet en OpenAPI 3.1 ou Postman Collection v2.1.
+
+Editeur avec coloration syntaxique
+Editeur CodeEdit avec tree-sitter, numéros de ligne et repli pour JSON, XML, HTML, JavaScript et SQL.
+
+Journal d'événements
+Journal de diagnostic filtré par protocole et sévérité. Jusqu'à 1 000 entrées pour déboguer connexions et trafic.
+
+Noyau réseau Rust sous forte charge IO. Interface SwiftUI native avec Liquid Glass.
+
+Toutes les fonctionnalités sont gratuites. Aucune limite. Aucun paywall. Aucune restriction.
+
+Terms of Use (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/

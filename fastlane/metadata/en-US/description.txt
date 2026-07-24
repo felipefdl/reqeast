@@ -1,0 +1,57 @@
+Reqeast is a native API client for iPhone, iPad, and Mac. Built with SwiftUI and Rust. Test HTTP, call gRPC, open TCP/TLS, send UDP, connect WebSocket, and subscribe to SSE. Six protocols in one app.
+
+No Electron. No cloud accounts. No sign-up. Launches instantly. Your data stays on your devices. Synced through iCloud. Nothing else.
+
+HTTP
+Request builder with GET, POST, PUT, PATCH, DELETE, HEAD, and OPTIONS. Headers, query params, and body as JSON, form data, URL encoded, text, or binary. Eight auth types: Bearer Token, Basic Auth, API Key, JWT Bearer, Hawk, AWS Signature V4, Akamai EdgeGrid, and more coming. Responses with syntax highlighting, JSON tree, images, and hex. Cookies built in. HTTP/1.1 and HTTP/2.
+
+gRPC
+Unary and streaming RPCs. Server reflection, local proto library with multi-file bundles, hex message mode. Proto bundles sync over iCloud.
+
+WebSocket
+Persistent bidirectional real-time connections. Custom headers, subprotocol, auto-ping, and TLS with insecure mode for development.
+
+Server-Sent Events
+Subscribe to SSE endpoints and watch event streams in real time. Event type and ID with full conversation history.
+
+TCP and TLS
+Raw TCP connections or TLS sessions. Persistent and one-shot modes. UTF-8, hex, base64, configurable line endings. Message history per session.
+
+UDP
+Send and receive datagrams with bind port and timeout. Same encoding options as TCP.
+
+Environments
+Variables per project with {{variable}} syntax. URLs, headers, body, auth. Secrets in Keychain. Switch instantly.
+
+Code Snippets
+Request code in 10 languages: cURL, HTTP raw, Python, Node.js, JavaScript Fetch, Java, Go, C#, Swift, and Rust.
+
+Import
+Paste cURL, HTTPie, or wget into requests. Import API specs: OpenAPI, Postman, Insomnia, Bruno, HAR, AsyncAPI, and GraphQL SDL from paste, file, URL, multi-file bundle, or Git. Link a project to a remote spec, review changes, and apply updates without losing local edits. On-device Apple Intelligence fallback for unrecognized formats.
+
+Project Organization
+Group requests into projects with icons and colors. Project and request folders. History with full snapshot restore.
+
+iCloud Sync
+Projects, requests, and environments sync across iPhone, iPad, and Mac through iCloud. Credentials through Keychain.
+
+Apple Shortcuts
+Six actions for HTTP, gRPC, TCP, UDP, WebSocket, and SSE. Automate from Shortcuts, Siri, or other tools. Variables and parameters at runtime.
+
+jq Filter
+Filter and transform JSON with jq in the response view. Optional unquote for string results.
+
+Export
+Export all projects as one file. Share or back up locally. Export a project as OpenAPI 3.1 or Postman Collection v2.1.
+
+Syntax Highlighted Editor
+CodeEdit editor with tree-sitter, line numbers, and code folding for JSON, XML, HTML, JavaScript, and SQL.
+
+Event Log
+Diagnostic log filtered by protocol and severity. Up to 1,000 entries for connection and traffic debugging.
+
+Rust networking core for heavy IO. Native SwiftUI interface with Liquid Glass.
+
+Every feature is free. No limits. No paywalls. No feature gating.
+
+Terms of Use (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/

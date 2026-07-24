@@ -1,0 +1,26 @@
+openapi: 3.0.0
+info:
+  title: Folder Flat API
+  version: 1.0.0
+paths:
+  /health:
+    get:
+      summary: Health check
+      operationId: healthCheck
+      responses:
+        "200":
+          description: ok
+  /version:
+    get:
+      summary: API version
+      operationId: getVersion
+      responses:
+        "200":
+          description: ok
+  /metrics:
+    get:
+      summary: Metrics
+      operationId: getMetrics
+      responses:
+        "200":
+          description: ok

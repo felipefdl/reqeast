@@ -1,0 +1,57 @@
+Reqeast 是一款 iPhone、iPad 和 Mac 原生 API 用戶端，使用 SwiftUI 和 Rust 打造。測試 HTTP、呼叫 gRPC、使用 TCP/TLS 與 UDP、連接 WebSocket、訂閱 SSE。六種協定，一個應用程式。
+
+沒有 Electron，沒有雲端帳號，不需註冊。即開即用。資料留在你的裝置上。透過 iCloud 同步，僅此而已。
+
+HTTP
+支援 GET、POST、PUT、PATCH、DELETE、HEAD、OPTIONS 的請求建構器。標頭、查詢參數、請求主體支援 JSON、表單、URL 編碼、文字、二進位。八種驗證：Bearer Token、Basic Auth、API Key、JWT Bearer、Hawk、AWS Signature V4、Akamai EdgeGrid，更多即將推出。語法醒目提示、JSON 樹、圖片與十六進位顯示。內建 Cookie。HTTP/1.1 與 HTTP/2。
+
+gRPC
+unary 與 streaming RPC。server reflection、支援多檔案的本機 proto 庫、十六進位訊息模式。Proto 套件透過 iCloud 同步。
+
+WebSocket
+持久雙向即時連線。自訂標頭、子協定、自動 Ping，支援 TLS 及開發用不安全模式。
+
+Server-Sent Events
+訂閱 SSE 端點，即時查看事件串流。事件類型與 ID，完整對話歷史。
+
+TCP 和 TLS
+原始 TCP 或 TLS 工作階段。持久與單次模式。UTF-8、十六進位、Base64，可設定行結尾。每工作階段訊息歷史。
+
+UDP
+可設定繫結連接埠與逾時的資料報收發。編碼選項與 TCP 相同。
+
+環境變數
+按專案使用 {{variable}} 語法。URL、標頭、請求主體、驗證。機密項存 Keychain。一鍵切換。
+
+程式碼片段
+產生 10 種語言：cURL、HTTP raw、Python、Node.js、JavaScript Fetch、Java、Go、C#、Swift、Rust。
+
+匯入
+貼上 cURL、HTTPie 或 wget 轉為請求。匯入 API 規格：OpenAPI、Postman、Insomnia、Bruno、HAR、AsyncAPI、GraphQL SDL，支援貼上、檔案、URL、多檔案套件或 Git。關聯遠端規格，審閱變更，在保留本機編輯的前提下套用更新。無法辨識的格式使用裝置端 Apple Intelligence 備選。
+
+專案管理
+帶圖示與顏色的專案。專案與請求資料夾。支援完整快照還原的歷史。
+
+iCloud 同步
+專案、請求與環境透過 iCloud 在 iPhone、iPad、Mac 間同步。憑證透過 Keychain。
+
+Apple 捷徑
+涵蓋 HTTP、gRPC、TCP、UDP、WebSocket、SSE 的六個動作。透過捷徑、Siri 等自動化。執行時可傳變數與參數。
+
+jq 篩選器
+在回應檢視用 jq 篩選和轉換 JSON。可在設定中取消字串引號。
+
+匯出
+將全部專案匯出為單一檔案。分享或本機備份。可將專案匯出為 OpenAPI 3.1 或 Postman Collection v2.1。
+
+語法醒目提示編輯器
+基於 CodeEdit，tree-sitter、行號、程式碼摺疊。支援 JSON、XML、HTML、JavaScript、SQL。
+
+事件記錄
+按協定與嚴重程度篩選。最多 1,000 筆，用於連線與流量診斷。
+
+Rust 網路核心。原生 SwiftUI 與 Liquid Glass。
+
+所有功能免費。沒有限制。沒有付費牆。沒有功能鎖定。
+
+使用條款（EULA）：https://www.apple.com/legal/internet-services/itunes/dev/stdeula/

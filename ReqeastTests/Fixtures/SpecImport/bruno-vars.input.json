@@ -1,0 +1,52 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Variables Bruno API",
+    "version": "1.0.0"
+  },
+  "request": {
+    "auth": {
+      "type": "apikey",
+      "key": "X-API-Key",
+      "value": "{{api_key}}",
+      "placement": "header"
+    }
+  },
+  "environments": [
+    {
+      "name": "Staging",
+      "variables": [
+        { "name": "base_url", "value": "https://staging.example.com" },
+        { "name": "api_key", "value": "{{api_key}}" }
+      ]
+    }
+  ],
+  "items": [
+    {
+      "info": {
+        "name": "Health",
+        "type": "http",
+        "seq": 1
+      },
+      "http": {
+        "method": "GET",
+        "url": "{{base_url}}/health"
+      }
+    },
+    {
+      "info": {
+        "name": "Search",
+        "type": "http",
+        "seq": 2
+      },
+      "http": {
+        "method": "GET",
+        "url": "{{base_url}}/search",
+        "params": [
+          { "name": "q", "value": "reqeast", "type": "query" }
+        ]
+      }
+    }
+  ],
+  "bundled": true
+}

@@ -1,0 +1,57 @@
+ReqeastはiPhone、iPad、Mac向けのネイティブAPIクライアントです。SwiftUIとRustで構築。HTTPのテスト、gRPCの呼び出し、TCP/TLS、UDP、WebSocket、SSE。6つのプロトコルを1つのアプリで。
+
+Electronなし。クラウドアカウントなし。サインアップ不要。即座に起動。データはデバイス内に留まります。iCloudで同期。それだけです。
+
+HTTP
+GET、POST、PUT、PATCH、DELETE、HEAD、OPTIONS対応のリクエストビルダー。ヘッダー、クエリ、ボディはJSON、フォーム、URLエンコード、テキスト、バイナリ。認証8種: Bearer Token、Basic Auth、API Key、JWT Bearer、Hawk、AWS Signature V4、Akamai EdgeGrid、その他追加予定。シンタックスハイライト、JSONツリー、画像、16進表示。Cookie管理。HTTP/1.1とHTTP/2。
+
+gRPC
+Unary と streaming の RPC。server reflection、複数ファイル対応のローカル proto ライブラリ、hex メッセージモード。Proto バンドルは iCloud で同期。
+
+WebSocket
+リアルタイム双方向の持続接続。カスタムヘッダー、サブプロトコル、自動ping、開発用の非セキュアTLS。
+
+Server-Sent Events
+SSEエンドポイントを購読し、イベントストリームをリアルタイム監視。イベントタイプとID、会話履歴。
+
+TCPとTLS
+TCP生接続またはTLSセッション。持続とワンショット。UTF-8、16進、base64、改行設定。セッションごとの履歴。
+
+UDP
+バインドポートとタイムアウト付きでデータグラム送受信。TCPと同じエンコーディング。
+
+環境変数
+プロジェクトごとに {{variable}} 構文で参照。URL、ヘッダー、ボディ、認証。シークレットはKeychain。即時切替。
+
+コードスニペット
+10言語で生成: cURL、HTTP raw、Python、Node.js、JavaScript Fetch、Java、Go、C#、Swift、Rust。
+
+インポート
+cURL、HTTPie、wgetを貼り付けてリクエスト化。API仕様: OpenAPI、Postman、Insomnia、Bruno、HAR、AsyncAPI、GraphQL SDL を貼り付け、ファイル、URL、複数ファイルバンドル、Git から取り込み。リモート仕様にリンクし、変更を確認してローカル編集を保ったまま更新。認識できない形式はデバイス上のApple Intelligenceがフォールバック。
+
+プロジェクト管理
+アイコンと色付きプロジェクト。プロジェクト/リクエストフォルダ。スナップショット復元付き履歴。
+
+iCloud同期
+プロジェクト、リクエスト、環境がiPhone、iPad、Mac間でiCloud同期。認証情報はKeychain。
+
+Apple Shortcuts
+HTTP、gRPC、TCP、UDP、WebSocket、SSEの6アクション。Shortcuts、Siriなどから自動化。実行時に変数とパラメータを指定。
+
+jqフィルター
+レスポンスビューでjqによりJSONをフィルタ・変換。文字列のアンクォートは設定で切替。
+
+エクスポート
+全プロジェクトを1ファイルで。共有やローカルバックアップ。プロジェクトを OpenAPI 3.1 または Postman Collection v2.1 でエクスポート。
+
+シンタックスハイライトエディタ
+CodeEditベース。tree-sitter、行番号、折りたたみ。JSON、XML、HTML、JavaScript、SQL。
+
+イベントログ
+プロトコルと重要度で絞り込み。最大1,000件。接続とトラフィックの診断。
+
+Rustネットワーキングコア。Liquid GlassのネイティブSwiftUI。
+
+全機能無料。制限なし。課金なし。機能制限なし。
+
+Terms of Use (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/

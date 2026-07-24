@@ -1,0 +1,83 @@
+{
+  "added": [],
+  "removed": [],
+  "modified": [
+    {
+      "request_id": "00000000-0000-0000-0000-000000000101",
+      "primary_key": "listPets",
+      "old_operation": {
+        "primary_key": "listPets",
+        "alternate_keys": [],
+        "name": "List pets",
+        "method": "GET",
+        "path": "/pet",
+        "deprecated": false,
+        "tags": [],
+        "protocol": "Http",
+        "binding": null,
+        "folder_id": null,
+        "parameters": [
+          {
+            "location": "Query",
+            "name": "limit",
+            "value": "10",
+            "required": false,
+            "enabled": false,
+            "value_source": "FromExample"
+          }
+        ],
+        "body": {
+          "kind": "None"
+        },
+        "body_candidates": [],
+        "auth": null,
+        "description": null
+      },
+      "new_operation": {
+        "primary_key": "listPets",
+        "alternate_keys": [],
+        "name": "List pets",
+        "method": "GET",
+        "path": "/pet",
+        "deprecated": false,
+        "tags": [],
+        "protocol": "Http",
+        "binding": null,
+        "folder_id": null,
+        "parameters": [
+          {
+            "location": "Query",
+            "name": "limit",
+            "value": "25",
+            "required": false,
+            "enabled": false,
+            "value_source": "FromExample"
+          }
+        ],
+        "body": {
+          "kind": "Json",
+          "content": "{}"
+        },
+        "body_candidates": [],
+        "auth": null,
+        "description": null
+      },
+      "field_deltas": [
+        {
+          "field": "Params",
+          "old_value": "query:limit=10:req=false:en=false",
+          "new_value": "query:limit=25:req=false:en=false",
+          "is_conflict": false
+        },
+        {
+          "field": "Body",
+          "old_value": "none",
+          "new_value": "json:{}",
+          "is_conflict": false
+        }
+      ]
+    }
+  ],
+  "unchanged": [],
+  "identity_changed": []
+}

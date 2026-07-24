@@ -1,0 +1,90 @@
+openapi: 3.1.0
+info:
+  title: OpenAPI 3.1 Petstore
+  description: Petstore sample for OpenAPI 3.1
+  version: 1.0.0
+servers:
+  - url: https://petstore31.example.test/v1
+tags:
+  - name: pet
+  - name: store
+paths:
+  /pet:
+    get:
+      tags:
+        - pet
+      summary: List all pets
+      operationId: listPets
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            example: 25
+      responses:
+        "200":
+          description: Successful operation
+    post:
+      tags:
+        - pet
+      summary: Add a new pet
+      operationId: addPet
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                  example: Mittens
+                status:
+                  type: string
+                  enum:
+                    - available
+                    - pending
+                    - sold
+            example:
+              name: Mittens
+              status: available
+      responses:
+        "201":
+          description: Created
+  /pet/{petId}:
+    get:
+      tags:
+        - pet
+      summary: Find pet by ID
+      operationId: getPetById
+      parameters:
+        - name: petId
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 42
+      responses:
+        "200":
+          description: Successful operation
+  /store/order:
+    post:
+      tags:
+        - store
+      summary: Place an order
+      operationId: placeOrder
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                quantity:
+                  type: integer
+                  example: 2
+      responses:
+        "200":
+          description: Successful operation

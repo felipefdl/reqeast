@@ -1,0 +1,66 @@
+default_platform(:ios)
+
+# Shared deliver options. Mac can double-upload if ASC verify races processing
+# (classic deliver path). Prefer careful re-runs over shipping ASC credentials
+# or prune scripts in this tree.
+def deliver_common
+  {
+    skip_binary_upload: true,
+    force: true,
+    overwrite_screenshots: true,
+    # Default is 3600; keep high so processing does not race verify.
+    screenshot_processing_timeout: 900
+  }
+end
+
+platform :ios do
+  desc "Upload metadata only to App Store Connect"
+  lane :metadata do
+    deliver(
+      **deliver_common,
+      skip_screenshots: true
+    )
+  end
+
+  desc "Upload screenshots only to App Store Connect"
+  lane :screenshots do
+    deliver(
+      **deliver_common,
+      skip_metadata: true
+    )
+  end
+
+  desc "Upload metadata and screenshots to App Store Connect"
+  lane :release_metadata do
+    deliver(**deliver_common)
+  end
+
+  desc "Preview metadata without uploading (dry run)"
+  lane :preview do
+    deliver(
+      skip_binary_upload: true,
+      force: false
+    )
+  end
+end
+
+platform :mac do
+  desc "Upload Mac metadata and screenshots to App Store Connect"
+  lane :release_metadata do
+    deliver(
+      **deliver_common,
+      platform: "osx",
+      screenshots_path: "./fastlane/screenshots-mac"
+    )
+  end
+
+  desc "Upload Mac screenshots only to App Store Connect"
+  lane :screenshots do
+    deliver(
+      **deliver_common,
+      platform: "osx",
+      screenshots_path: "./fastlane/screenshots-mac",
+      skip_metadata: true
+    )
+  end
+end

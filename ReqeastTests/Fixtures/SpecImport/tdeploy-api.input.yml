@@ -1,0 +1,524 @@
+openapi: 3.0.3
+info:
+  title: TagoIO Deploy API
+  description: |
+    API for managing TagoIO Deploy projects.
+
+    All authenticated endpoints require a valid token.
+  version: 1.0.0
+  contact:
+    name: TagoIO Support
+    url: https://tago.io
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: https://deploy.tagoio.com
+    description: Production server
+
+paths:
+  /api/projects/{project_id}/services:
+    get:
+      summary: List project services
+      description: Retrieve all services for a specific project
+      tags:
+        - Services
+      security:
+        - Project-Token: []
+      parameters:
+        - name: project_id
+          in: path
+          required: true
+          description: The project identifier
+          schema:
+            type: string
+            example: "507f1f77bcf86cd799439011"
+      responses:
+        "200":
+          description: List of project services
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ProjectServiceExpanded"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/projects/{project_id}/services/{service_id}/clients:
+    get:
+      summary: List MQTT clients
+      description: Retrieve all MQTT clients for a specific service
+      tags:
+        - MQTT Clients
+      security:
+        - Project-Token: []
+      parameters:
+        - name: project_id
+          in: path
+          required: true
+          description: The project identifier
+          schema:
+            type: string
+            example: "507f1f77bcf86cd799439011"
+        - name: service_id
+          in: path
+          required: true
+          description: The service identifier
+          schema:
+            type: string
+            example: "service_mqtt_123"
+      responses:
+        "200":
+          description: List of MQTT clients
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ClientInfo"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    post:
+      summary: Create MQTT client
+      description: Create a new MQTT client for a specific service
+      tags:
+        - MQTT Clients
+      security:
+        - Project-Token: []
+      parameters:
+        - name: project_id
+          in: path
+          required: true
+          description: The project identifier
+          schema:
+            type: string
+            example: "507f1f77bcf86cd799439011"
+        - name: service_id
+          in: path
+          required: true
+          description: The service identifier
+          schema:
+            type: string
+            example: "service_mqtt_123"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateClientRequest"
+      responses:
+        "200":
+          description: Created client information
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClientInfo"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/projects/{project_id}/services/{service_id}/clients/{client_id}:
+    put:
+      summary: Update MQTT client
+      description: Update an existing MQTT client
+      tags:
+        - MQTT Clients
+      security:
+        - Project-Token: []
+      parameters:
+        - name: project_id
+          in: path
+          required: true
+          description: The project identifier
+          schema:
+            type: string
+            example: "507f1f77bcf86cd799439011"
+        - name: service_id
+          in: path
+          required: true
+          description: The service identifier
+          schema:
+            type: string
+            example: "service_mqtt_123"
+        - name: client_id
+          in: path
+          required: true
+          description: The client identifier
+          schema:
+            type: string
+            example: "client_123"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateClientRequest"
+      responses:
+        "200":
+          description: Updated client information
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClientInfo"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    delete:
+      summary: Delete MQTT client
+      description: Delete an existing MQTT client
+      tags:
+        - MQTT Clients
+      security:
+        - Project-Token: []
+      parameters:
+        - name: project_id
+          in: path
+          required: true
+          description: The project identifier
+          schema:
+            type: string
+            example: "507f1f77bcf86cd799439011"
+        - name: service_id
+          in: path
+          required: true
+          description: The service identifier
+          schema:
+            type: string
+            example: "service_mqtt_123"
+        - name: client_id
+          in: path
+          required: true
+          description: The client identifier
+          schema:
+            type: string
+            example: "client_123"
+      responses:
+        "200":
+          description: Client deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+components:
+  securitySchemes:
+    Project-Token:
+      type: apiKey
+      description: >-
+        A Project-Token that is unique to your device. Generate a token by
+        accessing your Project's page.
+      name: token
+      in: header
+      x-example: p-5e12345a-d70a-4e2d-b83d-5c0123456789
+
+  schemas:
+    ProjectServiceExpanded:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the service
+          example: "507f1f77bcf86cd799439012"
+        active:
+          type: boolean
+          description: Whether the service is active
+          example: true
+        project:
+          type: string
+          description: Project identifier
+          example: "507f1f77bcf86cd799439011"
+        created_at:
+          type: string
+          format: date-time
+          description: When the service was created
+          example: "2023-01-01T00:00:00Z"
+        updated_at:
+          type: string
+          format: date-time
+          description: When the service was last updated
+          example: "2023-01-01T00:00:00Z"
+        cancelled_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: When the service was cancelled
+          example: null
+        version:
+          type: string
+          description: Service version
+          example: "1.0.0"
+        custom_name:
+          type: string
+          description: Custom name for the service
+          example: "My MQTT Broker"
+        settings:
+          type: array
+          items:
+            $ref: "#/components/schemas/SettingItem"
+          description: Service configuration settings
+        product:
+          $ref: "#/components/schemas/ProductExpanded"
+
+    ProductExpanded:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Product identifier
+          example: "prod_mqtt"
+        slug:
+          type: string
+          description: Product slug
+          example: "mqtt-broker"
+        name:
+          type: string
+          description: Product name
+          example: "MQTT Broker"
+        description:
+          type: string
+          description: Product description
+          example: "Managed MQTT message broker service"
+        active:
+          type: boolean
+          description: Whether the product is active
+          example: true
+        created_at:
+          type: string
+          format: date-time
+          description: When the product was created
+          example: "2023-01-01T00:00:00Z"
+
+    SettingItem:
+      type: object
+      properties:
+        key:
+          type: string
+          description: Setting key
+          example: "max_connections"
+        value:
+          type: string
+          description: Setting value
+          example: "1000"
+        type:
+          type: string
+          description: Setting type
+          example: "number"
+
+    ClientInfo:
+      type: object
+      properties:
+        client_id:
+          type: string
+          description: Unique client identifier
+          example: "507f1f77bcf86cd799439011"
+        name:
+          type: string
+          description: Human-readable client name
+          example: "IoT Device 1"
+        username:
+          type: string
+          nullable: true
+          description: MQTT username
+          example: "device_user"
+        password:
+          type: boolean
+          description: Whether client has a password set
+          example: true
+        certificate_fingerprint:
+          type: string
+          nullable: true
+          description: Client certificate fingerprint
+          example: "SHA256:abc123..."
+        certificate_metadata:
+          $ref: "#/components/schemas/CertificateMetadata"
+        created_at:
+          type: string
+          format: date-time
+          description: When the client was created
+          example: "2023-01-01T00:00:00Z"
+        updated_at:
+          type: string
+          format: date-time
+          description: When the client was last updated
+          example: "2023-01-01T00:00:00Z"
+
+    CertificateMetadata:
+      type: object
+      nullable: true
+      properties:
+        subject:
+          type: string
+          description: Certificate subject
+          example: "CN=device1.example.com"
+        issuer:
+          type: string
+          description: Certificate issuer
+          example: "CN=CA"
+        serial_number:
+          type: string
+          description: Certificate serial number
+          example: "12345"
+        not_before:
+          type: string
+          format: date-time
+          description: Certificate valid from
+          example: "2023-01-01T00:00:00Z"
+        not_after:
+          type: string
+          format: date-time
+          description: Certificate valid until
+          example: "2024-01-01T00:00:00Z"
+
+    CreateClientRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: Client name
+          example: "IoT Device 1"
+          minLength: 1
+          maxLength: 255
+        username:
+          type: string
+          nullable: true
+          description: MQTT username (optional)
+          example: "device_user"
+          minLength: 1
+          maxLength: 255
+        password:
+          type: string
+          nullable: true
+          description: Password for the client (optional)
+          example: "secure_password"
+          minLength: 8
+
+    UpdateClientRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: New client name
+          example: "Updated IoT Device"
+          minLength: 1
+          maxLength: 255
+        password:
+          type: string
+          nullable: true
+          description: New password for the client (optional)
+          example: "new_secure_password"
+          minLength: 8
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error message
+          example: "Resource not found"
+        code:
+          type: string
+          description: Error code
+          example: "NOT_FOUND"
+        details:
+          type: object
+          description: Additional error details
+          additionalProperties: true
+
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            error: "Invalid request parameters"
+            code: "BAD_REQUEST"
+
+    Unauthorized:
+      description: Authentication required
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            error: "Authentication required"
+            code: "UNAUTHORIZED"
+
+    Forbidden:
+      description: Access denied
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            error: "Access denied"
+            code: "FORBIDDEN"
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            error: "Resource not found"
+            code: "NOT_FOUND"
+
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            error: "Internal server error"
+            code: "INTERNAL_ERROR"
+
+tags:
+  - name: Health
+    description: Health check endpoints
+  - name: Services
+    description: Project service management
+  - name: MQTT Clients
+    description: MQTT client management operations
+
+externalDocs:
+  description: TagoIO Deploy Documentation
+  url: https://docs.tago.io/deploy

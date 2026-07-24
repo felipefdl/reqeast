@@ -1,0 +1,57 @@
+Reqeast ist ein nativer API-Client für iPhone, iPad und Mac. Entwickelt mit SwiftUI und Rust. HTTP testen, gRPC aufrufen, TCP/TLS und UDP nutzen, WebSocket verbinden, SSE abonnieren. Sechs Protokolle in einer App.
+
+Kein Electron. Keine Cloud-Konten. Keine Registrierung. Startet sofort. Daten bleiben auf deinen Geräten. Sync über iCloud. Sonst nichts.
+
+HTTP
+Request-Builder mit GET, POST, PUT, PATCH, DELETE, HEAD und OPTIONS. Header, Query-Parameter und Body als JSON, Formular, URL-kodiert, Text oder Binärdatei. Acht Auth-Typen: Bearer Token, Basic Auth, API Key, JWT Bearer, Hawk, AWS Signature V4, Akamai EdgeGrid, weitere folgen. Antworten mit Syntax-Highlighting, JSON-Baum, Bild und Hex. Cookies integriert. HTTP/1.1 und HTTP/2.
+
+gRPC
+Unary- und Streaming-RPCs. Server Reflection, lokale Proto-Bibliothek mit Mehrdatei-Bundles, Hex-Nachrichtenmodus. Proto-Bundles synchronisieren über iCloud.
+
+WebSocket
+Persistente bidirektionale Echtzeitverbindungen. Custom Header, Subprotokoll, Auto-Ping und TLS inkl. unsicherem Entwicklungsmodus.
+
+Server-Sent Events
+SSE-Endpunkte abonnieren und Event-Streams in Echtzeit beobachten. Event-Typ und ID mit vollständigem Verlauf.
+
+TCP und TLS
+Rohe TCP-Verbindungen oder TLS-Sitzungen. Persistenter und Einmal-Modus. UTF-8, Hex, Base64, konfigurierbare Zeilenenden. Nachrichtenverlauf pro Sitzung.
+
+UDP
+Datagramme senden und empfangen mit Bind-Port und Timeout. Gleiche Kodierungsoptionen wie TCP.
+
+Umgebungen
+Variablen pro Projekt mit {{variable}}-Syntax. URLs, Header, Body, Auth. Geheimnisse im Keychain. Sofort umschalten.
+
+Code-Snippets
+Request-Code in 10 Sprachen: cURL, HTTP raw, Python, Node.js, JavaScript Fetch, Java, Go, C#, Swift und Rust.
+
+Import
+cURL, HTTPie oder wget einfügen und zu Requests parsen. API-Specs importieren: OpenAPI, Postman, Insomnia, Bruno, HAR, AsyncAPI und GraphQL SDL per Einfügen, Datei, URL, Mehrdatei-Bundle oder Git. Projekt mit Remote-Spec verknüpfen, Änderungen prüfen und Updates übernehmen, ohne lokale Änderungen zu verlieren. Apple Intelligence On-Device als Fallback.
+
+Projektorganisation
+Requests in Projekte mit Icons und Farben. Projekt- und Request-Ordner. Verlauf mit vollständiger Wiederherstellung.
+
+iCloud-Sync
+Projekte, Requests und Umgebungen syncen über iCloud zwischen iPhone, iPad und Mac. Zugangsdaten über Keychain.
+
+Apple Shortcuts
+Sechs Aktionen für HTTP, gRPC, TCP, UDP, WebSocket und SSE. Automatisieren über Shortcuts, Siri oder andere Tools. Variablen und Parameter zur Laufzeit.
+
+jq Filter
+JSON-Antworten mit jq direkt in der Antwortansicht filtern und transformieren. String-Ergebnisse optional ohne Anführungszeichen.
+
+Export
+Alle Projekte als eine Datei exportieren. Workspace teilen oder lokal sichern. Projekt als OpenAPI 3.1 oder Postman Collection v2.1 exportieren.
+
+Editor mit Syntax-Highlighting
+CodeEdit-Editor mit tree-sitter, Zeilennummern und Code-Faltung für JSON, XML, HTML, JavaScript und SQL.
+
+Event-Protokoll
+Strukturiertes Diagnoseprotokoll nach Protokoll und Schweregrad. Bis 1.000 Einträge für Verbindungs- und Traffic-Analyse.
+
+Rust-Netzwerkkern für hohe IO-Last. Oberfläche: natives SwiftUI mit Liquid Glass.
+
+Alle Funktionen kostenlos. Keine Limits. Keine Paywalls. Keine Funktionseinschränkungen.
+
+Terms of Use (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/

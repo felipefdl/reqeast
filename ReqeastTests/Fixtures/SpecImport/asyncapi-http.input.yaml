@@ -1,0 +1,56 @@
+asyncapi: '2.6.0'
+info:
+  title: AsyncAPI HTTP Demo
+  version: '1.0.0'
+  description: HTTP channels with unsupported Kafka and AMQP bindings
+servers:
+  production:
+    url: api.example.com/v1
+    protocol: https
+    description: Production
+channels:
+  /users:
+    description: List users
+    bindings:
+      http:
+        method: GET
+        type: request
+    subscribe:
+      summary: List users
+      message:
+        name: UsersList
+        payload:
+          type: array
+  /users/create:
+    description: Create user
+    bindings:
+      http:
+        method: POST
+        type: request
+    publish:
+      operationId: createUser
+      summary: Create user
+      message:
+        payload:
+          type: object
+          example:
+            name: Ada
+  events/orders:
+    description: Order events via Kafka
+    bindings:
+      kafka:
+        bindingVersion: '0.4.0'
+    publish:
+      operationId: publishOrder
+      message:
+        payload:
+          type: object
+  events/payments:
+    description: Payment events via AMQP
+    bindings:
+      amqp:
+        is: routingKey
+    publish:
+      message:
+        payload:
+          type: object

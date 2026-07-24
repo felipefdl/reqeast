@@ -1,0 +1,2785 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "IoT Order Service API",
+    "version": "0.0.1"
+  },
+  "servers": [
+    {
+      "url": "https://internal.api.com",
+      "description": "Production server"
+    }
+  ],
+  "security": [
+    {
+      "BearerAuth": []
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "DependencyHealth": {
+        "type": "string",
+        "enum": [
+          "healthy",
+          "degraded",
+          "unreachable"
+        ],
+        "description": "Operational status reported for downstream dependencies"
+      },
+      "OrderType": {
+        "type": "string",
+        "enum": [
+          "provisioning",
+          "activation",
+          "top_up"
+        ],
+        "description": "Order intent that determines which order manager workflow is triggered.",
+        "examples": [
+          "provisioning"
+        ]
+      },
+      "OrderStatus": {
+        "type": "string",
+        "enum": [
+          "pending",
+          "ready_for_provisioning",
+          "cancelled"
+        ],
+        "description": "Current order status.",
+        "examples": [
+          "pending"
+        ]
+      },
+      "ProductCatalogStatus": {
+        "type": "string",
+        "enum": [
+          "draft",
+          "active"
+        ],
+        "description": "Lifecycle status for a product catalog.",
+        "examples": [
+          "draft"
+        ]
+      },
+      "ProductOfferingType": {
+        "type": "string",
+        "enum": [
+          "plan",
+          "top_up",
+          "sim",
+          "sim_plan"
+        ],
+        "description": "Offering archetype."
+      },
+      "BaseEntity": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "ulid"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "examples": [
+              "2025-09-10T14:01:27.071Z"
+            ],
+            "description": "ISO 8601 date-time string"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "examples": [
+              "2025-09-10T14:01:27.071Z"
+            ],
+            "description": "ISO 8601 date-time string"
+          }
+        },
+        "required": [
+          "id",
+          "created_at",
+          "updated_at"
+        ],
+        "description": "Schema for BaseEntity."
+      },
+      "ProductOfferingBase": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseEntity"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "ulid",
+                "examples": [
+                  "poff_01HK2V8F3MNQRXZ4W7Y6P3JBCZ"
+                ],
+                "description": "Unique identifier for the product offering."
+              },
+              "title": {
+                "type": "string",
+                "examples": [
+                  "Flex EU 1GB Plan"
+                ]
+              },
+              "description": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "examples": [
+                  "Pay-as-you-go plan targeting EU coverage."
+                ]
+              },
+              "status": {
+                "$ref": "#/components/schemas/ProductCatalogStatus"
+              },
+              "resource_specification_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "ulid"
+                },
+                "minItems": 1,
+                "description": "Resource specifications included in this offering."
+              },
+              "eligible_order_types": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/OrderType"
+                },
+                "minItems": 1,
+                "description": "Order intents supported by this offering (used to route to order manager workflows).",
+                "examples": [
+                  [
+                    "provisioning",
+                    "activation"
+                  ]
+                ]
+              },
+              "external_id": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "examples": [
+                  "ext-ofr-12345"
+                ],
+                "description": "External identifier for the product offering."
+              },
+              "type": {
+                "$ref": "#/components/schemas/ProductOfferingType"
+              }
+            },
+            "required": [
+              "title",
+              "status",
+              "resource_specification_ids",
+              "eligible_order_types",
+              "type"
+            ]
+          }
+        ],
+        "description": "Product offering snapshot captured at time of sale."
+      },
+      "PriceBase": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseEntity"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "ulid",
+                "examples": [
+                  "prc_01HK2V8F3MNQRXZ4W7Y6P3JBD1"
+                ],
+                "description": "Unique identifier for the price record."
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "draft",
+                  "active",
+                  "inactive"
+                ],
+                "examples": [
+                  "active"
+                ],
+                "description": "Lifecycle status for this price record."
+              },
+              "amount": {
+                "type": "integer",
+                "minimum": 0,
+                "examples": [
+                  4999
+                ],
+                "description": "Monetary amount in cents (e.g. 4999 = 49.99). Applies across all currencies.",
+                "format": "int64"
+              },
+              "currency": {
+                "type": "string",
+                "pattern": "^[A-Z]{3}$",
+                "examples": [
+                  "EUR"
+                ],
+                "description": "ISO 4217 currency code in uppercase."
+              },
+              "effective_at": {
+                "type": "string",
+                "format": "date-time",
+                "examples": [
+                  "2025-12-01T00:00:00.000Z"
+                ],
+                "description": "Timestamp when this price becomes effective (omit for immediate)."
+              }
+            },
+            "required": [
+              "status",
+              "amount",
+              "currency"
+            ]
+          }
+        ],
+        "description": "Price details captured at time of sale (optional for no-charge orders)."
+      },
+      "PlanSpecification": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseEntity"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "ulid",
+                "examples": [
+                  "rsc_01HK2V8F3MNQRXZ4W7Y6P3JBD0"
+                ],
+                "description": "Unique identifier for the resource specification."
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "examples": [
+                  "Europe Flex 1GB"
+                ],
+                "description": "Marketing name for the resource specification."
+              },
+              "description": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "examples": [
+                  "Entry plan with EU coverage."
+                ],
+                "description": "Optional descriptive summary."
+              },
+              "network_specification_id": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "ulid",
+                "examples": [
+                  "nspc_01HK2V8F3MNQRXZ4W7Y6P3JBD8"
+                ],
+                "description": "FK to the network specification associated with this resource specification."
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "plan"
+                ]
+              }
+            },
+            "required": [
+              "name",
+              "type"
+            ]
+          }
+        ],
+        "description": "Plan-specific details scoped to a footprint."
+      },
+      "SimSpecification": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseEntity"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "ulid",
+                "examples": [
+                  "rsc_01HK2V8F3MNQRXZ4W7Y6P3JBD0"
+                ],
+                "description": "Unique identifier for the resource specification."
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "examples": [
+                  "Nano SIM Triple-Cut"
+                ],
+                "description": "Marketing name for the resource specification."
+              },
+              "description": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "examples": [
+                  "Triple-cut SIM for IoT devices."
+                ],
+                "description": "Optional descriptive summary."
+              },
+              "network_specification_id": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "ulid",
+                "examples": [
+                  "nspc_01HK2V8F3MNQRXZ4W7Y6P3JBD8"
+                ],
+                "description": "FK to the network specification associated with this resource specification."
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "sim"
+                ]
+              },
+              "sku_id": {
+                "type": "string",
+                "examples": [
+                  "sku_SIM-S-IO3-TRI-2"
+                ],
+                "description": "FK to the SKU defining this SIM's hardware characteristics."
+              }
+            },
+            "required": [
+              "name",
+              "type",
+              "sku_id"
+            ]
+          }
+        ],
+        "description": "SIM hardware specification metadata."
+      },
+      "ResourceSpecificationBase": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/PlanSpecification"
+          },
+          {
+            "$ref": "#/components/schemas/SimSpecification"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "type",
+          "mapping": {
+            "plan": "#/components/schemas/PlanSpecification",
+            "sim": "#/components/schemas/SimSpecification"
+          }
+        },
+        "description": "Technical resource specification detailing plan, SIM, or add-on metadata."
+      },
+      "AllowanceType": {
+        "type": "string",
+        "enum": [
+          "data",
+          "voice",
+          "sms"
+        ],
+        "description": "Allowance domain tracked by the plan or subscription."
+      },
+      "AllowanceUnit": {
+        "type": "string",
+        "enum": [
+          "bytes",
+          "gigabytes",
+          "megabytes",
+          "minutes",
+          "count"
+        ],
+        "description": "Unit used to express allowance quantities."
+      },
+      "TimeUnit": {
+        "type": "string",
+        "enum": [
+          "second",
+          "minute",
+          "day",
+          "month",
+          "year"
+        ],
+        "description": "Supported duration units used by catalog timing constructs."
+      },
+      "Period": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "integer",
+            "minimum": 1,
+            "examples": [
+              30
+            ],
+            "format": "int32"
+          },
+          "unit": {
+            "$ref": "#/components/schemas/TimeUnit"
+          }
+        },
+        "required": [
+          "value",
+          "unit"
+        ],
+        "description": "Base period definition pairing a numeric value with a time unit."
+      },
+      "AllowanceDuration": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Period"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "recurring": {
+                "type": "boolean",
+                "enum": [
+                  false
+                ]
+              }
+            }
+          }
+        ],
+        "description": "Duration information associated with this allowance."
+      },
+      "AllowanceCoverage": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "ulid",
+            "examples": [
+              "cov_01HK2V8F3MNQRXZ4W7Y6P3JBCW"
+            ]
+          },
+          "title": {
+            "type": "string",
+            "examples": [
+              "EU Coverage"
+            ]
+          },
+          "type": {
+            "type": "string",
+            "examples": [
+              "regional"
+            ]
+          },
+          "countries": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "examples": [
+              [
+                "fr",
+                "de",
+                "es"
+              ]
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "type",
+          "countries"
+        ],
+        "description": "Coverage attached to this allowance."
+      },
+      "Allowance": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseEntity"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "ulid",
+                "examples": [
+                  "alw_01HK2V8F3MNQRXZ4W7Y6P3JBCJ"
+                ]
+              },
+              "title": {
+                "type": "string",
+                "examples": [
+                  "EU Data 1GB"
+                ],
+                "description": "Display title for the allowance."
+              },
+              "type": {
+                "$ref": "#/components/schemas/AllowanceType"
+              },
+              "unit": {
+                "$ref": "#/components/schemas/AllowanceUnit"
+              },
+              "unit_count": {
+                "type": "integer",
+                "minimum": 0,
+                "format": "int64",
+                "examples": [
+                  1073741824
+                ],
+                "description": "Whole-number quantity for this allowance bucket."
+              },
+              "is_unlimited": {
+                "type": "boolean"
+              },
+              "duration": {
+                "$ref": "#/components/schemas/AllowanceDuration"
+              },
+              "coverage": {
+                "$ref": "#/components/schemas/AllowanceCoverage"
+              }
+            },
+            "required": [
+              "title",
+              "type",
+              "unit",
+              "unit_count",
+              "is_unlimited"
+            ]
+          }
+        ],
+        "description": "Catalog allowance definition."
+      },
+      "OrderProductSnapshot": {
+        "type": "object",
+        "properties": {
+          "product_catalog_id": {
+            "type": "string",
+            "format": "ulid",
+            "examples": [
+              "pcat_01HK2V8F3MNQRXZ4W7Y6P3JBCY"
+            ],
+            "description": "Product catalog identifier at time of sale."
+          },
+          "product_offering": {
+            "$ref": "#/components/schemas/ProductOfferingBase"
+          },
+          "price": {
+            "$ref": "#/components/schemas/PriceBase"
+          },
+          "resource_specifications": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ResourceSpecificationBase"
+            },
+            "minItems": 1,
+            "description": "Resource specifications captured at time of sale."
+          },
+          "allowances": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Allowance"
+            },
+            "description": "Allowances captured at time of sale."
+          }
+        },
+        "required": [
+          "product_catalog_id",
+          "product_offering",
+          "resource_specifications"
+        ],
+        "description": "Snapshot of the product offering stored with the order."
+      },
+      "OrderProduct": {
+        "type": "object",
+        "properties": {
+          "quantity": {
+            "type": "integer",
+            "minimum": 1,
+            "examples": [
+              1
+            ],
+            "description": "Quantity purchased for this order line.",
+            "format": "int32"
+          },
+          "snapshot": {
+            "$ref": "#/components/schemas/OrderProductSnapshot"
+          }
+        },
+        "required": [
+          "quantity",
+          "snapshot"
+        ],
+        "description": "Order line item representing a sold product offering."
+      },
+      "Order": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "ulid",
+            "examples": [
+              "ord_01HK2V8F3MNQRXZ4W7Y6P3JBCF"
+            ],
+            "description": "Unique identifier for the order."
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "examples": [
+              "2025-09-10T14:01:27.071Z"
+            ],
+            "description": "ISO 8601 date-time string"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "examples": [
+              "2025-09-10T14:01:27.071Z"
+            ],
+            "description": "ISO 8601 date-time string"
+          },
+          "salesforce_order_id": {
+            "type": "string",
+            "minLength": 1,
+            "examples": [
+              "801xx0000001AbcAAA"
+            ],
+            "description": "Salesforce order identifier."
+          },
+          "type": {
+            "$ref": "#/components/schemas/OrderType"
+          },
+          "status": {
+            "$ref": "#/components/schemas/OrderStatus"
+          },
+          "products": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrderProduct"
+            },
+            "minItems": 1,
+            "description": "Products purchased in this order."
+          },
+          "_links": {
+            "type": "object",
+            "properties": {
+              "self": {
+                "type": "object",
+                "properties": {
+                  "href": {
+                    "type": "string",
+                    "format": "uri",
+                    "examples": [
+                      "https://internal.api.com/orders/ord_01HK2V8F3MNQRXZ4W7Y6P3JBCF"
+                    ]
+                  },
+                  "title": {
+                    "type": "string",
+                    "examples": [
+                      "Order"
+                    ],
+                    "description": "Human-readable title describing the linked resource relation"
+                  }
+                },
+                "required": [
+                  "href",
+                  "title"
+                ]
+              },
+              "account": {
+                "type": "object",
+                "properties": {
+                  "href": {
+                    "type": "string",
+                    "format": "uri",
+                    "examples": [
+                      "https://internal.api.com/accounts/acc_01HK2V8F3MNQRXZ4W7Y6P3JBCE"
+                    ]
+                  },
+                  "title": {
+                    "type": "string",
+                    "examples": [
+                      "Related resource"
+                    ],
+                    "description": "Human-readable title describing the linked resource relation"
+                  }
+                },
+                "required": [
+                  "href",
+                  "title"
+                ],
+                "description": "Owning account for this order"
+              },
+              "payment-record": {
+                "type": "object",
+                "properties": {
+                  "href": {
+                    "type": "string",
+                    "format": "uri",
+                    "examples": [
+                      "https://internal.api.com/accounts/payment-records/pmr_01HK2V8F3MNQRXZ4W7Y6P3JBCN"
+                    ]
+                  },
+                  "title": {
+                    "type": "string",
+                    "examples": [
+                      "Related resource"
+                    ],
+                    "description": "Human-readable title describing the linked resource relation"
+                  }
+                },
+                "required": [
+                  "href",
+                  "title"
+                ],
+                "description": "Payment record associated with this order"
+              },
+              "subscription": {
+                "type": "object",
+                "properties": {
+                  "href": {
+                    "type": "string",
+                    "format": "uri",
+                    "examples": [
+                      "https://internal.api.com/subscriptions/sub_01HK2V8F3MNQRXZ4W7Y6P3JBCD"
+                    ]
+                  },
+                  "title": {
+                    "type": "string",
+                    "examples": [
+                      "Related resource"
+                    ],
+                    "description": "Human-readable title describing the linked resource relation"
+                  }
+                },
+                "required": [
+                  "href",
+                  "title"
+                ],
+                "description": "Provisioned subscription associated with this order"
+              },
+              "cancel": {
+                "type": "object",
+                "properties": {
+                  "href": {
+                    "type": "string",
+                    "format": "uri",
+                    "example": "https://internal.api.com/orders/ord_01HK2V8F3MNQRXZ4W7Y6P3JBCF/cancel"
+                  },
+                  "method": {
+                    "type": "string",
+                    "enum": [
+                      "POST"
+                    ]
+                  }
+                },
+                "required": [
+                  "href",
+                  "method"
+                ],
+                "description": "Affordance to cancel this order."
+              }
+            },
+            "required": [
+              "self"
+            ],
+            "description": "HAL+JSON links (internal)"
+          },
+          "_embedded": {
+            "type": "object",
+            "properties": {
+              "account": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "format": "ulid"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "_links": {
+                    "type": "object",
+                    "properties": {
+                      "self": {
+                        "type": "object",
+                        "properties": {
+                          "href": {
+                            "type": "string",
+                            "format": "uri",
+                            "examples": [
+                              "https://internal.api.com/accounts/acc_01HK2V8F3MNQRXZ4W7Y6P3JBCE"
+                            ]
+                          },
+                          "title": {
+                            "type": "string",
+                            "examples": [
+                              "Account"
+                            ],
+                            "description": "Human-readable title describing the linked resource relation"
+                          }
+                        },
+                        "required": [
+                          "href",
+                          "title"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "self"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "name",
+                  "_links"
+                ]
+              },
+              "payment_record": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "format": "ulid"
+                  },
+                  "_links": {
+                    "type": "object",
+                    "properties": {
+                      "self": {
+                        "type": "object",
+                        "properties": {
+                          "href": {
+                            "type": "string",
+                            "format": "uri",
+                            "examples": [
+                              "https://internal.api.com/payment-records/pmr_01HK2V8F3MNQRXZ4W7Y6P3JBCN"
+                            ]
+                          },
+                          "title": {
+                            "type": "string",
+                            "examples": [
+                              "Payment Record"
+                            ],
+                            "description": "Human-readable title describing the linked resource relation"
+                          }
+                        },
+                        "required": [
+                          "href",
+                          "title"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "self"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "_links"
+                ]
+              },
+              "subscription": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "format": "ulid"
+                  },
+                  "_links": {
+                    "type": "object",
+                    "properties": {
+                      "self": {
+                        "type": "object",
+                        "properties": {
+                          "href": {
+                            "type": "string",
+                            "format": "uri",
+                            "examples": [
+                              "https://internal.api.com/subscriptions/sub_01HK2V8F3MNQRXZ4W7Y6P3JBCD"
+                            ]
+                          },
+                          "title": {
+                            "type": "string",
+                            "examples": [
+                              "Subscription"
+                            ],
+                            "description": "Human-readable title describing the linked resource relation"
+                          }
+                        },
+                        "required": [
+                          "href",
+                          "title"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "self"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "_links"
+                ]
+              }
+            },
+            "description": "Optionally embedded related resources (internal)."
+          }
+        },
+        "required": [
+          "id",
+          "created_at",
+          "updated_at",
+          "salesforce_order_id",
+          "type",
+          "status",
+          "products",
+          "_links"
+        ],
+        "description": "Internal HAL representation of an order."
+      },
+      "OrderProductCreate": {
+        "type": "object",
+        "properties": {
+          "quantity": {
+            "type": "integer",
+            "minimum": 1,
+            "examples": [
+              1
+            ],
+            "description": "Quantity purchased for this order line.",
+            "format": "int32"
+          },
+          "snapshot": {
+            "$ref": "#/components/schemas/OrderProductSnapshot"
+          }
+        },
+        "required": [
+          "quantity",
+          "snapshot"
+        ],
+        "description": "Order line payload for order creation."
+      },
+      "OrderCreate": {
+        "type": "object",
+        "properties": {
+          "account_id": {
+            "type": "string",
+            "format": "ulid",
+            "examples": [
+              "acc_01HK2V8F3MNQRXZ4W7Y6P3JBCE"
+            ],
+            "description": "Account that owns this order."
+          },
+          "payment_record_id": {
+            "type": "string",
+            "format": "ulid",
+            "examples": [
+              "pmr_01HK2V8F3MNQRXZ4W7Y6P3JBCN"
+            ],
+            "description": "Optional payment record linked to this order."
+          },
+          "subscription_id": {
+            "type": "string",
+            "format": "ulid",
+            "examples": [
+              "sub_01HK2V8F3MNQRXZ4W7Y6P3JBCD"
+            ],
+            "description": "Subscription created from this order (if provisioned)."
+          },
+          "salesforce_order_id": {
+            "type": "string",
+            "minLength": 1,
+            "examples": [
+              "801xx0000001AbcAAA"
+            ],
+            "description": "Salesforce order identifier."
+          },
+          "type": {
+            "$ref": "#/components/schemas/OrderType"
+          },
+          "products": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrderProductCreate"
+            },
+            "minItems": 1,
+            "description": "Products purchased in this order."
+          }
+        },
+        "required": [
+          "account_id",
+          "salesforce_order_id",
+          "type",
+          "products"
+        ],
+        "description": "Payload to create an order."
+      },
+      "CursorPaginationMeta": {
+        "type": "object",
+        "properties": {
+          "count": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100,
+            "format": "int32",
+            "description": "Number of items returned in this response",
+            "examples": [
+              20
+            ]
+          }
+        },
+        "required": [
+          "count"
+        ],
+        "description": "Cursor-based pagination metadata"
+      },
+      "OrderCollection": {
+        "type": "object",
+        "properties": {
+          "_embedded": {
+            "type": "object",
+            "properties": {
+              "orders": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Order"
+                },
+                "maxItems": 40,
+                "description": "Array of orders resources (max 100 per page)"
+              }
+            },
+            "required": [
+              "orders"
+            ]
+          },
+          "_links": {
+            "type": "object",
+            "properties": {
+              "self": {
+                "type": "object",
+                "properties": {
+                  "href": {
+                    "type": "string",
+                    "format": "uri",
+                    "examples": [
+                      "https://internal.api.com/orders?limit=20"
+                    ]
+                  }
+                },
+                "required": [
+                  "href"
+                ]
+              },
+              "next": {
+                "type": "object",
+                "properties": {
+                  "href": {
+                    "type": "string",
+                    "format": "uri",
+                    "examples": [
+                      "https://internal.api.com/orders?cursor=eyJzbyI6eyJkIjoiREVTQyIsInAiOiJleHRlcm5hYifQ==&limit=20"
+                    ]
+                  }
+                },
+                "required": [
+                  "href"
+                ]
+              },
+              "prev": {
+                "type": "object",
+                "properties": {
+                  "href": {
+                    "type": "string",
+                    "format": "uri",
+                    "examples": [
+                      "https://internal.api.com/orders?cursor=eyJzbyI6eyJkIjoiREVTQyIsInAiOiJleHRlcm5hYifQ==&limit=20"
+                    ]
+                  }
+                },
+                "required": [
+                  "href"
+                ]
+              }
+            },
+            "required": [
+              "self"
+            ]
+          },
+          "page": {
+            "$ref": "#/components/schemas/CursorPaginationMeta"
+          }
+        },
+        "required": [
+          "_embedded",
+          "_links",
+          "page"
+        ],
+        "description": "Paginated list of orders"
+      },
+      "CancelOrderInput": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "examples": [
+              "Customer requested cancellation before provisioning."
+            ],
+            "description": "Optional reason for cancelling the order."
+          }
+        },
+        "description": "Payload to cancel an order."
+      },
+      "SubscriptionProductFootprint": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "ulid",
+            "examples": [
+              "fpt_01HK2V8F3MNQRXZ4W7Y6P3JBCY"
+            ],
+            "description": "Unique identifier for the footprint."
+          },
+          "title": {
+            "type": "string",
+            "examples": [
+              "Global"
+            ]
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "examples": [
+              "Footprint covering global roaming regions."
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "title"
+        ],
+        "description": "Projected footprint from the assigned product resource specification."
+      },
+      "AllowanceBalance": {
+        "type": "object",
+        "properties": {
+          "remaining": {
+            "type": "integer",
+            "minimum": 0,
+            "format": "int64",
+            "examples": [
+              1073741824
+            ],
+            "description": "Remaining balance available for this allowance."
+          },
+          "used": {
+            "type": "integer",
+            "minimum": 0,
+            "format": "int64",
+            "examples": [
+              1073741824
+            ],
+            "description": "Consumed balance for this allowance."
+          }
+        },
+        "required": [
+          "remaining",
+          "used"
+        ],
+        "description": "Runtime balance for an allowance bucket."
+      },
+      "SubscriptionProductAllowance": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "examples": [
+              "EU Data 1GB"
+            ],
+            "description": "Display title for the allowance."
+          },
+          "type": {
+            "$ref": "#/components/schemas/AllowanceType"
+          },
+          "unit": {
+            "$ref": "#/components/schemas/AllowanceUnit"
+          },
+          "amount": {
+            "type": "integer",
+            "minimum": 0,
+            "format": "int64",
+            "examples": [
+              1073741824
+            ],
+            "description": "Whole-number quantity for this allowance bucket."
+          },
+          "is_unlimited": {
+            "type": "boolean"
+          },
+          "balance": {
+            "$ref": "#/components/schemas/AllowanceBalance"
+          }
+        },
+        "required": [
+          "title",
+          "type",
+          "unit",
+          "amount",
+          "is_unlimited",
+          "balance"
+        ],
+        "description": "Runtime allowance projection on a subscription product without catalog coverage metadata."
+      },
+      "SubscriptionProduct": {
+        "type": "object",
+        "properties": {
+          "start_at": {
+            "type": "string",
+            "format": "date-time",
+            "examples": [
+              "2025-09-10T14:01:27.071Z"
+            ],
+            "description": "Date from which this product is effective"
+          },
+          "end_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "examples": [
+              "2025-09-10T14:01:27.071Z"
+            ],
+            "description": "Date on which this product expires (null for open-ended assignments)"
+          },
+          "id": {
+            "type": "string",
+            "format": "ulid"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "examples": [
+              "2025-09-10T14:01:27.071Z"
+            ],
+            "description": "ISO 8601 date-time string"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "examples": [
+              "2025-09-10T14:01:27.071Z"
+            ],
+            "description": "ISO 8601 date-time string"
+          },
+          "name": {
+            "type": "string",
+            "examples": [
+              "Europe Multi-Country Data Plan"
+            ],
+            "description": "Projected product name from the assigned resource specification."
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "examples": [
+              "Data plan with separate country allowances."
+            ],
+            "description": "Projected product description from the assigned resource specification."
+          },
+          "footprint": {
+            "$ref": "#/components/schemas/SubscriptionProductFootprint"
+          },
+          "allowances": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SubscriptionProductAllowance"
+            },
+            "description": "Allowance buckets for this product assignment, including aggregated runtime usage across subscriptions sharing the same purchased product."
+          },
+          "_links": {
+            "type": "object",
+            "properties": {
+              "self": {
+                "type": "object",
+                "properties": {
+                  "href": {
+                    "type": "string",
+                    "format": "uri",
+                    "examples": [
+                      "https://internal.api.com/subscriptions/sub_01HK2V8F3MNQRXZ4W7Y6P3JBCD/products/sbp_01HK2V8F3MNQRXZ4W7Y6P3JBD6"
+                    ]
+                  },
+                  "title": {
+                    "type": "string",
+                    "examples": [
+                      "Subscription Product"
+                    ],
+                    "description": "Human-readable title describing the linked resource relation"
+                  }
+                },
+                "required": [
+                  "href",
+                  "title"
+                ]
+              },
+              "subscription": {
+                "type": "object",
+                "properties": {
+                  "href": {
+                    "type": "string",
+                    "format": "uri",
+                    "examples": [
+                      "https://internal.api.com/subscriptions/sub_01HK2V8F3MNQRXZ4W7Y6P3JBCD"
+                    ]
+                  },
+                  "title": {
+                    "type": "string",
+                    "examples": [
+                      "Related resource"
+                    ],
+                    "description": "Human-readable title describing the linked resource relation"
+                  }
+                },
+                "required": [
+                  "href",
+                  "title"
+                ]
+              },
+              "product-offering": {
+                "type": "object",
+                "properties": {
+                  "href": {
+                    "type": "string",
+                    "format": "uri",
+                    "examples": [
+                      "https://internal.api.com/product-offerings/poff_01HK2V8F3MNQRXZ4W7Y6P3JBCZ"
+                    ]
+                  },
+                  "title": {
+                    "type": "string",
+                    "examples": [
+                      "Related resource"
+                    ],
+                    "description": "Human-readable title describing the linked resource relation"
+                  }
+                },
+                "required": [
+                  "href",
+                  "title"
+                ]
+              },
+              "resource-specification": {
+                "type": "object",
+                "properties": {
+                  "href": {
+                    "type": "string",
+                    "format": "uri",
+                    "examples": [
+                      "https://internal.api.com/resource-specifications/rsc_01HK2V8F3MNQRXZ4W7Y6P3JBD0"
+                    ]
+                  },
+                  "title": {
+                    "type": "string",
+                    "examples": [
+                      "Related resource"
+                    ],
+                    "description": "Human-readable title describing the linked resource relation"
+                  }
+                },
+                "required": [
+                  "href",
+                  "title"
+                ]
+              },
+              "network-service": {
+                "type": "object",
+                "properties": {
+                  "href": {
+                    "type": "string",
+                    "format": "uri",
+                    "examples": [
+                      "https://internal.api.com/network-api/services/serv_01HK2V8F3MNQRXZ4W7Y6P3JBD4"
+                    ]
+                  },
+                  "title": {
+                    "type": "string",
+                    "examples": [
+                      "Related resource"
+                    ],
+                    "description": "Human-readable title describing the linked resource relation"
+                  }
+                },
+                "required": [
+                  "href",
+                  "title"
+                ]
+              },
+              "order": {
+                "type": "object",
+                "properties": {
+                  "href": {
+                    "type": "string",
+                    "format": "uri",
+                    "examples": [
+                      "https://internal.api.com/orders/ord_01HK2V8F3MNQRXZ4W7Y6P3JBCF"
+                    ]
+                  },
+                  "title": {
+                    "type": "string",
+                    "examples": [
+                      "Related resource"
+                    ],
+                    "description": "Human-readable title describing the linked resource relation"
+                  }
+                },
+                "required": [
+                  "href",
+                  "title"
+                ]
+              }
+            },
+            "required": [
+              "self",
+              "subscription",
+              "product-offering"
+            ],
+            "description": "HAL+JSON links (internal)"
+          },
+          "_embedded": {
+            "type": "object",
+            "properties": {},
+            "description": "Reserved for future embedded relations"
+          }
+        },
+        "required": [
+          "start_at",
+          "id",
+          "created_at",
+          "updated_at"
+        ],
+        "description": "HAL representation of a subscription product assignment."
+      },
+      "SubscriptionProductAllowanceCreate": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "examples": [
+              "EU Data 1GB"
+            ],
+            "description": "Display title for the allowance."
+          },
+          "type": {
+            "$ref": "#/components/schemas/AllowanceType"
+          },
+          "unit": {
+            "$ref": "#/components/schemas/AllowanceUnit"
+          },
+          "unit_count": {
+            "type": "integer",
+            "minimum": 0,
+            "format": "int64",
+            "examples": [
+              1073741824
+            ],
+            "description": "Whole-number quantity for this allowance bucket."
+          },
+          "is_unlimited": {
+            "type": "boolean"
+          },
+          "duration": {
+            "$ref": "#/components/schemas/AllowanceDuration"
+          },
+          "coverage": {
+            "$ref": "#/components/schemas/AllowanceCoverage"
+          }
+        },
+        "required": [
+          "title",
+          "type",
+          "unit",
+          "unit_count",
+          "is_unlimited"
+        ],
+        "description": "Static allowance snapshot used to create product and subscription allowances during order fulfilment. Does not carry runtime balance."
+      },
+      "SubscriptionProductCreate": {
+        "type": "object",
+        "properties": {
+          "product_offering_id": {
+            "type": "string",
+            "format": "ulid",
+            "description": "Product offering identifier assigned to this subscription product"
+          },
+          "resource_specification_id": {
+            "type": "string",
+            "format": "ulid",
+            "description": "Resource specification identifier governing the connectivity parameters for this product"
+          },
+          "network_service_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "ulid",
+            "examples": [
+              "serv_01HK2V8F3MNQRXZ4W7Y6P3JBD4"
+            ],
+            "description": "Network service provisioned for this subscription product"
+          },
+          "order_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "ulid",
+            "description": "Order identifier that triggered this product assignment"
+          },
+          "start_at": {
+            "type": "string",
+            "format": "date-time",
+            "examples": [
+              "2025-09-10T14:01:27.071Z"
+            ],
+            "description": "Date from which this product is effective"
+          },
+          "end_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "examples": [
+              "2025-09-10T14:01:27.071Z"
+            ],
+            "description": "Date on which this product expires (omit or null for open-ended assignments)"
+          },
+          "allowances": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SubscriptionProductAllowanceCreate"
+            },
+            "description": "Static allowance definitions to materialize for this product assignment. Supplied from the order snapshot; runtime balances are created and managed separately."
+          }
+        },
+        "required": [
+          "product_offering_id",
+          "resource_specification_id",
+          "start_at"
+        ],
+        "description": "Payload to create a subscription product assignment, optionally including static allowance definitions from the order snapshot."
+      }
+    },
+    "parameters": {}
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "operationId": "healthCheck",
+        "tags": [
+          "System"
+        ],
+        "summary": "Service health check",
+        "description": "Check the health status of the provisioning service",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Service is healthy",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "healthy"
+                      ]
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "description": "Time the health response was generated"
+                    },
+                    "server_time": {
+                      "type": "string",
+                      "format": "date-time",
+                      "description": "Server clock timestamp at response time"
+                    },
+                    "uptime_seconds": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "description": "Number of seconds since the process started"
+                    },
+                    "version": {
+                      "type": "string",
+                      "description": "Semantic version deployed in this environment"
+                    },
+                    "build": {
+                      "type": "object",
+                      "properties": {
+                        "version": {
+                          "type": "string",
+                          "description": "Build identifier for the deployed artifact"
+                        },
+                        "git_commit": {
+                          "type": "string",
+                          "description": "Git commit hash used for this deployment"
+                        },
+                        "build_time": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "Timestamp when the artifact was built"
+                        }
+                      },
+                      "required": [
+                        "version",
+                        "git_commit",
+                        "build_time"
+                      ],
+                      "description": "Build metadata useful for deployment tracing"
+                    },
+                    "dependencies": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "$ref": "#/components/schemas/DependencyHealth"
+                      },
+                      "description": "Map of dependency/service identifiers to their current health status",
+                      "examples": [
+                        {
+                          "database": "healthy",
+                          "kafka": "healthy",
+                          "connect_auth": "degraded"
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "timestamp",
+                    "server_time",
+                    "uptime_seconds",
+                    "version",
+                    "build",
+                    "dependencies"
+                  ]
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service is unhealthy",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer"
+                    },
+                    "type": {
+                      "type": "string",
+                      "format": "uri"
+                    },
+                    "dependencies": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "$ref": "#/components/schemas/DependencyHealth"
+                      },
+                      "description": "Dependencies contributing to the unhealthy status",
+                      "examples": [
+                        {
+                          "kafka": "unreachable"
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status",
+                    "type"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/orders": {
+      "post": {
+        "operationId": "createOrder",
+        "tags": [
+          "Orders"
+        ],
+        "summary": "Create an order",
+        "description": "Create a new order from a Salesforce sale payload.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrderCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Order created successfully.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Order"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Access token is not set or invalid",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The requestor is not authorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "listOrders",
+        "tags": [
+          "Orders"
+        ],
+        "summary": "List orders",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "ulid",
+              "description": "Filter by account ID."
+            },
+            "required": false,
+            "description": "Filter by account ID.",
+            "name": "account-id",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "ulid",
+              "description": "Filter by payment record ID."
+            },
+            "required": false,
+            "description": "Filter by payment record ID.",
+            "name": "payment-record-id",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Filter by Salesforce order ID."
+            },
+            "required": false,
+            "description": "Filter by Salesforce order ID.",
+            "name": "salesforce-order-id",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/OrderStatus"
+                },
+                {
+                  "description": "Filter by order status."
+                }
+              ]
+            },
+            "required": false,
+            "description": "Filter by order status.",
+            "name": "status",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Pagination cursor."
+            },
+            "required": false,
+            "description": "Pagination cursor.",
+            "name": "cursor",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "description": "Maximum items per page."
+            },
+            "required": false,
+            "description": "Maximum items per page.",
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated list of orders.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderCollection"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Access token is not set or invalid",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The requestor is not authorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/orders/{order_id}": {
+      "get": {
+        "operationId": "getOrder",
+        "tags": [
+          "Orders"
+        ],
+        "summary": "Get order",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "ulid",
+              "description": "Order identifier."
+            },
+            "required": true,
+            "description": "Order identifier.",
+            "name": "order_id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Order details.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Order"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Access token is not set or invalid",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The requestor is not authorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/orders/{order_id}/cancel": {
+      "post": {
+        "operationId": "cancelOrder",
+        "tags": [
+          "Orders"
+        ],
+        "summary": "Cancel an order",
+        "description": "Cancel an order before provisioning starts.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "ulid",
+              "description": "Order identifier."
+            },
+            "required": true,
+            "description": "Order identifier.",
+            "name": "order_id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CancelOrderInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Order cancelled.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Order"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Access token is not set or invalid",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The requestor is not authorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/orders/{order_id}/subscriptions/{subscription_id}/products": {
+      "post": {
+        "operationId": "orderFulfilSubscriptionProduct",
+        "tags": [
+          "Orders"
+        ],
+        "summary": "Fulfil subscription product from order",
+        "description": "Called by the Order Service when an order is fulfilled to assign a product offering as an active product on the target subscription. Internally delegates to POST /subscriptions/{subscription_id}/products with the order_id attached.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "ulid",
+              "description": "Order identifier."
+            },
+            "required": true,
+            "description": "Order identifier.",
+            "name": "order_id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "ulid",
+              "description": "Subscription identifier."
+            },
+            "required": true,
+            "description": "Subscription identifier.",
+            "name": "subscription_id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubscriptionProductCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Product assigned to subscription as part of order fulfilment.",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionProduct"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Access token is not set or invalid",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The requestor is not authorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "webhooks": {}
+}

@@ -1,0 +1,100 @@
+{
+  "environments": [
+    {
+      "id": "52257bb2-fcce-4dac-b966-0bf8147fb9a5",
+      "isActive": true,
+      "name": "Collection",
+      "variables": [
+        {
+          "enabled": true,
+          "key": "base_url",
+          "value": "https://staging.example.com"
+        },
+        {
+          "enabled": true,
+          "key": "api_key",
+          "value": "{{api_key}}"
+        }
+      ]
+    }
+  ],
+  "folders": [],
+  "project": {
+    "id": "1cbafb43-32bb-4ef3-9e7d-2a4a3f3a83fe",
+    "name": "Variables Postman API"
+  },
+  "requests": [
+    {
+      "folderId": null,
+      "http": {
+        "authApiKeyLocation": "header",
+        "authApiKeyName": "X-API-Key",
+        "authApiKeyValue": "{{api_key}}",
+        "authOAuth2AuthURL": "",
+        "authOAuth2GrantType": "",
+        "authOAuth2Scopes": "",
+        "authOAuth2TokenURL": "",
+        "authPassword": "",
+        "authToken": "",
+        "authType": "apiKey",
+        "authUsername": "",
+        "binaryFileName": "",
+        "bodyContent": "",
+        "bodyFormData": [],
+        "bodyFormDataEntries": [],
+        "bodyType": "none",
+        "headers": [],
+        "method": "GET",
+        "params": [],
+        "rawContentType": "text",
+        "url": "{{base_url}}/health"
+      },
+      "id": "b462d1b9-1758-4c47-b4ab-bb67ba16dd82",
+      "name": "Health",
+      "sortOrder": 0,
+      "specIdentity": {
+        "alternateKeys": [],
+        "primaryKey": "GET /health"
+      }
+    },
+    {
+      "folderId": null,
+      "http": {
+        "authApiKeyLocation": "header",
+        "authApiKeyName": "X-API-Key",
+        "authApiKeyValue": "{{api_key}}",
+        "authOAuth2AuthURL": "",
+        "authOAuth2GrantType": "",
+        "authOAuth2Scopes": "",
+        "authOAuth2TokenURL": "",
+        "authPassword": "",
+        "authToken": "",
+        "authType": "apiKey",
+        "authUsername": "",
+        "binaryFileName": "",
+        "bodyContent": "",
+        "bodyFormData": [],
+        "bodyFormDataEntries": [],
+        "bodyType": "none",
+        "headers": [],
+        "method": "GET",
+        "params": [
+          {
+            "enabled": true,
+            "key": "q",
+            "value": "reqeast"
+          }
+        ],
+        "rawContentType": "text",
+        "url": "{{base_url}}/search"
+      },
+      "id": "eadbfa84-6c3a-4cce-a54f-c78b75d1f405",
+      "name": "Search",
+      "sortOrder": 1,
+      "specIdentity": {
+        "alternateKeys": [],
+        "primaryKey": "GET /search"
+      }
+    }
+  ]
+}

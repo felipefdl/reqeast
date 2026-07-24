@@ -1,0 +1,31 @@
+asyncapi: '2.6.0'
+info:
+  title: AsyncAPI WebSocket Demo
+  version: '1.0.0'
+servers:
+  production:
+    url: echo.websocket.org
+    protocol: wss
+    description: Production
+channels:
+  /chat:
+    description: Chat channel
+    bindings:
+      ws:
+        method: GET
+    publish:
+      operationId: sendChatMessage
+      summary: Send chat message
+      message:
+        payload:
+          type: object
+          example:
+            text: hello
+    subscribe:
+      operationId: receiveChatMessage
+      summary: Receive chat message
+      message:
+        payload:
+          type: object
+          example:
+            text: world

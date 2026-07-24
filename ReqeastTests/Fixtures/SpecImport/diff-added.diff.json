@@ -1,0 +1,27 @@
+{
+  "added": [
+    {
+      "primary_key": "createPet",
+      "alternate_keys": [],
+      "name": "Create pet",
+      "method": "POST",
+      "path": "/pet",
+      "deprecated": false,
+      "tags": [],
+      "protocol": "Http",
+      "binding": null,
+      "folder_id": null,
+      "parameters": [],
+      "body": {
+        "kind": "None"
+      },
+      "body_candidates": [],
+      "auth": null,
+      "description": null
+    }
+  ],
+  "removed": [],
+  "modified": [],
+  "unchanged": [],
+  "identity_changed": []
+}

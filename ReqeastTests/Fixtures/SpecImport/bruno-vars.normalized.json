@@ -1,0 +1,102 @@
+{
+  "project": {
+    "title": "Variables Bruno API",
+    "description": null,
+    "version": "1.0.0",
+    "icon_url": null,
+    "security_schemes": [],
+    "folders": [],
+    "operations": [
+      {
+        "primary_key": "GET /health",
+        "alternate_keys": [],
+        "name": "Health",
+        "method": "GET",
+        "path": "/health",
+        "deprecated": false,
+        "tags": [],
+        "protocol": "Http",
+        "binding": null,
+        "folder_id": null,
+        "parameters": [],
+        "body": {
+          "kind": "None"
+        },
+        "body_candidates": [],
+        "auth": {
+          "scheme_type": "apiKey",
+          "header_name": "X-API-Key",
+          "query_name": null,
+          "placeholder_value": "{{api_key}}",
+          "oauth2_grant_type": null,
+          "oauth2_auth_url": null,
+          "oauth2_token_url": null,
+          "oauth2_scopes": null
+        },
+        "description": null
+      },
+      {
+        "primary_key": "GET /search",
+        "alternate_keys": [],
+        "name": "Search",
+        "method": "GET",
+        "path": "/search",
+        "deprecated": false,
+        "tags": [],
+        "protocol": "Http",
+        "binding": null,
+        "folder_id": null,
+        "parameters": [
+          {
+            "location": "Query",
+            "name": "q",
+            "value": "reqeast",
+            "required": false,
+            "enabled": true,
+            "value_source": "FromExample"
+          }
+        ],
+        "body": {
+          "kind": "None"
+        },
+        "body_candidates": [],
+        "auth": {
+          "scheme_type": "apiKey",
+          "header_name": "X-API-Key",
+          "query_name": null,
+          "placeholder_value": "{{api_key}}",
+          "oauth2_grant_type": null,
+          "oauth2_auth_url": null,
+          "oauth2_token_url": null,
+          "oauth2_scopes": null
+        },
+        "description": null
+      }
+    ],
+    "environments": [
+      {
+        "name": "Staging",
+        "variables": [
+          {
+            "key": "base_url",
+            "value": "https://staging.example.com",
+            "enabled": true
+          },
+          {
+            "key": "api_key",
+            "value": "{{api_key}}",
+            "enabled": true
+          }
+        ]
+      }
+    ]
+  },
+  "warnings": [
+    {
+      "code": "MIGRATION_FROM_BRUNO",
+      "message": "Imported from Bruno; scripts, tests, and assertions are not migrated",
+      "operation_ref": null
+    }
+  ],
+  "content_fingerprint": "eba49d441262888e1d8378f966dfe9a00546e3c954eea52bbbb9be00a5fc6b85"
+}

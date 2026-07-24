@@ -1,0 +1,1 @@
+Cliente de API nativo para iPhone, iPad y Mac. HTTP, gRPC, WebSocket, SSE, TCP/TLS y UDP. Importa OpenAPI y Postman. Hecho con SwiftUI y Rust.

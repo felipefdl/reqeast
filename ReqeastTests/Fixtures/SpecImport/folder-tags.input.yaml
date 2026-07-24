@@ -1,0 +1,47 @@
+openapi: 3.0.0
+info:
+  title: Folder Tags API
+  version: 1.0.0
+tags:
+  - name: users
+    description: User management
+  - name: billing
+    description: Billing operations
+  - name: admin
+    description: Admin operations
+paths:
+  /users:
+    get:
+      tags:
+        - users
+      summary: List users
+      operationId: listUsers
+      responses:
+        "200":
+          description: ok
+  /users/{id}:
+    get:
+      tags:
+        - users
+        - admin
+      summary: Get user
+      operationId: getUser
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            example: usr_1
+      responses:
+        "200":
+          description: ok
+  /invoices:
+    get:
+      tags:
+        - billing
+      summary: List invoices
+      operationId: listInvoices
+      responses:
+        "200":
+          description: ok

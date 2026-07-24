@@ -1,0 +1,350 @@
+{
+  "iphone": {
+    "01": {
+      "en": {
+        "title": "Test and Debug APIs on iPhone",
+        "subtitle": "HTTP, gRPC, WebSocket, SSE, TCP/TLS, and UDP"
+      },
+      "zh-Hans": {
+        "title": "在 iPhone 上测试和调试 API",
+        "subtitle": "HTTP、gRPC、WebSocket、SSE、TCP/TLS 和 UDP"
+      },
+      "zh-Hant": {
+        "title": "在 iPhone 上測試和除錯 API",
+        "subtitle": "HTTP、gRPC、WebSocket、SSE、TCP/TLS 和 UDP"
+      },
+      "ja": {
+        "title": "iPhone で API をテスト・デバッグ",
+        "subtitle": "HTTP、gRPC、WebSocket、SSE、TCP/TLS、UDP"
+      },
+      "fr": {
+        "title": "Testez vos API sur iPhone",
+        "subtitle": "HTTP, gRPC, WebSocket, SSE, TCP/TLS et UDP"
+      },
+      "pt-BR": {
+        "title": "Teste e depure APIs no iPhone",
+        "subtitle": "HTTP, gRPC, WebSocket, SSE, TCP/TLS e UDP"
+      },
+      "es": {
+        "title": "Prueba y depura APIs en iPhone",
+        "subtitle": "HTTP, gRPC, WebSocket, SSE, TCP/TLS y UDP"
+      },
+      "ko": {
+        "title": "iPhone에서 API 테스트 및 디버깅",
+        "subtitle": "HTTP, gRPC, WebSocket, SSE, TCP/TLS, UDP"
+      },
+      "de": {
+        "title": "APIs testen und debuggen auf iPhone",
+        "subtitle": "HTTP, gRPC, WebSocket, SSE, TCP/TLS und UDP"
+      }
+    },
+    "02": {
+      "en": {
+        "title": "Six Protocols. One App.",
+        "subtitle": "Raw Sockets. Zero Overhead."
+      },
+      "zh-Hans": {
+        "title": "六种协议，一个应用。",
+        "subtitle": "原生套接字，直连无损。"
+      },
+      "zh-Hant": {
+        "title": "六種協定，一個應用。",
+        "subtitle": "原生套接字，直連無損。"
+      },
+      "ja": {
+        "title": "6つのプロトコル。1つのアプリ。",
+        "subtitle": "生ソケット。オーバーヘッドなし。"
+      },
+      "fr": {
+        "title": "Six protocoles. Une app.",
+        "subtitle": "Sockets natifs. Aucun compromis."
+      },
+      "pt-BR": {
+        "title": "Seis protocolos. Um app.",
+        "subtitle": "Sockets diretos. Zero overhead."
+      },
+      "es": {
+        "title": "Seis protocolos. Una app.",
+        "subtitle": "Sockets directos. Cero overhead."
+      },
+      "ko": {
+        "title": "여섯 프로토콜. 하나의 앱.",
+        "subtitle": "로우 소켓. 제로 오버헤드."
+      },
+      "de": {
+        "title": "Sechs Protokolle. Eine App.",
+        "subtitle": "Raw Sockets. Kein Overhead."
+      }
+    },
+    "03": {
+      "en": {
+        "title": "Data never leaves your iPhone.",
+        "subtitle": "Synced through iCloud. Nothing else."
+      },
+      "zh-Hans": {
+        "title": "数据从不离开你的 iPhone。",
+        "subtitle": "通过 iCloud 同步。仅此而已。"
+      },
+      "zh-Hant": {
+        "title": "資料從不離開你的 iPhone。",
+        "subtitle": "透過 iCloud 同步。僅此而已。"
+      },
+      "ja": {
+        "title": "データは iPhone から出ない。",
+        "subtitle": "iCloud で同期。それだけ。"
+      },
+      "fr": {
+        "title": "Données sur votre iPhone.",
+        "subtitle": "Synchronisées via iCloud. Rien d'autre."
+      },
+      "pt-BR": {
+        "title": "Dados ficam no seu iPhone.",
+        "subtitle": "Sincronizados via iCloud. Nada mais."
+      },
+      "es": {
+        "title": "Datos en tu iPhone.",
+        "subtitle": "Sincronizados por iCloud. Nada más."
+      },
+      "ko": {
+        "title": "데이터는 iPhone을 떠나지 않는다.",
+        "subtitle": "iCloud로 동기화. 그뿐."
+      },
+      "de": {
+        "title": "Daten auf dem iPhone.",
+        "subtitle": "Synchronisiert über iCloud. Sonst nichts."
+      }
+    }
+  },
+  "ipad": {
+    "01": {
+      "en": {
+        "title": "Test and Debug APIs on iPad",
+        "subtitle": "HTTP, gRPC, WebSocket, SSE, TCP/TLS, and UDP"
+      },
+      "zh-Hans": {
+        "title": "在 iPad 上测试和调试 API",
+        "subtitle": "HTTP、gRPC、WebSocket、SSE、TCP/TLS 和 UDP"
+      },
+      "zh-Hant": {
+        "title": "在 iPad 上測試和除錯 API",
+        "subtitle": "HTTP、gRPC、WebSocket、SSE、TCP/TLS 和 UDP"
+      },
+      "ja": {
+        "title": "iPad で API をテスト・デバッグ",
+        "subtitle": "HTTP、gRPC、WebSocket、SSE、TCP/TLS、UDP"
+      },
+      "fr": {
+        "title": "Testez vos API sur iPad",
+        "subtitle": "HTTP, gRPC, WebSocket, SSE, TCP/TLS et UDP"
+      },
+      "pt-BR": {
+        "title": "Teste e depure APIs no iPad",
+        "subtitle": "HTTP, gRPC, WebSocket, SSE, TCP/TLS e UDP"
+      },
+      "es": {
+        "title": "Prueba y depura APIs en iPad",
+        "subtitle": "HTTP, gRPC, WebSocket, SSE, TCP/TLS y UDP"
+      },
+      "ko": {
+        "title": "iPad에서 API 테스트 및 디버깅",
+        "subtitle": "HTTP, gRPC, WebSocket, SSE, TCP/TLS, UDP"
+      },
+      "de": {
+        "title": "APIs testen und debuggen auf iPad",
+        "subtitle": "HTTP, gRPC, WebSocket, SSE, TCP/TLS und UDP"
+      }
+    },
+    "02": {
+      "en": {
+        "title": "Six Protocols. One App.",
+        "subtitle": "Raw Sockets. Zero Overhead."
+      },
+      "zh-Hans": {
+        "title": "六种协议，一个应用。",
+        "subtitle": "原生套接字，直连无损。"
+      },
+      "zh-Hant": {
+        "title": "六種協定，一個應用。",
+        "subtitle": "原生套接字，直連無損。"
+      },
+      "ja": {
+        "title": "6つのプロトコル。1つのアプリ。",
+        "subtitle": "生ソケット。オーバーヘッドなし。"
+      },
+      "fr": {
+        "title": "Six protocoles. Une app.",
+        "subtitle": "Sockets natifs. Aucun compromis."
+      },
+      "pt-BR": {
+        "title": "Seis protocolos. Um app.",
+        "subtitle": "Sockets diretos. Zero overhead."
+      },
+      "es": {
+        "title": "Seis protocolos. Una app.",
+        "subtitle": "Sockets directos. Cero overhead."
+      },
+      "ko": {
+        "title": "여섯 프로토콜. 하나의 앱.",
+        "subtitle": "로우 소켓. 제로 오버헤드."
+      },
+      "de": {
+        "title": "Sechs Protokolle. Eine App.",
+        "subtitle": "Raw Sockets. Kein Overhead."
+      }
+    },
+    "03": {
+      "en": {
+        "title": "Your data never leaves your iPad.",
+        "subtitle": "Synced through iCloud. Nothing else."
+      },
+      "zh-Hans": {
+        "title": "数据从不离开你的 iPad。",
+        "subtitle": "通过 iCloud 同步。仅此而已。"
+      },
+      "zh-Hant": {
+        "title": "資料從不離開你的 iPad。",
+        "subtitle": "透過 iCloud 同步。僅此而已。"
+      },
+      "ja": {
+        "title": "データは iPad から出ない。",
+        "subtitle": "iCloud で同期。それだけ。"
+      },
+      "fr": {
+        "title": "Vos données ne quittent jamais votre iPad.",
+        "subtitle": "Synchronisées via iCloud. Rien d'autre."
+      },
+      "pt-BR": {
+        "title": "Seus dados nunca saem do seu iPad.",
+        "subtitle": "Sincronizados via iCloud. Nada mais."
+      },
+      "es": {
+        "title": "Tus datos nunca salen de tu iPad.",
+        "subtitle": "Sincronizados por iCloud. Nada más."
+      },
+      "ko": {
+        "title": "데이터는 절대 iPad을 떠나지 않는다.",
+        "subtitle": "iCloud로 동기화. 그뿐."
+      },
+      "de": {
+        "title": "Deine Daten verlassen nie dein iPad.",
+        "subtitle": "Synchronisiert über iCloud. Sonst nichts."
+      }
+    }
+  },
+  "mac": {
+    "01": {
+      "en": {
+        "title": "Test and Debug APIs on Mac",
+        "subtitle": "HTTP, gRPC, WebSocket, SSE, TCP/TLS, and UDP"
+      },
+      "zh-Hans": {
+        "title": "在 Mac 上测试和调试 API",
+        "subtitle": "HTTP、gRPC、WebSocket、SSE、TCP/TLS 和 UDP"
+      },
+      "zh-Hant": {
+        "title": "在 Mac 上測試和除錯 API",
+        "subtitle": "HTTP、gRPC、WebSocket、SSE、TCP/TLS 和 UDP"
+      },
+      "ja": {
+        "title": "Mac で API をテスト・デバッグ",
+        "subtitle": "HTTP、gRPC、WebSocket、SSE、TCP/TLS、UDP"
+      },
+      "fr": {
+        "title": "Testez vos API sur Mac",
+        "subtitle": "HTTP, gRPC, WebSocket, SSE, TCP/TLS et UDP"
+      },
+      "pt-BR": {
+        "title": "Teste e depure APIs no Mac",
+        "subtitle": "HTTP, gRPC, WebSocket, SSE, TCP/TLS e UDP"
+      },
+      "es": {
+        "title": "Prueba y depura APIs en Mac",
+        "subtitle": "HTTP, gRPC, WebSocket, SSE, TCP/TLS y UDP"
+      },
+      "ko": {
+        "title": "Mac에서 API 테스트 및 디버깅",
+        "subtitle": "HTTP, gRPC, WebSocket, SSE, TCP/TLS, UDP"
+      },
+      "de": {
+        "title": "APIs testen und debuggen auf Mac",
+        "subtitle": "HTTP, gRPC, WebSocket, SSE, TCP/TLS und UDP"
+      }
+    },
+    "02": {
+      "en": {
+        "title": "Six Protocols. One App.",
+        "subtitle": "Raw Sockets. Zero Overhead."
+      },
+      "zh-Hans": {
+        "title": "六种协议，一个应用。",
+        "subtitle": "原生套接字，直连无损。"
+      },
+      "zh-Hant": {
+        "title": "六種協定，一個應用。",
+        "subtitle": "原生套接字，直連無損。"
+      },
+      "ja": {
+        "title": "6つのプロトコル。1つのアプリ。",
+        "subtitle": "生ソケット。オーバーヘッドなし。"
+      },
+      "fr": {
+        "title": "Six protocoles. Une app.",
+        "subtitle": "Sockets natifs. Aucun compromis."
+      },
+      "pt-BR": {
+        "title": "Seis protocolos. Um app.",
+        "subtitle": "Sockets diretos. Zero overhead."
+      },
+      "es": {
+        "title": "Seis protocolos. Una app.",
+        "subtitle": "Sockets directos. Cero overhead."
+      },
+      "ko": {
+        "title": "여섯 프로토콜. 하나의 앱.",
+        "subtitle": "로우 소켓. 제로 오버헤드."
+      },
+      "de": {
+        "title": "Sechs Protokolle. Eine App.",
+        "subtitle": "Raw Sockets. Kein Overhead."
+      }
+    },
+    "03": {
+      "en": {
+        "title": "Your data never leaves your Mac.",
+        "subtitle": "Synced through iCloud. Nothing else."
+      },
+      "zh-Hans": {
+        "title": "数据从不离开你的 Mac。",
+        "subtitle": "通过 iCloud 同步。仅此而已。"
+      },
+      "zh-Hant": {
+        "title": "資料從不離開你的 Mac。",
+        "subtitle": "透過 iCloud 同步。僅此而已。"
+      },
+      "ja": {
+        "title": "データは Mac から出ない。",
+        "subtitle": "iCloud で同期。それだけ。"
+      },
+      "fr": {
+        "title": "Vos données ne quittent jamais votre Mac.",
+        "subtitle": "Synchronisées via iCloud. Rien d'autre."
+      },
+      "pt-BR": {
+        "title": "Seus dados nunca saem do seu Mac.",
+        "subtitle": "Sincronizados via iCloud. Nada mais."
+      },
+      "es": {
+        "title": "Tus datos nunca salen de tu Mac.",
+        "subtitle": "Sincronizados por iCloud. Nada más."
+      },
+      "ko": {
+        "title": "데이터는 절대 Mac을 떠나지 않는다.",
+        "subtitle": "iCloud로 동기화. 그뿐."
+      },
+      "de": {
+        "title": "Deine Daten verlassen nie deinen Mac.",
+        "subtitle": "Synchronisiert über iCloud. Sonst nichts."
+      }
+    }
+  }
+}

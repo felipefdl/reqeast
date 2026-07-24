@@ -1,0 +1,80 @@
+{
+  "project": {
+    "title": "AsyncAPI WebSocket Demo",
+    "description": null,
+    "version": "1.0.0",
+    "icon_url": null,
+    "security_schemes": [],
+    "folders": [],
+    "operations": [
+      {
+        "primary_key": "sendChatMessage",
+        "alternate_keys": [],
+        "name": "Send chat message",
+        "method": "PUBLISH",
+        "path": "wss://echo.websocket.org/chat",
+        "deprecated": false,
+        "tags": [
+          "/chat"
+        ],
+        "protocol": "WebSocket",
+        "binding": {
+          "protocol": "WebSocket",
+          "address": "wss://echo.websocket.org/chat",
+          "operation_type": "publish",
+          "message_template": "{\n  \"text\": \"hello\"\n}"
+        },
+        "folder_id": null,
+        "parameters": [],
+        "body": {
+          "kind": "Json",
+          "content": "{\n  \"text\": \"hello\"\n}"
+        },
+        "body_candidates": [],
+        "auth": null,
+        "description": "Chat channel"
+      },
+      {
+        "primary_key": "receiveChatMessage",
+        "alternate_keys": [],
+        "name": "Receive chat message",
+        "method": "SUBSCRIBE",
+        "path": "wss://echo.websocket.org/chat",
+        "deprecated": false,
+        "tags": [
+          "/chat"
+        ],
+        "protocol": "WebSocket",
+        "binding": {
+          "protocol": "WebSocket",
+          "address": "wss://echo.websocket.org/chat",
+          "operation_type": "subscribe",
+          "message_template": "{\n  \"text\": \"world\"\n}"
+        },
+        "folder_id": null,
+        "parameters": [],
+        "body": {
+          "kind": "Json",
+          "content": "{\n  \"text\": \"world\"\n}"
+        },
+        "body_candidates": [],
+        "auth": null,
+        "description": "Chat channel"
+      }
+    ],
+    "environments": [
+      {
+        "name": "Production",
+        "variables": [
+          {
+            "key": "ws_url",
+            "value": "wss://echo.websocket.org",
+            "enabled": true
+          }
+        ]
+      }
+    ]
+  },
+  "warnings": [],
+  "content_fingerprint": "8d601194f4cfc6bfaa47f903a4df52293c85b95b54a58553436c256387710cdf"
+}

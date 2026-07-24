@@ -1,0 +1,100 @@
+{
+  "project": {
+    "title": "Multi-server API",
+    "description": null,
+    "version": "1.0.0",
+    "icon_url": "https://api.example.test/favicon.ico",
+    "security_schemes": [],
+    "folders": [],
+    "operations": [
+      {
+        "primary_key": "getStatus",
+        "alternate_keys": [],
+        "name": "Health check",
+        "method": "GET",
+        "path": "/status",
+        "deprecated": false,
+        "tags": [],
+        "protocol": "Http",
+        "binding": null,
+        "folder_id": null,
+        "parameters": [],
+        "body": {
+          "kind": "None"
+        },
+        "body_candidates": [],
+        "auth": null,
+        "description": null
+      },
+      {
+        "primary_key": "listUsers",
+        "alternate_keys": [],
+        "name": "List users",
+        "method": "GET",
+        "path": "/users",
+        "deprecated": false,
+        "tags": [],
+        "protocol": "Http",
+        "binding": null,
+        "folder_id": null,
+        "parameters": [],
+        "body": {
+          "kind": "None"
+        },
+        "body_candidates": [],
+        "auth": null,
+        "description": null
+      }
+    ],
+    "environments": [
+      {
+        "name": "Primary API",
+        "variables": [
+          {
+            "key": "base_url",
+            "value": "https://api.example.test/production",
+            "enabled": true
+          },
+          {
+            "key": "environment",
+            "value": "production",
+            "enabled": true
+          }
+        ]
+      },
+      {
+        "name": "Sandbox",
+        "variables": [
+          {
+            "key": "base_url",
+            "value": "https://sandbox.example.test",
+            "enabled": true
+          }
+        ]
+      },
+      {
+        "name": "EU region",
+        "variables": [
+          {
+            "key": "base_url",
+            "value": "https://eu.example.test",
+            "enabled": true
+          }
+        ]
+      }
+    ]
+  },
+  "warnings": [
+    {
+      "code": "NO_TAGS",
+      "message": "Spec has no tags; operations import into the project root",
+      "operation_ref": null
+    },
+    {
+      "code": "OPERATION_SERVER_IGNORED",
+      "message": "Operation-level servers are ignored in P0; use root servers as environments",
+      "operation_ref": "get /users"
+    }
+  ],
+  "content_fingerprint": "d898c9dccd90f623d453e309f02cd3e6056e02d5d3b590f1cc1d5bfaee38b458"
+}

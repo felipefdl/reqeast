@@ -1,0 +1,77 @@
+{
+  "info": {
+    "name": "Nested Postman API",
+    "description": "Collection with nested folders",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "https://api.example.com" }
+  ],
+  "item": [
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "List users",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/users?limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["users"],
+              "query": [
+                { "key": "limit", "value": "10" }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "OK",
+              "status": "OK",
+              "code": 200,
+              "body": "[]"
+            }
+          ]
+        },
+        {
+          "name": "Profiles",
+          "item": [
+            {
+              "name": "Get profile",
+              "request": {
+                "method": "GET",
+                "url": {
+                  "raw": "{{base_url}}/users/:userId/profile",
+                  "host": ["{{base_url}}"],
+                  "path": ["users", ":userId", "profile"],
+                  "variable": [
+                    { "key": "userId", "value": "42" }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Create user",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Ada\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": "{{base_url}}/users"
+      }
+    }
+  ]
+}

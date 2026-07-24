@@ -1,0 +1,4 @@
+{
+  "kind": "InvalidSpec",
+  "message": "Duplicate operationId: duplicateOp"
+}

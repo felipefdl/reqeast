@@ -1,0 +1,90 @@
+{
+  "project": {
+    "title": "AsyncAPI HTTP Demo",
+    "description": "HTTP channels with unsupported Kafka and AMQP bindings",
+    "version": "1.0.0",
+    "icon_url": null,
+    "security_schemes": [],
+    "folders": [],
+    "operations": [
+      {
+        "primary_key": "GET /users",
+        "alternate_keys": [],
+        "name": "List users",
+        "method": "GET",
+        "path": "/users",
+        "deprecated": false,
+        "tags": [
+          "/users"
+        ],
+        "protocol": "Http",
+        "binding": {
+          "protocol": "Http",
+          "address": "/users",
+          "operation_type": "subscribe",
+          "message_template": ""
+        },
+        "folder_id": null,
+        "parameters": [],
+        "body": {
+          "kind": "None"
+        },
+        "body_candidates": [],
+        "auth": null,
+        "description": "List users"
+      },
+      {
+        "primary_key": "createUser",
+        "alternate_keys": [],
+        "name": "Create user",
+        "method": "POST",
+        "path": "/users/create",
+        "deprecated": false,
+        "tags": [
+          "/users/create"
+        ],
+        "protocol": "Http",
+        "binding": {
+          "protocol": "Http",
+          "address": "/users/create",
+          "operation_type": "publish",
+          "message_template": "{\n  \"name\": \"Ada\"\n}"
+        },
+        "folder_id": null,
+        "parameters": [],
+        "body": {
+          "kind": "Json",
+          "content": "{\n  \"name\": \"Ada\"\n}"
+        },
+        "body_candidates": [],
+        "auth": null,
+        "description": "Create user"
+      }
+    ],
+    "environments": [
+      {
+        "name": "Production",
+        "variables": [
+          {
+            "key": "base_url",
+            "value": "https://api.example.com/v1",
+            "enabled": true
+          }
+        ]
+      }
+    ]
+  },
+  "warnings": [
+    {
+      "code": "UNSUPPORTED_BINDING",
+      "message": "Unsupported AsyncAPI binding `kafka` on channel `events/orders`; operation skipped",
+      "operation_ref": "events/orders"
+    },
+    {
+      "code": "UNSUPPORTED_BINDING",
+      "message": "Unsupported AsyncAPI binding `amqp` on channel `events/payments`; operation skipped",
+      "operation_ref": "events/payments"
+    }
+  ],
+  "content_fingerprint": "3be0b34f1c1979dbcc8de3e1962e247d9ec33af7d4bf645f40641412dcdb3768"
+}

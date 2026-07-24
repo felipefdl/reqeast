@@ -1,0 +1,107 @@
+{
+  "environments": [
+    {
+      "id": "a89aeb7c-ab65-4134-83a6-e13d024d91cd",
+      "isActive": true,
+      "name": "Capture",
+      "variables": [
+        {
+          "enabled": true,
+          "key": "base_url",
+          "value": "https://api.example.com"
+        }
+      ]
+    }
+  ],
+  "folders": [],
+  "project": {
+    "id": "82c5d061-222d-405d-bb01-af2a3146b5e9",
+    "name": "Reqeast HAR Fixture"
+  },
+  "requests": [
+    {
+      "folderId": null,
+      "http": {
+        "authApiKeyLocation": "header",
+        "authApiKeyName": "",
+        "authApiKeyValue": "",
+        "authOAuth2AuthURL": "",
+        "authOAuth2GrantType": "",
+        "authOAuth2Scopes": "",
+        "authOAuth2TokenURL": "",
+        "authPassword": "",
+        "authToken": "",
+        "authType": "none",
+        "authUsername": "",
+        "binaryFileName": "",
+        "bodyContent": "",
+        "bodyFormData": [],
+        "bodyFormDataEntries": [],
+        "bodyType": "none",
+        "headers": [
+          {
+            "enabled": true,
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "method": "GET",
+        "params": [
+          {
+            "enabled": true,
+            "key": "limit",
+            "value": "5"
+          }
+        ],
+        "rawContentType": "text",
+        "url": "{{base_url}}/pets"
+      },
+      "id": "1e0b00c2-acfc-4c08-8e6b-cf5eccb9afd4",
+      "name": "List pets",
+      "sortOrder": 0,
+      "specIdentity": {
+        "alternateKeys": [],
+        "primaryKey": "GET /pets"
+      }
+    },
+    {
+      "folderId": null,
+      "http": {
+        "authApiKeyLocation": "header",
+        "authApiKeyName": "",
+        "authApiKeyValue": "",
+        "authOAuth2AuthURL": "",
+        "authOAuth2GrantType": "",
+        "authOAuth2Scopes": "",
+        "authOAuth2TokenURL": "",
+        "authPassword": "",
+        "authToken": "",
+        "authType": "none",
+        "authUsername": "",
+        "binaryFileName": "",
+        "bodyContent": "{\n  \"name\": \"Ada\"\n}",
+        "bodyFormData": [],
+        "bodyFormDataEntries": [],
+        "bodyType": "json",
+        "headers": [
+          {
+            "enabled": true,
+            "key": "X-Request-Id",
+            "value": "req-42"
+          }
+        ],
+        "method": "POST",
+        "params": [],
+        "rawContentType": "text",
+        "url": "{{base_url}}/pets"
+      },
+      "id": "cf320026-beec-42c3-a538-95095bbc9fa4",
+      "name": "Create pet",
+      "sortOrder": 1,
+      "specIdentity": {
+        "alternateKeys": [],
+        "primaryKey": "POST /pets"
+      }
+    }
+  ]
+}

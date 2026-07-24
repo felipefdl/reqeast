@@ -1,0 +1,498 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Authentication Service API",
+    "version": "0.0.1"
+  },
+  "servers": [
+    {
+      "url": "https://internal.api.com",
+      "description": "Production server"
+    }
+  ],
+  "security": [
+    {
+      "BearerAuth": []
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "AuthenticationPolicyHal": {
+        "type": "object",
+        "properties": {
+          "external_id": {
+            "type": "string",
+            "format": "ULID",
+            "example": "01HGXY9K2ABCDEF123456GHJK1"
+          },
+          "mfa_requirement": {
+            "type": "string",
+            "enum": [
+              "none",
+              "any",
+              "all"
+            ],
+            "example": "any"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-12-12T10:30:00.000Z"
+          },
+          "_links": {
+            "type": "object",
+            "properties": {
+              "self": {
+                "type": "object",
+                "properties": {
+                  "href": {
+                    "type": "string",
+                    "format": "uri",
+                    "examples": [
+                      "https://internal.api.com/authentication-policies/authpol_01HGXY9K2ABCDEF123456GHJK1"
+                    ]
+                  },
+                  "title": {
+                    "type": "string",
+                    "examples": [
+                      "Authentication Policy"
+                    ],
+                    "description": "Human-readable title describing the linked resource relation"
+                  }
+                },
+                "required": [
+                  "href",
+                  "title"
+                ]
+              }
+            },
+            "required": [
+              "self"
+            ],
+            "description": "HAL+JSON links (internal)"
+          },
+          "_embedded": {
+            "type": "object",
+            "additionalProperties": {},
+            "description": "HAL embedded resources (optional)"
+          }
+        },
+        "required": [
+          "external_id",
+          "mfa_requirement",
+          "updated_at",
+          "_links"
+        ],
+        "description": "Internal HAL representation of an authentication policy."
+      }
+    },
+    "parameters": {}
+  },
+  "paths": {
+    "/authentication-policies/": {
+      "get": {
+        "operationId": "getAuthPolicy",
+        "tags": [
+          "Authentication Policies"
+        ],
+        "summary": "Get MFA Policy",
+        "description": "Retrieves the authentication policy for a specific external identifier.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "ULID",
+              "description": "External identifier",
+              "example": "01HGXY9K2ABCDEF123456GHJK1"
+            },
+            "required": true,
+            "description": "External identifier",
+            "name": "external-id",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Authentication policy retrieved successfully",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthenticationPolicyHal"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Access token is not set or invalid",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The requestor is not authorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "upsertAuthPolicy",
+        "tags": [
+          "Authentication Policies"
+        ],
+        "summary": "Create or Update Authentication Policy",
+        "description": "Creates or updates the authentication policy for an external identifier.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "external_id": {
+                    "type": "string",
+                    "format": "ULID",
+                    "description": "External identifier",
+                    "example": "01HGXY9K2ABCDEF123456GHJK1"
+                  },
+                  "mfa_requirement": {
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "any",
+                      "all"
+                    ],
+                    "description": "MFA enforcement level",
+                    "example": "any"
+                  }
+                },
+                "required": [
+                  "external_id",
+                  "mfa_requirement"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Authentication policy updated successfully",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthenticationPolicyHal"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Access token is not set or invalid",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The requestor is not authorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "detail",
+                    "status"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "webhooks": {}
+}

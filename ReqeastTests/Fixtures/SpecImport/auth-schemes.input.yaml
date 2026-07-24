@@ -1,0 +1,73 @@
+openapi: 3.0.0
+info:
+  title: Auth Schemes API
+  version: 1.0.0
+servers:
+  - url: https://auth.example.test
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: JWT bearer token
+    apiKeyHeader:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: API key in header
+    apiKeyQuery:
+      type: apiKey
+      in: query
+      name: api_key
+      description: API key in query
+    oauth2:
+      type: oauth2
+      description: OAuth2 client credentials
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.example.test/oauth/token
+          scopes:
+            read: Read access
+            write: Write access
+    openId:
+      type: openIdConnect
+      openIdConnectUrl: https://auth.example.test/.well-known/openid-configuration
+security:
+  - bearerAuth: []
+paths:
+  /public:
+    get:
+      summary: Public endpoint
+      operationId: getPublic
+      security: []
+      responses:
+        "200":
+          description: ok
+  /protected:
+    get:
+      summary: Bearer protected
+      operationId: getProtected
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: ok
+  /api-key:
+    get:
+      summary: API key protected
+      operationId: getApiKey
+      security:
+        - apiKeyHeader: []
+      responses:
+        "200":
+          description: ok
+  /oauth:
+    post:
+      summary: OAuth protected
+      operationId: postOAuth
+      security:
+        - oauth2:
+            - write
+      responses:
+        "200":
+          description: ok

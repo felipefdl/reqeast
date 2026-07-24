@@ -1,0 +1,4 @@
+{
+  "kind": "InvalidSpec",
+  "message": "Remote $ref is not allowed: https://example.com/schemas/limit.json"
+}

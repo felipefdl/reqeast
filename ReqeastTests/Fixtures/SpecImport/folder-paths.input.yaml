@@ -1,0 +1,47 @@
+openapi: 3.0.0
+info:
+  title: Folder Paths API
+  version: 1.0.0
+paths:
+  /api/v1/users:
+    get:
+      summary: List users
+      operationId: listUsers
+      responses:
+        "200":
+          description: ok
+  /api/v1/users/{id}:
+    get:
+      summary: Get user
+      operationId: getUser
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            example: usr_1
+      responses:
+        "200":
+          description: ok
+  /api/v1/billing/invoices:
+    get:
+      summary: List invoices
+      operationId: listInvoices
+      responses:
+        "200":
+          description: ok
+  /api/v1/billing/invoices/{id}/payments:
+    post:
+      summary: Record payment
+      operationId: recordPayment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            example: inv_1
+      responses:
+        "201":
+          description: created

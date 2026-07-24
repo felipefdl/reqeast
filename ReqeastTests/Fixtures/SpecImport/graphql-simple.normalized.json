@@ -1,0 +1,149 @@
+{
+  "project": {
+    "title": "Imported GraphQL Schema",
+    "description": null,
+    "version": null,
+    "icon_url": null,
+    "security_schemes": [],
+    "folders": [
+      {
+        "id": "folder:Query",
+        "parent_id": null,
+        "name": "Query",
+        "sort_hint": 0
+      },
+      {
+        "id": "folder:Mutation",
+        "parent_id": null,
+        "name": "Mutation",
+        "sort_hint": 1
+      }
+    ],
+    "operations": [
+      {
+        "primary_key": "query user",
+        "alternate_keys": [],
+        "name": "Fetch a user by ID",
+        "method": "POST",
+        "path": "",
+        "deprecated": false,
+        "tags": [
+          "graphql",
+          "Query"
+        ],
+        "protocol": "Http",
+        "binding": null,
+        "folder_id": "folder:Query",
+        "parameters": [
+          {
+            "location": "Query",
+            "name": "id",
+            "value": "",
+            "required": true,
+            "enabled": true,
+            "value_source": "Missing"
+          }
+        ],
+        "body": {
+          "kind": "Json",
+          "content": "{\n  \"query\": \"query User($id: ID!) { user(id: $id) { __typename } }\",\n  \"variables\": {\"id\": \"\"}\n}"
+        },
+        "body_candidates": [],
+        "auth": null,
+        "description": "Fetch a user by ID"
+      },
+      {
+        "primary_key": "query users",
+        "alternate_keys": [],
+        "name": "List users with optional limit",
+        "method": "POST",
+        "path": "",
+        "deprecated": false,
+        "tags": [
+          "graphql",
+          "Query"
+        ],
+        "protocol": "Http",
+        "binding": null,
+        "folder_id": "folder:Query",
+        "parameters": [
+          {
+            "location": "Query",
+            "name": "limit",
+            "value": "10",
+            "required": false,
+            "enabled": true,
+            "value_source": "FromDefault"
+          }
+        ],
+        "body": {
+          "kind": "Json",
+          "content": "{\n  \"query\": \"query Users($limit: Int) { users(limit: $limit) { __typename } }\",\n  \"variables\": {\"limit\": \"10\"}\n}"
+        },
+        "body_candidates": [],
+        "auth": null,
+        "description": "List users with optional limit"
+      },
+      {
+        "primary_key": "mutation createUser",
+        "alternate_keys": [],
+        "name": "Create a new user",
+        "method": "POST",
+        "path": "",
+        "deprecated": false,
+        "tags": [
+          "graphql",
+          "Mutation"
+        ],
+        "protocol": "Http",
+        "binding": null,
+        "folder_id": "folder:Mutation",
+        "parameters": [
+          {
+            "location": "Query",
+            "name": "name",
+            "value": "",
+            "required": true,
+            "enabled": true,
+            "value_source": "Missing"
+          },
+          {
+            "location": "Query",
+            "name": "email",
+            "value": "",
+            "required": true,
+            "enabled": true,
+            "value_source": "Missing"
+          }
+        ],
+        "body": {
+          "kind": "Json",
+          "content": "{\n  \"query\": \"mutation CreateUser($name: String!, $email: String!) { createUser(name: $name, email: $email) { __typename } }\",\n  \"variables\": {\"name\": \"\", \"email\": \"\"}\n}"
+        },
+        "body_candidates": [],
+        "auth": null,
+        "description": "Create a new user"
+      }
+    ],
+    "environments": [
+      {
+        "name": "Default",
+        "variables": [
+          {
+            "key": "base_url",
+            "value": "https://api.example.com/graphql",
+            "enabled": true
+          }
+        ]
+      }
+    ]
+  },
+  "warnings": [
+    {
+      "code": "GRAPHQL_SDL_IMPORT",
+      "message": "Imported GraphQL SDL as HTTP POST operations with JSON query bodies",
+      "operation_ref": null
+    }
+  ],
+  "content_fingerprint": "a485c851df261d5ed7b2a0335573ec07ef5647e3dec728a8dc9d075896d1d4d3"
+}

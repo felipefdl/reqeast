@@ -1,0 +1,113 @@
+{
+  "project": {
+    "title": "Stripe-like Payments API",
+    "description": null,
+    "version": "2026-01-01",
+    "icon_url": "https://api.stripe-like.example.test/favicon.ico",
+    "security_schemes": [],
+    "folders": [],
+    "operations": [
+      {
+        "primary_key": "createCharge",
+        "alternate_keys": [],
+        "name": "Create a charge",
+        "method": "POST",
+        "path": "/charges",
+        "deprecated": false,
+        "tags": [],
+        "protocol": "Http",
+        "binding": null,
+        "folder_id": null,
+        "parameters": [],
+        "body": {
+          "kind": "Urlencoded",
+          "fields": [
+            {
+              "key": "amount",
+              "value": "2000",
+              "enabled": true
+            },
+            {
+              "key": "currency",
+              "value": "usd",
+              "enabled": true
+            }
+          ]
+        },
+        "body_candidates": [
+          {
+            "content_type": "application/x-www-form-urlencoded",
+            "body": {
+              "kind": "Urlencoded",
+              "fields": [
+                {
+                  "key": "amount",
+                  "value": "2000",
+                  "enabled": true
+                },
+                {
+                  "key": "currency",
+                  "value": "usd",
+                  "enabled": true
+                }
+              ]
+            }
+          }
+        ],
+        "auth": null,
+        "description": null
+      },
+      {
+        "primary_key": "createCustomer",
+        "alternate_keys": [],
+        "name": "Create a customer",
+        "method": "POST",
+        "path": "/customers",
+        "deprecated": false,
+        "tags": [],
+        "protocol": "Http",
+        "binding": null,
+        "folder_id": null,
+        "parameters": [],
+        "body": {
+          "kind": "None"
+        },
+        "body_candidates": [
+          {
+            "content_type": "application/x-www-form-urlencoded",
+            "body": {
+              "kind": "None"
+            }
+          }
+        ],
+        "auth": null,
+        "description": null
+      }
+    ],
+    "environments": [
+      {
+        "name": "Server 1",
+        "variables": [
+          {
+            "key": "base_url",
+            "value": "https://api.stripe-like.example.test/v1",
+            "enabled": true
+          }
+        ]
+      }
+    ]
+  },
+  "warnings": [
+    {
+      "code": "NO_TAGS",
+      "message": "Spec has no tags; operations import into the project root",
+      "operation_ref": null
+    },
+    {
+      "code": "MISSING_EXAMPLE",
+      "message": "No example found for request body content type 'application/x-www-form-urlencoded'",
+      "operation_ref": "post /customers"
+    }
+  ],
+  "content_fingerprint": "1e920cab80b0c4b935c340a7512ee481f1bcd7161c58a0aa533e4be663e13f48"
+}

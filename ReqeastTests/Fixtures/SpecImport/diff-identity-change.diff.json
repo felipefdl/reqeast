@@ -1,0 +1,59 @@
+{
+  "added": [],
+  "removed": [],
+  "modified": [],
+  "unchanged": [],
+  "identity_changed": [
+    {
+      "request_id": "00000000-0000-0000-0000-000000000301",
+      "old_primary_key": "listPets",
+      "new_primary_key": "listAllPets",
+      "old_operation": {
+        "primary_key": "listPets",
+        "alternate_keys": [],
+        "name": "List pets",
+        "method": "GET",
+        "path": "/pet",
+        "deprecated": false,
+        "tags": [],
+        "protocol": "Http",
+        "binding": null,
+        "folder_id": null,
+        "parameters": [],
+        "body": {
+          "kind": "None"
+        },
+        "body_candidates": [],
+        "auth": null,
+        "description": null
+      },
+      "new_operation": {
+        "primary_key": "listAllPets",
+        "alternate_keys": [],
+        "name": "List all pets",
+        "method": "GET",
+        "path": "/pet",
+        "deprecated": false,
+        "tags": [],
+        "protocol": "Http",
+        "binding": null,
+        "folder_id": null,
+        "parameters": [],
+        "body": {
+          "kind": "None"
+        },
+        "body_candidates": [],
+        "auth": null,
+        "description": null
+      },
+      "field_deltas": [
+        {
+          "field": "Name",
+          "old_value": "List pets",
+          "new_value": "List all pets",
+          "is_conflict": false
+        }
+      ]
+    }
+  ]
+}

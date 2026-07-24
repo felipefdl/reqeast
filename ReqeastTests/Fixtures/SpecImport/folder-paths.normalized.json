@@ -1,0 +1,126 @@
+{
+  "project": {
+    "title": "Folder Paths API",
+    "description": null,
+    "version": "1.0.0",
+    "icon_url": null,
+    "security_schemes": [],
+    "folders": [],
+    "operations": [
+      {
+        "primary_key": "listInvoices",
+        "alternate_keys": [],
+        "name": "List invoices",
+        "method": "GET",
+        "path": "/api/v1/billing/invoices",
+        "deprecated": false,
+        "tags": [],
+        "protocol": "Http",
+        "binding": null,
+        "folder_id": null,
+        "parameters": [],
+        "body": {
+          "kind": "None"
+        },
+        "body_candidates": [],
+        "auth": null,
+        "description": null
+      },
+      {
+        "primary_key": "recordPayment",
+        "alternate_keys": [],
+        "name": "Record payment",
+        "method": "POST",
+        "path": "/api/v1/billing/invoices/{id}/payments",
+        "deprecated": false,
+        "tags": [],
+        "protocol": "Http",
+        "binding": null,
+        "folder_id": null,
+        "parameters": [
+          {
+            "location": "Path",
+            "name": "id",
+            "value": "{{id}}",
+            "required": true,
+            "enabled": true,
+            "value_source": "FromExample"
+          }
+        ],
+        "body": {
+          "kind": "None"
+        },
+        "body_candidates": [],
+        "auth": null,
+        "description": null
+      },
+      {
+        "primary_key": "listUsers",
+        "alternate_keys": [],
+        "name": "List users",
+        "method": "GET",
+        "path": "/api/v1/users",
+        "deprecated": false,
+        "tags": [],
+        "protocol": "Http",
+        "binding": null,
+        "folder_id": null,
+        "parameters": [],
+        "body": {
+          "kind": "None"
+        },
+        "body_candidates": [],
+        "auth": null,
+        "description": null
+      },
+      {
+        "primary_key": "getUser",
+        "alternate_keys": [],
+        "name": "Get user",
+        "method": "GET",
+        "path": "/api/v1/users/{id}",
+        "deprecated": false,
+        "tags": [],
+        "protocol": "Http",
+        "binding": null,
+        "folder_id": null,
+        "parameters": [
+          {
+            "location": "Path",
+            "name": "id",
+            "value": "{{id}}",
+            "required": true,
+            "enabled": true,
+            "value_source": "FromExample"
+          }
+        ],
+        "body": {
+          "kind": "None"
+        },
+        "body_candidates": [],
+        "auth": null,
+        "description": null
+      }
+    ],
+    "environments": [
+      {
+        "name": "Default",
+        "variables": [
+          {
+            "key": "base_url",
+            "value": "/",
+            "enabled": true
+          }
+        ]
+      }
+    ]
+  },
+  "warnings": [
+    {
+      "code": "NO_TAGS",
+      "message": "Spec has no tags; operations import into the project root",
+      "operation_ref": null
+    }
+  ],
+  "content_fingerprint": "2e7068fd2dd638097001a69e055b51f6aeed361e4b161e70d05617d2c85c0822"
+}

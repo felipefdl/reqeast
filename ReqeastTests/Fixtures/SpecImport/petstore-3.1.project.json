@@ -1,0 +1,170 @@
+{
+  "environments": [
+    {
+      "id": "d9892a70-50bf-4ecc-be36-bca07c636522",
+      "isActive": true,
+      "name": "Server 1",
+      "variables": [
+        {
+          "enabled": true,
+          "key": "base_url",
+          "value": "https://petstore31.example.test/v1"
+        }
+      ]
+    }
+  ],
+  "folders": [
+    {
+      "id": "2fe353df-c08e-4109-a29d-ea72a7bf60e9",
+      "name": "pet"
+    },
+    {
+      "id": "968f6b47-c9c4-4200-a3d4-c861f569dc7f",
+      "name": "store"
+    }
+  ],
+  "project": {
+    "id": "0f721fcc-26a1-4ef3-adae-2b9d9466f3fc",
+    "name": "OpenAPI 3.1 Petstore"
+  },
+  "requests": [
+    {
+      "folderId": "2fe353df-c08e-4109-a29d-ea72a7bf60e9",
+      "http": {
+        "authApiKeyLocation": "header",
+        "authApiKeyName": "",
+        "authApiKeyValue": "",
+        "authOAuth2AuthURL": "",
+        "authOAuth2GrantType": "",
+        "authOAuth2Scopes": "",
+        "authOAuth2TokenURL": "",
+        "authPassword": "",
+        "authToken": "",
+        "authType": "none",
+        "authUsername": "",
+        "binaryFileName": "",
+        "bodyContent": "",
+        "bodyFormData": [],
+        "bodyFormDataEntries": [],
+        "bodyType": "none",
+        "headers": [],
+        "method": "GET",
+        "params": [
+          {
+            "enabled": false,
+            "key": "limit",
+            "value": "25"
+          }
+        ],
+        "rawContentType": "text",
+        "url": "{{base_url}}/pet"
+      },
+      "id": "21992511-31ea-4a7d-879f-0ac3f04eab11",
+      "name": "List all pets",
+      "sortOrder": 0,
+      "specIdentity": {
+        "alternateKeys": [],
+        "primaryKey": "listPets"
+      }
+    },
+    {
+      "folderId": "2fe353df-c08e-4109-a29d-ea72a7bf60e9",
+      "http": {
+        "authApiKeyLocation": "header",
+        "authApiKeyName": "",
+        "authApiKeyValue": "",
+        "authOAuth2AuthURL": "",
+        "authOAuth2GrantType": "",
+        "authOAuth2Scopes": "",
+        "authOAuth2TokenURL": "",
+        "authPassword": "",
+        "authToken": "",
+        "authType": "none",
+        "authUsername": "",
+        "binaryFileName": "",
+        "bodyContent": "{\n  \"name\": \"Mittens\",\n  \"status\": \"available\"\n}",
+        "bodyFormData": [],
+        "bodyFormDataEntries": [],
+        "bodyType": "json",
+        "headers": [],
+        "method": "POST",
+        "params": [],
+        "rawContentType": "text",
+        "url": "{{base_url}}/pet"
+      },
+      "id": "383022ae-bb72-4bda-96cd-49f3e2792c2a",
+      "name": "Add a new pet",
+      "sortOrder": 1,
+      "specIdentity": {
+        "alternateKeys": [],
+        "primaryKey": "addPet"
+      }
+    },
+    {
+      "folderId": "2fe353df-c08e-4109-a29d-ea72a7bf60e9",
+      "http": {
+        "authApiKeyLocation": "header",
+        "authApiKeyName": "",
+        "authApiKeyValue": "",
+        "authOAuth2AuthURL": "",
+        "authOAuth2GrantType": "",
+        "authOAuth2Scopes": "",
+        "authOAuth2TokenURL": "",
+        "authPassword": "",
+        "authToken": "",
+        "authType": "none",
+        "authUsername": "",
+        "binaryFileName": "",
+        "bodyContent": "",
+        "bodyFormData": [],
+        "bodyFormDataEntries": [],
+        "bodyType": "none",
+        "headers": [],
+        "method": "GET",
+        "params": [],
+        "rawContentType": "text",
+        "url": "{{base_url}}/pet/{{petId}}"
+      },
+      "id": "348341a3-c8df-483a-bf04-306d216ab9b8",
+      "name": "Find pet by ID",
+      "sortOrder": 2,
+      "specIdentity": {
+        "alternateKeys": [],
+        "primaryKey": "getPetById"
+      }
+    },
+    {
+      "folderId": "968f6b47-c9c4-4200-a3d4-c861f569dc7f",
+      "http": {
+        "authApiKeyLocation": "header",
+        "authApiKeyName": "",
+        "authApiKeyValue": "",
+        "authOAuth2AuthURL": "",
+        "authOAuth2GrantType": "",
+        "authOAuth2Scopes": "",
+        "authOAuth2TokenURL": "",
+        "authPassword": "",
+        "authToken": "",
+        "authType": "none",
+        "authUsername": "",
+        "binaryFileName": "",
+        "bodyContent": "",
+        "bodyFormData": [],
+        "bodyFormDataEntries": [],
+        "bodyType": "none",
+        "headers": [],
+        "method": "POST",
+        "params": [],
+        "rawContentType": "text",
+        "url": "{{base_url}}/store/order"
+      },
+      "id": "ae294af6-a0d0-4030-b318-388661b43713",
+      "name": "Place an order",
+      "sortOrder": 3,
+      "specIdentity": {
+        "alternateKeys": [],
+        "primaryKey": "placeOrder"
+      }
+    }
+  ]
+}

@@ -1,0 +1,96 @@
+{
+  "project": {
+    "title": "Variables Postman API",
+    "description": null,
+    "version": null,
+    "icon_url": null,
+    "security_schemes": [],
+    "folders": [],
+    "operations": [
+      {
+        "primary_key": "GET /health",
+        "alternate_keys": [],
+        "name": "Health",
+        "method": "GET",
+        "path": "/health",
+        "deprecated": false,
+        "tags": [],
+        "protocol": "Http",
+        "binding": null,
+        "folder_id": null,
+        "parameters": [],
+        "body": {
+          "kind": "None"
+        },
+        "body_candidates": [],
+        "auth": {
+          "scheme_type": "apiKey",
+          "header_name": "X-API-Key",
+          "query_name": null,
+          "placeholder_value": "{{api_key}}",
+          "oauth2_grant_type": null,
+          "oauth2_auth_url": null,
+          "oauth2_token_url": null,
+          "oauth2_scopes": null
+        },
+        "description": null
+      },
+      {
+        "primary_key": "GET /search",
+        "alternate_keys": [],
+        "name": "Search",
+        "method": "GET",
+        "path": "/search",
+        "deprecated": false,
+        "tags": [],
+        "protocol": "Http",
+        "binding": null,
+        "folder_id": null,
+        "parameters": [
+          {
+            "location": "Query",
+            "name": "q",
+            "value": "reqeast",
+            "required": false,
+            "enabled": true,
+            "value_source": "FromExample"
+          }
+        ],
+        "body": {
+          "kind": "None"
+        },
+        "body_candidates": [],
+        "auth": {
+          "scheme_type": "apiKey",
+          "header_name": "X-API-Key",
+          "query_name": null,
+          "placeholder_value": "{{api_key}}",
+          "oauth2_grant_type": null,
+          "oauth2_auth_url": null,
+          "oauth2_token_url": null,
+          "oauth2_scopes": null
+        },
+        "description": null
+      }
+    ],
+    "environments": [
+      {
+        "name": "Collection",
+        "variables": [
+          {
+            "key": "base_url",
+            "value": "https://staging.example.com",
+            "enabled": true
+          },
+          {
+            "key": "api_key",
+            "value": "{{api_key}}",
+            "enabled": true
+          }
+        ]
+      }
+    ]
+  },
+  "warnings": [],
+  "content_fingerprint": "a0915ec20786054977e8e09aa57f364f8d210b1aabd1e4ab34a4c8744a32de44"
+}

@@ -1,0 +1,98 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Nested Bruno API",
+    "version": "1.0.0"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{token}}"
+    }
+  },
+  "environments": [
+    {
+      "name": "Development",
+      "variables": [
+        { "name": "base_url", "value": "https://api.example.com" },
+        { "name": "token", "value": "" }
+      ]
+    }
+  ],
+  "items": [
+    {
+      "info": {
+        "name": "Users",
+        "type": "folder",
+        "seq": 1
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List users",
+            "type": "http",
+            "seq": 1
+          },
+          "http": {
+            "method": "GET",
+            "url": "{{base_url}}/users",
+            "params": [
+              { "name": "limit", "value": "10", "type": "query" }
+            ]
+          },
+          "runtime": {
+            "scripts": [
+              {
+                "type": "tests",
+                "code": "test(\"ok\", function() {});"
+              }
+            ]
+          }
+        },
+        {
+          "info": {
+            "name": "Profiles",
+            "type": "folder",
+            "seq": 2
+          },
+          "items": [
+            {
+              "info": {
+                "name": "Get profile",
+                "type": "http",
+                "seq": 1
+              },
+              "http": {
+                "method": "GET",
+                "url": "{{base_url}}/users/:userId/profile",
+                "params": [
+                  { "name": "userId", "value": "42", "type": "path" }
+                ]
+              },
+              "docs": "Fetch a user profile"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Create user",
+        "type": "http",
+        "seq": 2
+      },
+      "http": {
+        "method": "POST",
+        "url": "{{base_url}}/users",
+        "headers": [
+          { "name": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "type": "json",
+          "data": "{\n  \"name\": \"Ada\"\n}"
+        }
+      }
+    }
+  ],
+  "bundled": true
+}

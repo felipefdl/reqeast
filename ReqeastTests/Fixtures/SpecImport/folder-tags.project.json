@@ -1,0 +1,131 @@
+{
+  "environments": [
+    {
+      "id": "5eb7ec00-5887-496f-ab6c-ef792e634c24",
+      "isActive": true,
+      "name": "Default",
+      "variables": [
+        {
+          "enabled": true,
+          "key": "base_url",
+          "value": "/"
+        }
+      ]
+    }
+  ],
+  "folders": [
+    {
+      "id": "fd439729-154b-4d97-bb2a-9ecc5c4c6ddd",
+      "name": "users"
+    },
+    {
+      "id": "8852e472-a36e-4a0a-ad0a-d1046d196a3e",
+      "name": "billing"
+    }
+  ],
+  "project": {
+    "id": "92fc4b6b-2204-45fe-bf69-506ece863453",
+    "name": "Folder Tags API"
+  },
+  "requests": [
+    {
+      "folderId": "8852e472-a36e-4a0a-ad0a-d1046d196a3e",
+      "http": {
+        "authApiKeyLocation": "header",
+        "authApiKeyName": "",
+        "authApiKeyValue": "",
+        "authOAuth2AuthURL": "",
+        "authOAuth2GrantType": "",
+        "authOAuth2Scopes": "",
+        "authOAuth2TokenURL": "",
+        "authPassword": "",
+        "authToken": "",
+        "authType": "none",
+        "authUsername": "",
+        "binaryFileName": "",
+        "bodyContent": "",
+        "bodyFormData": [],
+        "bodyFormDataEntries": [],
+        "bodyType": "none",
+        "headers": [],
+        "method": "GET",
+        "params": [],
+        "rawContentType": "text",
+        "url": "{{base_url}}/invoices"
+      },
+      "id": "5fbe353e-274f-466f-a770-e2c72a01dd42",
+      "name": "List invoices",
+      "sortOrder": 0,
+      "specIdentity": {
+        "alternateKeys": [],
+        "primaryKey": "listInvoices"
+      }
+    },
+    {
+      "folderId": "fd439729-154b-4d97-bb2a-9ecc5c4c6ddd",
+      "http": {
+        "authApiKeyLocation": "header",
+        "authApiKeyName": "",
+        "authApiKeyValue": "",
+        "authOAuth2AuthURL": "",
+        "authOAuth2GrantType": "",
+        "authOAuth2Scopes": "",
+        "authOAuth2TokenURL": "",
+        "authPassword": "",
+        "authToken": "",
+        "authType": "none",
+        "authUsername": "",
+        "binaryFileName": "",
+        "bodyContent": "",
+        "bodyFormData": [],
+        "bodyFormDataEntries": [],
+        "bodyType": "none",
+        "headers": [],
+        "method": "GET",
+        "params": [],
+        "rawContentType": "text",
+        "url": "{{base_url}}/users"
+      },
+      "id": "6b7c6373-4178-4256-9985-b813410a0bd3",
+      "name": "List users",
+      "sortOrder": 1,
+      "specIdentity": {
+        "alternateKeys": [],
+        "primaryKey": "listUsers"
+      }
+    },
+    {
+      "folderId": "fd439729-154b-4d97-bb2a-9ecc5c4c6ddd",
+      "http": {
+        "authApiKeyLocation": "header",
+        "authApiKeyName": "",
+        "authApiKeyValue": "",
+        "authOAuth2AuthURL": "",
+        "authOAuth2GrantType": "",
+        "authOAuth2Scopes": "",
+        "authOAuth2TokenURL": "",
+        "authPassword": "",
+        "authToken": "",
+        "authType": "none",
+        "authUsername": "",
+        "binaryFileName": "",
+        "bodyContent": "",
+        "bodyFormData": [],
+        "bodyFormDataEntries": [],
+        "bodyType": "none",
+        "headers": [],
+        "method": "GET",
+        "params": [],
+        "rawContentType": "text",
+        "url": "{{base_url}}/users/{{id}}"
+      },
+      "id": "afb13a05-a4fb-44a7-9151-885c5d20f5c8",
+      "name": "Get user",
+      "sortOrder": 2,
+      "specIdentity": {
+        "alternateKeys": [],
+        "primaryKey": "getUser"
+      }
+    }
+  ]
+}

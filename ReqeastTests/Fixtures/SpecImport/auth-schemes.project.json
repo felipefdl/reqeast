@@ -1,0 +1,155 @@
+{
+  "environments": [
+    {
+      "id": "843c79bd-348f-4931-9aa0-716b769e8327",
+      "isActive": true,
+      "name": "Server 1",
+      "variables": [
+        {
+          "enabled": true,
+          "key": "base_url",
+          "value": "https://auth.example.test"
+        }
+      ]
+    }
+  ],
+  "folders": [],
+  "project": {
+    "id": "b08fa800-876a-412d-9fff-e0a587d2ea9c",
+    "name": "Auth Schemes API"
+  },
+  "requests": [
+    {
+      "folderId": null,
+      "http": {
+        "authApiKeyLocation": "header",
+        "authApiKeyName": "X-API-Key",
+        "authApiKeyValue": "{{apiKeyHeader}}",
+        "authOAuth2AuthURL": "",
+        "authOAuth2GrantType": "",
+        "authOAuth2Scopes": "",
+        "authOAuth2TokenURL": "",
+        "authPassword": "",
+        "authToken": "",
+        "authType": "apiKey",
+        "authUsername": "",
+        "binaryFileName": "",
+        "bodyContent": "",
+        "bodyFormData": [],
+        "bodyFormDataEntries": [],
+        "bodyType": "none",
+        "headers": [],
+        "method": "GET",
+        "params": [],
+        "rawContentType": "text",
+        "url": "{{base_url}}/api-key"
+      },
+      "id": "78daebe5-3be7-4d98-af71-6b94e106ef41",
+      "name": "API key protected",
+      "sortOrder": 0,
+      "specIdentity": {
+        "alternateKeys": [],
+        "primaryKey": "getApiKey"
+      }
+    },
+    {
+      "folderId": null,
+      "http": {
+        "authApiKeyLocation": "header",
+        "authApiKeyName": "",
+        "authApiKeyValue": "",
+        "authOAuth2AuthURL": "",
+        "authOAuth2GrantType": "clientCredentials",
+        "authOAuth2Scopes": "write",
+        "authOAuth2TokenURL": "https://auth.example.test/oauth/token",
+        "authPassword": "",
+        "authToken": "{{token}}",
+        "authType": "oauth2",
+        "authUsername": "",
+        "binaryFileName": "",
+        "bodyContent": "",
+        "bodyFormData": [],
+        "bodyFormDataEntries": [],
+        "bodyType": "none",
+        "headers": [],
+        "method": "POST",
+        "params": [],
+        "rawContentType": "text",
+        "url": "{{base_url}}/oauth"
+      },
+      "id": "ff6befd1-d42f-4832-9029-b97b54d00b21",
+      "name": "OAuth protected",
+      "sortOrder": 1,
+      "specIdentity": {
+        "alternateKeys": [],
+        "primaryKey": "postOAuth"
+      }
+    },
+    {
+      "folderId": null,
+      "http": {
+        "authApiKeyLocation": "header",
+        "authApiKeyName": "",
+        "authApiKeyValue": "",
+        "authOAuth2AuthURL": "",
+        "authOAuth2GrantType": "",
+        "authOAuth2Scopes": "",
+        "authOAuth2TokenURL": "",
+        "authPassword": "",
+        "authToken": "{{token}}",
+        "authType": "bearer",
+        "authUsername": "",
+        "binaryFileName": "",
+        "bodyContent": "",
+        "bodyFormData": [],
+        "bodyFormDataEntries": [],
+        "bodyType": "none",
+        "headers": [],
+        "method": "GET",
+        "params": [],
+        "rawContentType": "text",
+        "url": "{{base_url}}/protected"
+      },
+      "id": "a8741ab9-add6-4df6-9b97-12a3bc894a1a",
+      "name": "Bearer protected",
+      "sortOrder": 2,
+      "specIdentity": {
+        "alternateKeys": [],
+        "primaryKey": "getProtected"
+      }
+    },
+    {
+      "folderId": null,
+      "http": {
+        "authApiKeyLocation": "header",
+        "authApiKeyName": "",
+        "authApiKeyValue": "",
+        "authOAuth2AuthURL": "",
+        "authOAuth2GrantType": "",
+        "authOAuth2Scopes": "",
+        "authOAuth2TokenURL": "",
+        "authPassword": "",
+        "authToken": "",
+        "authType": "none",
+        "authUsername": "",
+        "binaryFileName": "",
+        "bodyContent": "",
+        "bodyFormData": [],
+        "bodyFormDataEntries": [],
+        "bodyType": "none",
+        "headers": [],
+        "method": "GET",
+        "params": [],
+        "rawContentType": "text",
+        "url": "{{base_url}}/public"
+      },
+      "id": "a48e6199-04f9-4712-9f20-a961ffabc5b4",
+      "name": "Public endpoint",
+      "sortOrder": 3,
+      "specIdentity": {
+        "alternateKeys": [],
+        "primaryKey": "getPublic"
+      }
+    }
+  ]
+}

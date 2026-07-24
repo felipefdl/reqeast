@@ -1,0 +1,89 @@
+{
+  "project": {
+    "title": "Folder Flat API",
+    "description": null,
+    "version": "1.0.0",
+    "icon_url": null,
+    "security_schemes": [],
+    "folders": [],
+    "operations": [
+      {
+        "primary_key": "healthCheck",
+        "alternate_keys": [],
+        "name": "Health check",
+        "method": "GET",
+        "path": "/health",
+        "deprecated": false,
+        "tags": [],
+        "protocol": "Http",
+        "binding": null,
+        "folder_id": null,
+        "parameters": [],
+        "body": {
+          "kind": "None"
+        },
+        "body_candidates": [],
+        "auth": null,
+        "description": null
+      },
+      {
+        "primary_key": "getMetrics",
+        "alternate_keys": [],
+        "name": "Metrics",
+        "method": "GET",
+        "path": "/metrics",
+        "deprecated": false,
+        "tags": [],
+        "protocol": "Http",
+        "binding": null,
+        "folder_id": null,
+        "parameters": [],
+        "body": {
+          "kind": "None"
+        },
+        "body_candidates": [],
+        "auth": null,
+        "description": null
+      },
+      {
+        "primary_key": "getVersion",
+        "alternate_keys": [],
+        "name": "API version",
+        "method": "GET",
+        "path": "/version",
+        "deprecated": false,
+        "tags": [],
+        "protocol": "Http",
+        "binding": null,
+        "folder_id": null,
+        "parameters": [],
+        "body": {
+          "kind": "None"
+        },
+        "body_candidates": [],
+        "auth": null,
+        "description": null
+      }
+    ],
+    "environments": [
+      {
+        "name": "Default",
+        "variables": [
+          {
+            "key": "base_url",
+            "value": "/",
+            "enabled": true
+          }
+        ]
+      }
+    ]
+  },
+  "warnings": [
+    {
+      "code": "NO_TAGS",
+      "message": "Spec has no tags; operations import into the project root",
+      "operation_ref": null
+    }
+  ],
+  "content_fingerprint": "9f2a60cae127571c883d79c6cee0d5a9523759e04d55cf0436757381bc001ac8"
+}

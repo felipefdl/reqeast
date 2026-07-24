@@ -1,0 +1,63 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_date": "2026-06-20T12:00:00.000Z",
+  "__export_source": "insomnia.desktop.app:v2023.5.8",
+  "resources": [
+    {
+      "_id": "wrk_vars",
+      "_type": "workspace",
+      "parentId": null,
+      "name": "Variables Insomnia API"
+    },
+    {
+      "_id": "req_health",
+      "_type": "request",
+      "parentId": "wrk_vars",
+      "name": "Health",
+      "method": "GET",
+      "url": "{{base_url}}/health",
+      "parameters": [],
+      "headers": [],
+      "body": {},
+      "authentication": {
+        "type": "bearer",
+        "token": "{{token}}"
+      }
+    },
+    {
+      "_id": "req_search",
+      "_type": "request",
+      "parentId": "wrk_vars",
+      "name": "Search",
+      "method": "GET",
+      "url": "{{base_url}}/search",
+      "parameters": [
+        { "name": "q", "value": "reqeast" }
+      ],
+      "headers": [],
+      "body": {},
+      "authentication": {
+        "type": "bearer",
+        "token": "{{token}}"
+      }
+    },
+    {
+      "_id": "env_base",
+      "_type": "environment",
+      "parentId": "wrk_vars",
+      "name": "Base Environment",
+      "data": {}
+    },
+    {
+      "_id": "env_staging",
+      "_type": "environment",
+      "parentId": "env_base",
+      "name": "Staging",
+      "data": {
+        "base_url": "https://staging.example.com",
+        "token": ""
+      }
+    }
+  ]
+}

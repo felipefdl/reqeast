@@ -1,0 +1,6 @@
+name: petId
+in: path
+required: true
+schema:
+  type: integer
+  example: 1

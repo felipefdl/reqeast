@@ -1,0 +1,170 @@
+{
+  "environments": [
+    {
+      "id": "11fe4dde-1abc-4341-9901-7f83748bbdd6",
+      "isActive": true,
+      "name": "Server 1",
+      "variables": [
+        {
+          "enabled": true,
+          "key": "base_url",
+          "value": "https://petstore.swagger.io/v2"
+        }
+      ]
+    }
+  ],
+  "folders": [
+    {
+      "id": "88dc625b-5c82-429a-bbf2-0d8fb6fcc2f8",
+      "name": "pet"
+    },
+    {
+      "id": "691ecb70-d7a5-41fb-abaa-fc8ebb2caac0",
+      "name": "store"
+    }
+  ],
+  "project": {
+    "id": "b26aca35-7070-4b4d-9b17-c593cfb933da",
+    "name": "Swagger Petstore"
+  },
+  "requests": [
+    {
+      "folderId": "88dc625b-5c82-429a-bbf2-0d8fb6fcc2f8",
+      "http": {
+        "authApiKeyLocation": "header",
+        "authApiKeyName": "",
+        "authApiKeyValue": "",
+        "authOAuth2AuthURL": "",
+        "authOAuth2GrantType": "",
+        "authOAuth2Scopes": "",
+        "authOAuth2TokenURL": "",
+        "authPassword": "",
+        "authToken": "",
+        "authType": "none",
+        "authUsername": "",
+        "binaryFileName": "",
+        "bodyContent": "",
+        "bodyFormData": [],
+        "bodyFormDataEntries": [],
+        "bodyType": "none",
+        "headers": [],
+        "method": "GET",
+        "params": [
+          {
+            "enabled": false,
+            "key": "limit",
+            "value": ""
+          }
+        ],
+        "rawContentType": "text",
+        "url": "{{base_url}}/pet"
+      },
+      "id": "83e2c0cd-635d-4a0a-be64-99236067400b",
+      "name": "List all pets",
+      "sortOrder": 0,
+      "specIdentity": {
+        "alternateKeys": [],
+        "primaryKey": "listPets"
+      }
+    },
+    {
+      "folderId": "88dc625b-5c82-429a-bbf2-0d8fb6fcc2f8",
+      "http": {
+        "authApiKeyLocation": "header",
+        "authApiKeyName": "",
+        "authApiKeyValue": "",
+        "authOAuth2AuthURL": "",
+        "authOAuth2GrantType": "",
+        "authOAuth2Scopes": "",
+        "authOAuth2TokenURL": "",
+        "authPassword": "",
+        "authToken": "",
+        "authType": "none",
+        "authUsername": "",
+        "binaryFileName": "",
+        "bodyContent": "{\n  \"name\": \"Fluffy\"\n}",
+        "bodyFormData": [],
+        "bodyFormDataEntries": [],
+        "bodyType": "json",
+        "headers": [],
+        "method": "POST",
+        "params": [],
+        "rawContentType": "text",
+        "url": "{{base_url}}/pet"
+      },
+      "id": "c8d80893-280b-4c99-9d1a-3f471eefbc8d",
+      "name": "Add a new pet",
+      "sortOrder": 1,
+      "specIdentity": {
+        "alternateKeys": [],
+        "primaryKey": "addPet"
+      }
+    },
+    {
+      "folderId": "88dc625b-5c82-429a-bbf2-0d8fb6fcc2f8",
+      "http": {
+        "authApiKeyLocation": "header",
+        "authApiKeyName": "",
+        "authApiKeyValue": "",
+        "authOAuth2AuthURL": "",
+        "authOAuth2GrantType": "",
+        "authOAuth2Scopes": "",
+        "authOAuth2TokenURL": "",
+        "authPassword": "",
+        "authToken": "",
+        "authType": "none",
+        "authUsername": "",
+        "binaryFileName": "",
+        "bodyContent": "",
+        "bodyFormData": [],
+        "bodyFormDataEntries": [],
+        "bodyType": "none",
+        "headers": [],
+        "method": "GET",
+        "params": [],
+        "rawContentType": "text",
+        "url": "{{base_url}}/pet/{{petId}}"
+      },
+      "id": "b4d3a5b9-781f-471f-8cc0-81464e239e72",
+      "name": "Find pet by ID",
+      "sortOrder": 2,
+      "specIdentity": {
+        "alternateKeys": [],
+        "primaryKey": "getPetById"
+      }
+    },
+    {
+      "folderId": "691ecb70-d7a5-41fb-abaa-fc8ebb2caac0",
+      "http": {
+        "authApiKeyLocation": "header",
+        "authApiKeyName": "",
+        "authApiKeyValue": "",
+        "authOAuth2AuthURL": "",
+        "authOAuth2GrantType": "",
+        "authOAuth2Scopes": "",
+        "authOAuth2TokenURL": "",
+        "authPassword": "",
+        "authToken": "",
+        "authType": "none",
+        "authUsername": "",
+        "binaryFileName": "",
+        "bodyContent": "",
+        "bodyFormData": [],
+        "bodyFormDataEntries": [],
+        "bodyType": "none",
+        "headers": [],
+        "method": "POST",
+        "params": [],
+        "rawContentType": "text",
+        "url": "{{base_url}}/store/order"
+      },
+      "id": "8a609423-aff0-4686-a9ce-f37d97994fc0",
+      "name": "Place an order",
+      "sortOrder": 3,
+      "specIdentity": {
+        "alternateKeys": [],
+        "primaryKey": "placeOrder"
+      }
+    }
+  ]
+}

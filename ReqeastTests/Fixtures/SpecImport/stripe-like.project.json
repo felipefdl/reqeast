@@ -1,0 +1,100 @@
+{
+  "environments": [
+    {
+      "id": "5024cb10-42fb-45e8-871f-6d7141731f65",
+      "isActive": true,
+      "name": "Server 1",
+      "variables": [
+        {
+          "enabled": true,
+          "key": "base_url",
+          "value": "https://api.stripe-like.example.test/v1"
+        }
+      ]
+    }
+  ],
+  "folders": [],
+  "project": {
+    "id": "9846d10a-b060-448d-9e98-92486ba5965d",
+    "name": "Stripe-like Payments API"
+  },
+  "requests": [
+    {
+      "folderId": null,
+      "http": {
+        "authApiKeyLocation": "header",
+        "authApiKeyName": "",
+        "authApiKeyValue": "",
+        "authOAuth2AuthURL": "",
+        "authOAuth2GrantType": "",
+        "authOAuth2Scopes": "",
+        "authOAuth2TokenURL": "",
+        "authPassword": "",
+        "authToken": "",
+        "authType": "none",
+        "authUsername": "",
+        "binaryFileName": "",
+        "bodyContent": "",
+        "bodyFormData": [
+          {
+            "enabled": true,
+            "key": "amount",
+            "value": "2000"
+          },
+          {
+            "enabled": true,
+            "key": "currency",
+            "value": "usd"
+          }
+        ],
+        "bodyFormDataEntries": [],
+        "bodyType": "urlencoded",
+        "headers": [],
+        "method": "POST",
+        "params": [],
+        "rawContentType": "text",
+        "url": "{{base_url}}/charges"
+      },
+      "id": "d7006685-1aa9-4ca1-97b7-ba83016a3af0",
+      "name": "Create a charge",
+      "sortOrder": 0,
+      "specIdentity": {
+        "alternateKeys": [],
+        "primaryKey": "createCharge"
+      }
+    },
+    {
+      "folderId": null,
+      "http": {
+        "authApiKeyLocation": "header",
+        "authApiKeyName": "",
+        "authApiKeyValue": "",
+        "authOAuth2AuthURL": "",
+        "authOAuth2GrantType": "",
+        "authOAuth2Scopes": "",
+        "authOAuth2TokenURL": "",
+        "authPassword": "",
+        "authToken": "",
+        "authType": "none",
+        "authUsername": "",
+        "binaryFileName": "",
+        "bodyContent": "",
+        "bodyFormData": [],
+        "bodyFormDataEntries": [],
+        "bodyType": "none",
+        "headers": [],
+        "method": "POST",
+        "params": [],
+        "rawContentType": "text",
+        "url": "{{base_url}}/customers"
+      },
+      "id": "9b183df7-a457-4902-90e3-e870aff7e5fc",
+      "name": "Create a customer",
+      "sortOrder": 1,
+      "specIdentity": {
+        "alternateKeys": [],
+        "primaryKey": "createCustomer"
+      }
+    }
+  ]
+}

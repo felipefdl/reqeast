@@ -1,0 +1,14 @@
+openapi: 3.0.0
+info:
+  title: Remote Ref Denied
+  version: 1.0.0
+paths:
+  /pets:
+    get:
+      summary: List pets
+      operationId: listPets
+      parameters:
+        - $ref: https://example.com/schemas/limit.json
+      responses:
+        "200":
+          description: ok

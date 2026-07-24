@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!--
+		DO NOT REMOVE remote-notification. CKSyncEngine requires the Remote
+		Notifications entitlement to function at all. The engine registers its
+		own CKDatabaseSubscription and intercepts silent pushes internally.
+		Removing this key breaks iCloud sync entirely. See CLAUDE.md > iCloud Sync.
+	-->
+	<key>GitHubOAuthClientID</key>
+	<string>Iv1.8a61f03b3a7aba76</string>
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>app.reqeast.spec-background-check</string>
+	</array>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>remote-notification</string>
+		<string>fetch</string>
+	</array>
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+	<true/>
+	<key>UTExportedTypeDeclarations</key>
+	<array>
+		<dict>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.json</string>
+			</array>
+			<key>UTTypeDescription</key>
+				<string>Reqeast Projects</string>
+			<key>UTTypeIdentifier</key>
+			<string>app.reqeast.project-export</string>
+			<key>UTTypeIconName</key>
+			<string>DocumentTypeIcon</string>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>reqeast</string>
+				</array>
+			</dict>
+		</dict>
+	</array>
+	<key>CFBundleDocumentTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeName</key>
+				<string>Reqeast Projects</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>LSHandlerRank</key>
+			<string>Owner</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>app.reqeast.project-export</string>
+			</array>
+		</dict>
+	</array>
+</dict>
+</plist>

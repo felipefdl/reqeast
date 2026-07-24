@@ -1,0 +1,158 @@
+{
+  "project": {
+    "title": "Nested Bruno API",
+    "description": null,
+    "version": "1.0.0",
+    "icon_url": null,
+    "security_schemes": [],
+    "folders": [
+      {
+        "id": "folder:Users",
+        "parent_id": null,
+        "name": "Users",
+        "sort_hint": 1
+      },
+      {
+        "id": "folder:Users/Profiles",
+        "parent_id": "folder:Users",
+        "name": "Profiles",
+        "sort_hint": 2
+      }
+    ],
+    "operations": [
+      {
+        "primary_key": "GET /users",
+        "alternate_keys": [],
+        "name": "List users",
+        "method": "GET",
+        "path": "/users",
+        "deprecated": false,
+        "tags": [],
+        "protocol": "Http",
+        "binding": null,
+        "folder_id": "folder:Users",
+        "parameters": [
+          {
+            "location": "Query",
+            "name": "limit",
+            "value": "10",
+            "required": false,
+            "enabled": true,
+            "value_source": "FromExample"
+          }
+        ],
+        "body": {
+          "kind": "None"
+        },
+        "body_candidates": [],
+        "auth": {
+          "scheme_type": "http:bearer",
+          "header_name": "Authorization",
+          "query_name": null,
+          "placeholder_value": "Bearer {{token}}",
+          "oauth2_grant_type": null,
+          "oauth2_auth_url": null,
+          "oauth2_token_url": null,
+          "oauth2_scopes": null
+        },
+        "description": null
+      },
+      {
+        "primary_key": "GET /users/{userId}/profile",
+        "alternate_keys": [],
+        "name": "Get profile",
+        "method": "GET",
+        "path": "/users/{userId}/profile",
+        "deprecated": false,
+        "tags": [],
+        "protocol": "Http",
+        "binding": null,
+        "folder_id": "folder:Users/Profiles",
+        "parameters": [
+          {
+            "location": "Path",
+            "name": "userId",
+            "value": "{{userId}}",
+            "required": true,
+            "enabled": true,
+            "value_source": "FromExample"
+          }
+        ],
+        "body": {
+          "kind": "None"
+        },
+        "body_candidates": [],
+        "auth": {
+          "scheme_type": "http:bearer",
+          "header_name": "Authorization",
+          "query_name": null,
+          "placeholder_value": "Bearer {{token}}",
+          "oauth2_grant_type": null,
+          "oauth2_auth_url": null,
+          "oauth2_token_url": null,
+          "oauth2_scopes": null
+        },
+        "description": "Fetch a user profile"
+      },
+      {
+        "primary_key": "POST /users",
+        "alternate_keys": [],
+        "name": "Create user",
+        "method": "POST",
+        "path": "/users",
+        "deprecated": false,
+        "tags": [],
+        "protocol": "Http",
+        "binding": null,
+        "folder_id": null,
+        "parameters": [],
+        "body": {
+          "kind": "Json",
+          "content": "{\n  \"name\": \"Ada\"\n}"
+        },
+        "body_candidates": [],
+        "auth": {
+          "scheme_type": "http:bearer",
+          "header_name": "Authorization",
+          "query_name": null,
+          "placeholder_value": "Bearer {{token}}",
+          "oauth2_grant_type": null,
+          "oauth2_auth_url": null,
+          "oauth2_token_url": null,
+          "oauth2_scopes": null
+        },
+        "description": null
+      }
+    ],
+    "environments": [
+      {
+        "name": "Development",
+        "variables": [
+          {
+            "key": "base_url",
+            "value": "https://api.example.com",
+            "enabled": true
+          },
+          {
+            "key": "token",
+            "value": "",
+            "enabled": true
+          }
+        ]
+      }
+    ]
+  },
+  "warnings": [
+    {
+      "code": "MIGRATION_FROM_BRUNO",
+      "message": "Imported from Bruno; scripts, tests, and assertions are not migrated",
+      "operation_ref": null
+    },
+    {
+      "code": "SCRIPT_NOT_IMPORTED",
+      "message": "Bruno runtime scripts and assertions are not imported",
+      "operation_ref": "GET /users"
+    }
+  ],
+  "content_fingerprint": "2003addf4fbe29edfb9e7964ec2448fbfaad11d9af90b3a3dfa79d87d54aa25c"
+}

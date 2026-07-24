@@ -1,0 +1,67 @@
+{
+  "environments": [
+    {
+      "id": "45940108-5d1e-4e11-b81d-fb273a167260",
+      "isActive": true,
+      "name": "Production",
+      "variables": [
+        {
+          "enabled": true,
+          "key": "ws_url",
+          "value": "wss://echo.websocket.org"
+        }
+      ]
+    }
+  ],
+  "folders": [],
+  "project": {
+    "id": "17e21c4a-3c96-4256-a830-3cc95e75d69e",
+    "name": "AsyncAPI WebSocket Demo"
+  },
+  "requests": [
+    {
+      "folderId": null,
+      "id": "a26db0fe-c22e-42c5-9482-e45bfe0436ff",
+      "name": "Send chat message",
+      "sortOrder": 0,
+      "specIdentity": {
+        "alternateKeys": [],
+        "primaryKey": "sendChatMessage"
+      },
+      "webSocket": {
+        "encoding": "utf8",
+        "headers": [],
+        "messageHistory": [
+          {
+            "encoding": "utf8",
+            "text": "{\n  \"text\": \"hello\"\n}"
+          }
+        ],
+        "subprotocols": "",
+        "url": "{{ws_url}}/chat"
+      }
+    },
+    {
+      "folderId": null,
+      "id": "0b9dbf85-a8da-4897-835c-90ad93e80c3e",
+      "name": "Receive chat message",
+      "sortOrder": 1,
+      "specIdentity": {
+        "alternateKeys": [],
+        "primaryKey": "receiveChatMessage"
+      },
+      "webSocket": {
+        "encoding": "utf8",
+        "headers": [],
+        "messageHistory": [
+          {
+            "encoding": "utf8",
+            "text": "{\n  \"text\": \"world\"\n}"
+          }
+        ],
+        "subprotocols": "",
+        "url": "{{ws_url}}/chat"
+      }
+    }
+  ]
+}

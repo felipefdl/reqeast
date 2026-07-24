@@ -1,0 +1,15 @@
+{
+  "name": "curlconverter-bundle",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Bundle curlconverter for JavaScriptCore",
+  "dependencies": {
+    "curlconverter": "3.21.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0"
+  },
+  "scripts": {
+    "bundle": "node bundle.js"
+  }
+}

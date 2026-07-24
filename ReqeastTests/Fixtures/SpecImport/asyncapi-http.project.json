@@ -1,0 +1,89 @@
+{
+  "environments": [
+    {
+      "id": "e3311a34-b023-4f4a-9228-76284b839ce6",
+      "isActive": true,
+      "name": "Production",
+      "variables": [
+        {
+          "enabled": true,
+          "key": "base_url",
+          "value": "https://api.example.com/v1"
+        }
+      ]
+    }
+  ],
+  "folders": [],
+  "project": {
+    "id": "47829f86-4531-439c-b634-1c8eb11c9794",
+    "name": "AsyncAPI HTTP Demo"
+  },
+  "requests": [
+    {
+      "folderId": null,
+      "http": {
+        "authApiKeyLocation": "header",
+        "authApiKeyName": "",
+        "authApiKeyValue": "",
+        "authOAuth2AuthURL": "",
+        "authOAuth2GrantType": "",
+        "authOAuth2Scopes": "",
+        "authOAuth2TokenURL": "",
+        "authPassword": "",
+        "authToken": "",
+        "authType": "none",
+        "authUsername": "",
+        "binaryFileName": "",
+        "bodyContent": "",
+        "bodyFormData": [],
+        "bodyFormDataEntries": [],
+        "bodyType": "none",
+        "headers": [],
+        "method": "GET",
+        "params": [],
+        "rawContentType": "text",
+        "url": "{{base_url}}/users"
+      },
+      "id": "9fce01af-e5eb-4584-b451-df146e3f034d",
+      "name": "List users",
+      "sortOrder": 0,
+      "specIdentity": {
+        "alternateKeys": [],
+        "primaryKey": "GET /users"
+      }
+    },
+    {
+      "folderId": null,
+      "http": {
+        "authApiKeyLocation": "header",
+        "authApiKeyName": "",
+        "authApiKeyValue": "",
+        "authOAuth2AuthURL": "",
+        "authOAuth2GrantType": "",
+        "authOAuth2Scopes": "",
+        "authOAuth2TokenURL": "",
+        "authPassword": "",
+        "authToken": "",
+        "authType": "none",
+        "authUsername": "",
+        "binaryFileName": "",
+        "bodyContent": "{\n  \"name\": \"Ada\"\n}",
+        "bodyFormData": [],
+        "bodyFormDataEntries": [],
+        "bodyType": "json",
+        "headers": [],
+        "method": "POST",
+        "params": [],
+        "rawContentType": "text",
+        "url": "{{base_url}}/users/create"
+      },
+      "id": "0c4ac95d-3e25-4544-87c7-ced534a09f2f",
+      "name": "Create user",
+      "sortOrder": 1,
+      "specIdentity": {
+        "alternateKeys": [],
+        "primaryKey": "createUser"
+      }
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+New: gRPC. Unary and streaming RPCs, server reflection, local proto library, and hex message mode. Proto bundles sync over iCloud. Send gRPC Request Shortcuts action for unary calls.
+
+New: API spec import, linked sync, and export. Import OpenAPI, Postman, Insomnia, Bruno, HAR, AsyncAPI, and GraphQL SDL from paste, file, URL, multi-file bundle, or Git. Link a project to a remote spec, review changes, and apply updates without losing local edits. Export as OpenAPI 3.1 or Postman Collection v2.1.
+
+New: jq filter for JSON responses. Filter and transform JSON bodies in the response view.
+
+New: Localized in 9 languages (English, Simplified Chinese, Traditional Chinese, Japanese, French, Portuguese Brazil, Spanish, Korean, German).
+
+Improved iCloud sync reliability and large project storage.

@@ -1,0 +1,136 @@
+{
+  "project": {
+    "title": "Nested Insomnia API",
+    "description": "Workspace with nested folders",
+    "version": "insomnia-v4",
+    "icon_url": null,
+    "security_schemes": [],
+    "folders": [
+      {
+        "id": "folder:Users",
+        "parent_id": null,
+        "name": "Users",
+        "sort_hint": 0
+      },
+      {
+        "id": "folder:Users/Profiles",
+        "parent_id": "folder:Users",
+        "name": "Profiles",
+        "sort_hint": 1
+      }
+    ],
+    "operations": [
+      {
+        "primary_key": "GET /users",
+        "alternate_keys": [],
+        "name": "List users",
+        "method": "GET",
+        "path": "/users",
+        "deprecated": false,
+        "tags": [],
+        "protocol": "Http",
+        "binding": null,
+        "folder_id": "folder:Users",
+        "parameters": [
+          {
+            "location": "Query",
+            "name": "limit",
+            "value": "10",
+            "required": false,
+            "enabled": true,
+            "value_source": "FromExample"
+          }
+        ],
+        "body": {
+          "kind": "None"
+        },
+        "body_candidates": [],
+        "auth": null,
+        "description": null
+      },
+      {
+        "primary_key": "GET /users/{userId}/profile",
+        "alternate_keys": [],
+        "name": "Get profile",
+        "method": "GET",
+        "path": "/users/{userId}/profile",
+        "deprecated": false,
+        "tags": [],
+        "protocol": "Http",
+        "binding": null,
+        "folder_id": "folder:Users/Profiles",
+        "parameters": [
+          {
+            "location": "Path",
+            "name": "userId",
+            "value": "{{userId}}",
+            "required": true,
+            "enabled": true,
+            "value_source": "FromExample"
+          }
+        ],
+        "body": {
+          "kind": "None"
+        },
+        "body_candidates": [],
+        "auth": null,
+        "description": null
+      },
+      {
+        "primary_key": "POST /users",
+        "alternate_keys": [],
+        "name": "Create user",
+        "method": "POST",
+        "path": "/users",
+        "deprecated": false,
+        "tags": [],
+        "protocol": "Http",
+        "binding": null,
+        "folder_id": null,
+        "parameters": [],
+        "body": {
+          "kind": "Json",
+          "content": "{\n  \"name\": \"Ada\"\n}"
+        },
+        "body_candidates": [],
+        "auth": null,
+        "description": null
+      }
+    ],
+    "environments": [
+      {
+        "name": "Staging",
+        "variables": [
+          {
+            "key": "base_url",
+            "value": "https://api.example.com",
+            "enabled": true
+          },
+          {
+            "key": "userId",
+            "value": "42",
+            "enabled": true
+          }
+        ]
+      }
+    ]
+  },
+  "warnings": [
+    {
+      "code": "MIGRATION_FROM_INSOMNIA",
+      "message": "Imported from Insomnia; scripts, tests, and cookie jars are not migrated",
+      "operation_ref": null
+    },
+    {
+      "code": "RESPONSE_NOT_IMPORTED",
+      "message": "Insomnia response examples are not imported",
+      "operation_ref": null
+    },
+    {
+      "code": "COOKIE_JAR_NOT_IMPORTED",
+      "message": "Insomnia cookie jars are not imported",
+      "operation_ref": null
+    }
+  ],
+  "content_fingerprint": "a3c8d2fcf5c8a95666b60547ce1f0911f211421da93642027636e94cee3c212f"
+}

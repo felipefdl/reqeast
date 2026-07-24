@@ -1,0 +1,117 @@
+[package]
+name = "reqeast-core"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.88"
+license = "Apache-2.0"
+authors = ["Felipe Lima <felipefdl@reqeast.app>"]
+repository = "https://github.com/felipefdl/reqeast"
+description = "Rust networking core for the Reqeast API client (UniFFI)"
+
+[lib]
+crate-type = ["lib", "staticlib"]
+name = "reqeast_core"
+
+[features]
+default = ["spec-openapi"]
+spec-openapi = [
+  "dep:roas",
+  "dep:roas-file-fetcher",
+  "dep:serde_yaml_ng",
+  "dep:indexmap",
+  "dep:url",
+  "dep:graphql-parser",
+]
+
+[[bin]]
+name = "uniffi-bindgen"
+path = "uniffi-bindgen.rs"
+
+[dependencies]
+# HTTP client
+reqwest = { version = "0.13", default-features = false, features = ["rustls", "json", "multipart", "form", "stream", "http2", "gzip", "brotli", "deflate", "zstd"] }
+
+# Async runtime
+tokio = { version = "1", features = ["rt-multi-thread", "sync", "time", "macros", "net", "io-util"] }
+
+# TLS for TCP connections
+tokio-rustls = "0.26"
+
+# WebSocket client
+tokio-tungstenite = { version = "0.29", features = ["rustls-tls-webpki-roots"] }
+futures-util = { version = "0.3", default-features = false, features = ["sink"] }
+
+# UniFFI for Swift bindings
+uniffi = { version = "0.31", features = ["cli"] }
+
+# jq filter
+jaq-core = "3.1"
+jaq-std = "3.0"
+jaq-json = "2.0"
+
+# Error handling
+thiserror = "2"
+
+# Spec import (OpenAPI ingress + normalization)
+serde_json = { version = "1.0.150", features = ["preserve_order"] }
+roas = { version = "=0.17.2", default-features = false, features = ["v2", "v3_0", "v3_1"], optional = true }
+roas-file-fetcher = { version = "=0.1.1", default-features = false, features = ["yaml"], optional = true }
+serde_yaml_ng = { version = "0.10.0", optional = true }
+indexmap = { version = "2.14.0", features = ["serde"], optional = true }
+sha2 = "0.11.0"
+url = { version = "2", optional = true }
+
+# Logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# TLS
+rustls = "0.23"
+x509-parser = "0.18"
+rustls-pemfile = "2"
+webpki-roots = "1"
+graphql-parser = { version = "0.4.1", optional = true }
+
+# gRPC client
+tonic = { version = "0.14.6", default-features = false, features = [
+  "transport", "tls-webpki-roots", "gzip"
+] }
+tonic-prost = "0.14.6"
+tonic-reflection = "0.14.6"
+tonic-types = "0.14.6"
+prost = "0.14.4"
+prost-types = "0.14.4"
+prost-reflect = { version = "0.16.4", features = ["serde", "miette"] }
+protox = { version = "0.9.1", default-features = true }
+tokio-stream = "0.1.18"
+include_dir = "0.7.4"
+
+[build-dependencies]
+prost-build = "0.14.4"
+tonic-prost-build = "0.14.6"
+uniffi = { version = "0.31", features = ["build"] }
+
+[dev-dependencies]
+criterion = { version = "0.8", features = ["html_reports"] }
+prost-build = "0.14.4"
+tonic-prost-build = "0.14.6"
+tonic = { version = "0.14.6", default-features = false, features = ["transport", "codegen", "router"] }
+
+[[test]]
+name = "unary_test"
+path = "tests/grpc/unary_test.rs"
+
+[[test]]
+name = "streaming_test"
+path = "tests/grpc/streaming_test.rs"
+
+[[bench]]
+name = "spec_import"
+harness = false
+required-features = ["spec-openapi"]
+
+[profile.release]
+lto = true
+codegen-units = 1
+opt-level = "z"
+strip = true

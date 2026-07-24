@@ -1,0 +1,56 @@
+openapi: 3.0.0
+info:
+  title: Stripe-like Payments API
+  version: 2026-01-01
+servers:
+  - url: https://api.stripe-like.example.test/v1
+paths:
+  /charges:
+    post:
+      summary: Create a charge
+      operationId: createCharge
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - amount
+                - currency
+              properties:
+                amount:
+                  type: integer
+                  example: 2000
+                currency:
+                  type: string
+                  example: usd
+                customer:
+                  type: string
+                  example: cus_123
+                description:
+                  type: string
+                  example: Premium subscription
+      responses:
+        "200":
+          description: Charge created
+  /customers:
+    post:
+      summary: Create a customer
+      operationId: createCustomer
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: user@example.test
+                name:
+                  type: string
+                  example: Ada Lovelace
+      responses:
+        "200":
+          description: Customer created

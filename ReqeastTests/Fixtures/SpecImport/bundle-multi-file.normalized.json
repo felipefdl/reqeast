@@ -1,0 +1,123 @@
+{
+  "project": {
+    "title": "Multi-file Petstore",
+    "description": "OpenAPI bundle with external component files",
+    "version": "1.0.0",
+    "icon_url": "https://petstore.example.test/favicon.ico",
+    "security_schemes": [],
+    "folders": [
+      {
+        "id": "tag:pet",
+        "parent_id": null,
+        "name": "pet",
+        "sort_hint": 0
+      }
+    ],
+    "operations": [
+      {
+        "primary_key": "listPets",
+        "alternate_keys": [],
+        "name": "List all pets",
+        "method": "GET",
+        "path": "/pet",
+        "deprecated": false,
+        "tags": [
+          "pet"
+        ],
+        "protocol": "Http",
+        "binding": null,
+        "folder_id": "tag:pet",
+        "parameters": [
+          {
+            "location": "Query",
+            "name": "limit",
+            "value": "10",
+            "required": false,
+            "enabled": false,
+            "value_source": "FromExample"
+          }
+        ],
+        "body": {
+          "kind": "None"
+        },
+        "body_candidates": [],
+        "auth": null,
+        "description": null
+      },
+      {
+        "primary_key": "addPet",
+        "alternate_keys": [],
+        "name": "Add a new pet",
+        "method": "POST",
+        "path": "/pet",
+        "deprecated": false,
+        "tags": [
+          "pet"
+        ],
+        "protocol": "Http",
+        "binding": null,
+        "folder_id": "tag:pet",
+        "parameters": [],
+        "body": {
+          "kind": "Json",
+          "content": "{\n  \"name\": \"Fluffy\",\n  \"status\": \"available\"\n}"
+        },
+        "body_candidates": [
+          {
+            "content_type": "application/json",
+            "body": {
+              "kind": "Json",
+              "content": "{\n  \"name\": \"Fluffy\",\n  \"status\": \"available\"\n}"
+            }
+          }
+        ],
+        "auth": null,
+        "description": null
+      },
+      {
+        "primary_key": "getPetById",
+        "alternate_keys": [],
+        "name": "Find pet by ID",
+        "method": "GET",
+        "path": "/pet/{petId}",
+        "deprecated": false,
+        "tags": [
+          "pet"
+        ],
+        "protocol": "Http",
+        "binding": null,
+        "folder_id": "tag:pet",
+        "parameters": [
+          {
+            "location": "Path",
+            "name": "petId",
+            "value": "{{petId}}",
+            "required": true,
+            "enabled": true,
+            "value_source": "FromExample"
+          }
+        ],
+        "body": {
+          "kind": "None"
+        },
+        "body_candidates": [],
+        "auth": null,
+        "description": null
+      }
+    ],
+    "environments": [
+      {
+        "name": "Production server",
+        "variables": [
+          {
+            "key": "base_url",
+            "value": "https://petstore.example.test/api/v1",
+            "enabled": true
+          }
+        ]
+      }
+    ]
+  },
+  "warnings": [],
+  "content_fingerprint": "8d2e021b1482cc2ec8a01b826f8c01aa18ea3be4e493ff07ae4246b78f326fd7"
+}

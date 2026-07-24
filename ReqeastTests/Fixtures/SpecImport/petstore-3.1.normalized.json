@@ -1,0 +1,163 @@
+{
+  "project": {
+    "title": "OpenAPI 3.1 Petstore",
+    "description": "Petstore sample for OpenAPI 3.1",
+    "version": "1.0.0",
+    "icon_url": "https://petstore31.example.test/favicon.ico",
+    "security_schemes": [],
+    "folders": [
+      {
+        "id": "tag:pet",
+        "parent_id": null,
+        "name": "pet",
+        "sort_hint": 0
+      },
+      {
+        "id": "tag:store",
+        "parent_id": null,
+        "name": "store",
+        "sort_hint": 1
+      }
+    ],
+    "operations": [
+      {
+        "primary_key": "listPets",
+        "alternate_keys": [],
+        "name": "List all pets",
+        "method": "GET",
+        "path": "/pet",
+        "deprecated": false,
+        "tags": [
+          "pet"
+        ],
+        "protocol": "Http",
+        "binding": null,
+        "folder_id": "tag:pet",
+        "parameters": [
+          {
+            "location": "Query",
+            "name": "limit",
+            "value": "25",
+            "required": false,
+            "enabled": false,
+            "value_source": "FromExample"
+          }
+        ],
+        "body": {
+          "kind": "None"
+        },
+        "body_candidates": [],
+        "auth": null,
+        "description": null
+      },
+      {
+        "primary_key": "addPet",
+        "alternate_keys": [],
+        "name": "Add a new pet",
+        "method": "POST",
+        "path": "/pet",
+        "deprecated": false,
+        "tags": [
+          "pet"
+        ],
+        "protocol": "Http",
+        "binding": null,
+        "folder_id": "tag:pet",
+        "parameters": [],
+        "body": {
+          "kind": "Json",
+          "content": "{\n  \"name\": \"Mittens\",\n  \"status\": \"available\"\n}"
+        },
+        "body_candidates": [
+          {
+            "content_type": "application/json",
+            "body": {
+              "kind": "Json",
+              "content": "{\n  \"name\": \"Mittens\",\n  \"status\": \"available\"\n}"
+            }
+          }
+        ],
+        "auth": null,
+        "description": null
+      },
+      {
+        "primary_key": "getPetById",
+        "alternate_keys": [],
+        "name": "Find pet by ID",
+        "method": "GET",
+        "path": "/pet/{petId}",
+        "deprecated": false,
+        "tags": [
+          "pet"
+        ],
+        "protocol": "Http",
+        "binding": null,
+        "folder_id": "tag:pet",
+        "parameters": [
+          {
+            "location": "Path",
+            "name": "petId",
+            "value": "{{petId}}",
+            "required": true,
+            "enabled": true,
+            "value_source": "FromExample"
+          }
+        ],
+        "body": {
+          "kind": "None"
+        },
+        "body_candidates": [],
+        "auth": null,
+        "description": null
+      },
+      {
+        "primary_key": "placeOrder",
+        "alternate_keys": [],
+        "name": "Place an order",
+        "method": "POST",
+        "path": "/store/order",
+        "deprecated": false,
+        "tags": [
+          "store"
+        ],
+        "protocol": "Http",
+        "binding": null,
+        "folder_id": "tag:store",
+        "parameters": [],
+        "body": {
+          "kind": "None"
+        },
+        "body_candidates": [
+          {
+            "content_type": "application/json",
+            "body": {
+              "kind": "None"
+            }
+          }
+        ],
+        "auth": null,
+        "description": null
+      }
+    ],
+    "environments": [
+      {
+        "name": "Server 1",
+        "variables": [
+          {
+            "key": "base_url",
+            "value": "https://petstore31.example.test/v1",
+            "enabled": true
+          }
+        ]
+      }
+    ]
+  },
+  "warnings": [
+    {
+      "code": "MISSING_EXAMPLE",
+      "message": "No example found for request body content type 'application/json'",
+      "operation_ref": "post /store/order"
+    }
+  ],
+  "content_fingerprint": "11984138f05c39e3d042700ccb10c406daec77aaeafa5c4a1b90dc3f2d3ff5c0"
+}

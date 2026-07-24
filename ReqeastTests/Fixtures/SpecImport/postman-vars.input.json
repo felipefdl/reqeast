@@ -1,0 +1,41 @@
+{
+  "info": {
+    "name": "Variables Postman API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "https://staging.example.com" },
+    { "key": "api_key", "value": "{{api_key}}" }
+  ],
+  "auth": {
+    "type": "apikey",
+    "apikey": [
+      { "key": "key", "value": "X-API-Key" },
+      { "key": "value", "value": "{{api_key}}" },
+      { "key": "in", "value": "header" }
+    ]
+  },
+  "item": [
+    {
+      "name": "Health",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/health"
+      }
+    },
+    {
+      "name": "Search",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{base_url}}/search?q=reqeast",
+          "host": ["{{base_url}}"],
+          "path": ["search"],
+          "query": [
+            { "key": "q", "value": "reqeast" }
+          ]
+        }
+      }
+    }
+  ]
+}

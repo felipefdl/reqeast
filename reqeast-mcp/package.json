@@ -1,0 +1,45 @@
+{
+  "name": "reqeast-mcp",
+  "version": "1.0.0",
+  "description": "MCP server for Reqeast API client. Gives AI tools read-only access to your API requests, responses, and session history.",
+  "author": "Felipe Lima <felipefdl@reqeast.app>",
+  "homepage": "https://reqeast.app",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "reqeast",
+    "api-client",
+    "http",
+    "debugging",
+    "ai-tools",
+    "claude",
+    "cursor"
+  ],
+  "bin": {
+    "reqeast-mcp": "dist/index.js"
+  },
+  "type": "module",
+  "files": [
+    "dist",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "prepare": "tsc"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.27.0",
+    "zod": "^3.25.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0",
+    "@types/node": "^22.0.0"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "os": [
+    "darwin"
+  ],
+  "license": "Apache-2.0"
+}

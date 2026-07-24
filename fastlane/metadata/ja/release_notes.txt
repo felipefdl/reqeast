@@ -1,0 +1,9 @@
+新機能: gRPC。Unary と streaming の RPC、server reflection、ローカル proto ライブラリ、hex メッセージモード。Proto バンドルは iCloud で同期。Unary 呼び出し用の Send gRPC Request Shortcuts アクション。
+
+新機能: API 仕様のインポート、リンク同期、エクスポート。OpenAPI、Postman、Insomnia、Bruno、HAR、AsyncAPI、GraphQL SDL を貼り付け、ファイル、URL、複数ファイルバンドル、Git から取り込み。プロジェクトをリモート仕様にリンクし、変更を確認して、ローカル編集を失わずに更新を適用。OpenAPI 3.1 または Postman Collection v2.1 としてエクスポート。
+
+新機能: JSON レスポンス向け jq フィルター。レスポンスビューで JSON ボディをフィルタリング・変換。
+
+新機能: 9 言語に対応（英語、簡体字中国語、繁体字中国語、日本語、フランス語、ブラジルポルトガル語、スペイン語、韓国語、ドイツ語）。
+
+iCloud 同期の信頼性向上と大規模プロジェクトの保存改善。

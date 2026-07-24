@@ -1,0 +1,9 @@
+Nouveau : gRPC. RPC unary et streaming, server reflection, bibliothèque proto locale et mode message hex. Les bundles proto se synchronisent via iCloud. Action Shortcuts Send gRPC Request pour les appels unary.
+
+Nouveau : import de spécifications API, sync liée et export. Importez OpenAPI, Postman, Insomnia, Bruno, HAR, AsyncAPI et GraphQL SDL depuis le presse-papiers, un fichier, une URL, un bundle multi-fichiers ou Git. Liez un projet à une spécification distante, examinez les changements et appliquez les mises à jour sans perdre vos modifications locales. Export en OpenAPI 3.1 ou Postman Collection v2.1.
+
+Nouveau : filtre jq pour les réponses JSON. Filtrez et transformez les corps JSON dans la vue de réponse.
+
+Nouveau : localisé en 9 langues (anglais, chinois simplifié, chinois traditionnel, japonais, français, portugais du Brésil, espagnol, coréen, allemand).
+
+Fiabilité de la synchronisation iCloud améliorée et stockage des grands projets renforcé.

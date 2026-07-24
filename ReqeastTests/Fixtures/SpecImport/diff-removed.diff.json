@@ -1,0 +1,55 @@
+{
+  "added": [],
+  "removed": [
+    {
+      "request_id": "00000000-0000-0000-0000-000000000201",
+      "primary_key": "listPets",
+      "operation": {
+        "primary_key": "listPets",
+        "alternate_keys": [],
+        "name": "List pets",
+        "method": "GET",
+        "path": "/pet",
+        "deprecated": false,
+        "tags": [],
+        "protocol": "Http",
+        "binding": null,
+        "folder_id": null,
+        "parameters": [],
+        "body": {
+          "kind": "None"
+        },
+        "body_candidates": [],
+        "auth": null,
+        "description": null
+      }
+    }
+  ],
+  "modified": [],
+  "unchanged": [
+    {
+      "request_id": "00000000-0000-0000-0000-000000000202",
+      "primary_key": "getPet",
+      "operation": {
+        "primary_key": "getPet",
+        "alternate_keys": [],
+        "name": "Get pet",
+        "method": "GET",
+        "path": "/pet/{id}",
+        "deprecated": false,
+        "tags": [],
+        "protocol": "Http",
+        "binding": null,
+        "folder_id": null,
+        "parameters": [],
+        "body": {
+          "kind": "None"
+        },
+        "body_candidates": [],
+        "auth": null,
+        "description": null
+      }
+    }
+  ],
+  "identity_changed": []
+}

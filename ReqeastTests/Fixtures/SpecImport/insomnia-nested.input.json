@@ -1,0 +1,99 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_date": "2026-06-20T12:00:00.000Z",
+  "__export_source": "insomnia.desktop.app:v2023.5.8",
+  "resources": [
+    {
+      "_id": "wrk_nested",
+      "_type": "workspace",
+      "parentId": null,
+      "name": "Nested Insomnia API",
+      "description": "Workspace with nested folders"
+    },
+    {
+      "_id": "fld_users",
+      "_type": "request_group",
+      "parentId": "wrk_nested",
+      "name": "Users",
+      "metaSortKey": -2
+    },
+    {
+      "_id": "fld_profiles",
+      "_type": "request_group",
+      "parentId": "fld_users",
+      "name": "Profiles",
+      "metaSortKey": -1
+    },
+    {
+      "_id": "req_list",
+      "_type": "request",
+      "parentId": "fld_users",
+      "name": "List users",
+      "method": "GET",
+      "url": "{{base_url}}/users?limit=10",
+      "parameters": [],
+      "headers": [],
+      "body": {},
+      "authentication": {}
+    },
+    {
+      "_id": "req_profile",
+      "_type": "request",
+      "parentId": "fld_profiles",
+      "name": "Get profile",
+      "method": "GET",
+      "url": "{{base_url}}/users/:userId/profile",
+      "parameters": [],
+      "headers": [],
+      "body": {},
+      "authentication": {}
+    },
+    {
+      "_id": "req_create",
+      "_type": "request",
+      "parentId": "wrk_nested",
+      "name": "Create user",
+      "method": "POST",
+      "url": "{{base_url}}/users",
+      "parameters": [],
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Ada\"\n}"
+      },
+      "authentication": {}
+    },
+    {
+      "_id": "res_list",
+      "_type": "response",
+      "parentId": "req_list",
+      "name": "OK"
+    },
+    {
+      "_id": "jar_default",
+      "_type": "cookie_jar",
+      "parentId": "wrk_nested",
+      "name": "Default Jar"
+    },
+    {
+      "_id": "env_base",
+      "_type": "environment",
+      "parentId": "wrk_nested",
+      "name": "Base Environment",
+      "data": {}
+    },
+    {
+      "_id": "env_staging",
+      "_type": "environment",
+      "parentId": "env_base",
+      "name": "Staging",
+      "data": {
+        "base_url": "https://api.example.com",
+        "userId": "42"
+      }
+    }
+  ]
+}

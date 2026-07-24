@@ -1,0 +1,30 @@
+# Metadata
+metadata_path "./fastlane/metadata"
+screenshots_path "./fastlane/screenshots"
+
+# Languages supported by the app
+languages([
+  "en-US",
+  "de-DE",
+  "es-ES",
+  "fr-FR",
+  "ja",
+  "ko",
+  "pt-BR",
+  "zh-Hans",
+  "zh-Hant"
+])
+
+# Screenshot settings
+overwrite_screenshots true
+
+# We handle binary upload separately via `just deploy`
+skip_binary_upload true
+
+# Skip HTML report (use --force flag or set to true for CI)
+force true
+
+# Don't auto-submit for review
+submit_for_review false
+automatic_release false
+phased_release true

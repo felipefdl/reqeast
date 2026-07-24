@@ -1,0 +1,57 @@
+Reqeast는 iPhone, iPad, Mac용 네이티브 API 클라이언트입니다. SwiftUI와 Rust로 제작. HTTP 테스트, gRPC 호출, TCP/TLS, UDP, WebSocket, SSE. 6가지 프로토콜을 하나의 앱에서.
+
+Electron 없음. 클라우드 계정 없음. 가입 불필요. 즉시 실행. 데이터는 기기에 유지. iCloud로 동기화. 그뿐입니다.
+
+HTTP
+GET, POST, PUT, PATCH, DELETE, HEAD, OPTIONS 요청 빌더. 헤더, 쿼리, 본문을 JSON, 폼, URL 인코딩, 텍스트, 바이너리로 구성. 인증 8종: Bearer Token, Basic Auth, API Key, JWT Bearer, Hawk, AWS Signature V4, Akamai EdgeGrid, 추가 예정. 구문 강조, JSON 트리, 이미지, 16진수. 쿠키 관리. HTTP/1.1 및 HTTP/2.
+
+gRPC
+Unary 및 streaming RPC. server reflection, 다중 파일 로컬 proto 라이브러리, hex 메시지 모드. Proto 번들은 iCloud로 동기화.
+
+WebSocket
+실시간 양방향 지속 연결. 커스텀 헤더, 서브프로토콜, 자동 ping, 개발용 비보안 TLS.
+
+Server-Sent Events
+SSE 엔드포인트 구독과 실시간 이벤트 스트림. 이벤트 유형 및 ID, 전체 대화 기록.
+
+TCP 및 TLS
+TCP 원시 연결 또는 TLS 세션. 지속 및 원샷 모드. UTF-8, 16진, base64, 줄 끝 설정. 세션별 기록.
+
+UDP
+바인드 포트와 타임아웃으로 데이터그램 송수신. TCP와 동일한 인코딩.
+
+환경 변수
+프로젝트별 {{variable}} 구문. URL, 헤더, 본문, 인증. 시크릿은 Keychain. 즉시 전환.
+
+코드 스니펫
+10개 언어 생성: cURL, HTTP raw, Python, Node.js, JavaScript Fetch, Java, Go, C#, Swift, Rust.
+
+가져오기
+cURL, HTTPie, wget을 붙여 요청으로 변환. API 사양: OpenAPI, Postman, Insomnia, Bruno, HAR, AsyncAPI, GraphQL SDL을 붙여넣기, 파일, URL, 다중 파일 번들 또는 Git에서 가져오기. 원격 사양에 연결하고 변경을 검토한 뒤 로컬 편집을 유지하며 업데이트. 인식되지 않는 형식은 기기 내 Apple Intelligence 폴백.
+
+프로젝트 관리
+아이콘과 색상 프로젝트. 프로젝트/요청 폴더. 스냅샷 복원 기록.
+
+iCloud 동기화
+프로젝트, 요청, 환경이 iPhone, iPad, Mac 간 iCloud 동기화. 자격 증명은 Keychain.
+
+Apple Shortcuts
+HTTP, gRPC, TCP, UDP, WebSocket, SSE용 6가지 액션. Shortcuts, Siri 등으로 자동화. 실행 시 변수와 파라미터 지정.
+
+jq 필터
+응답 뷰에서 jq로 JSON 필터/변환. 문자열 언따옴표는 설정에서 전환.
+
+내보내기
+모든 프로젝트를 한 파일로. 공유 또는 로컬 백업. 프로젝트를 OpenAPI 3.1 또는 Postman Collection v2.1로 내보내기.
+
+구문 강조 편집기
+CodeEdit 기반. tree-sitter, 줄 번호, 접기. JSON, XML, HTML, JavaScript, SQL.
+
+이벤트 로그
+프로토콜과 심각도 필터. 최대 1,000개. 연결 및 트래픽 진단.
+
+Rust 네트워킹 코어. Liquid Glass 네이티브 SwiftUI.
+
+모든 기능 무료. 제한 없음. 유료 장벽 없음. 기능 잠금 없음.
+
+Terms of Use (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/

@@ -1,0 +1,57 @@
+Reqeast es un cliente de API nativo para iPhone, iPad y Mac. Hecho con SwiftUI y Rust. Prueba HTTP, llama gRPC, abre TCP/TLS, envía UDP, conéctate a WebSocket y suscríbete a SSE. Seis protocolos en una app.
+
+Sin Electron. Sin cuentas en la nube. Sin registro. Se abre al instante. Tus datos no salen de tus dispositivos. Sync por iCloud. Nada más.
+
+HTTP
+Constructor de solicitudes GET, POST, PUT, PATCH, DELETE, HEAD y OPTIONS. Headers, query y cuerpo como JSON, form data, URL encoded, texto o binario. Ocho autenticaciones: Bearer Token, Basic Auth, API Key, JWT Bearer, Hawk, AWS Signature V4, Akamai EdgeGrid, y más. Respuestas con syntax highlighting, árbol JSON, imágenes y hex. Cookies incluidas. HTTP/1.1 y HTTP/2.
+
+gRPC
+RPC unary y streaming. Server reflection, biblioteca proto local multiarchivo, modo mensaje hex. Paquetes proto sincronizados por iCloud.
+
+WebSocket
+Conexiones persistentes bidireccionales en tiempo real. Headers, subprotocolo, auto-ping y TLS con modo inseguro para desarrollo.
+
+Server-Sent Events
+Suscríbete a endpoints SSE y monitorea streams en tiempo real. Tipo e ID de evento con historial completo.
+
+TCP y TLS
+Conexiones TCP raw o sesiones TLS. Modos persistente y one-shot. UTF-8, hex, base64 y finales de línea configurables. Historial por sesión.
+
+UDP
+Envía y recibe datagramas con puerto de bind y timeout. Mismas codificaciones que TCP.
+
+Entornos
+Variables por proyecto con sintaxis {{variable}}. URLs, headers, body, auth. Secretos en Keychain. Cambio al instante.
+
+Fragmentos de Código
+Código de solicitud en 10 lenguajes: cURL, HTTP raw, Python, Node.js, JavaScript Fetch, Java, Go, C#, Swift y Rust.
+
+Importación
+Pega cURL, HTTPie o wget y conviértelos en solicitudes. Importa specs: OpenAPI, Postman, Insomnia, Bruno, HAR, AsyncAPI y GraphQL SDL desde pegado, archivo, URL, paquete multiarchivo o Git. Vincula un proyecto a una spec remota, revisa cambios y aplica sin perder ediciones locales. Apple Intelligence en el dispositivo como fallback.
+
+Organización de Proyectos
+Solicitudes en proyectos con iconos y colores. Carpetas de proyecto y de solicitud. Historial con restauración completa.
+
+Sincronización iCloud
+Proyectos, solicitudes y entornos se sincronizan entre iPhone, iPad y Mac por iCloud. Credenciales por Keychain.
+
+Apple Shortcuts
+Seis acciones para HTTP, gRPC, TCP, UDP, WebSocket y SSE. Automatiza desde Shortcuts, Siri u otras herramientas. Variables y parámetros en tiempo de ejecución.
+
+Filtro jq
+Filtra y transforma JSON con jq en la vista de respuesta. Comillas opcionales en resultados string.
+
+Exportación
+Exporta todos los proyectos en un archivo. Comparte o haz backup local. Exporta un proyecto como OpenAPI 3.1 o Postman Collection v2.1.
+
+Editor con Syntax Highlighting
+Editor CodeEdit con tree-sitter, números de línea y code folding para JSON, XML, HTML, JavaScript y SQL.
+
+Log de Eventos
+Log de diagnóstico filtrado por protocolo y severidad. Hasta 1.000 entradas para depurar conexiones y tráfico.
+
+Núcleo de red en Rust bajo IO intenso. Interfaz SwiftUI nativa con Liquid Glass.
+
+Todas las funciones son gratuitas. Sin límites. Sin paywalls. Sin bloqueo de funciones.
+
+Terms of Use (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/

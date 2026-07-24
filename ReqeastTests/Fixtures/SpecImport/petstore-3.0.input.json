@@ -1,0 +1,148 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "OpenAPI Petstore",
+    "description": "A sample pet store API",
+    "version": "1.0.11"
+  },
+  "servers": [
+    {
+      "url": "https://petstore3.swagger.io/api/v3",
+      "description": "Production server"
+    }
+  ],
+  "tags": [
+    {
+      "name": "pet",
+      "description": "Pet operations"
+    },
+    {
+      "name": "store",
+      "description": "Store operations"
+    }
+  ],
+  "paths": {
+    "/pet": {
+      "get": {
+        "tags": [
+          "pet"
+        ],
+        "summary": "List all pets",
+        "operationId": "listPets",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "example": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "pet"
+        ],
+        "summary": "Add a new pet",
+        "operationId": "addPet",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "Fluffy"
+                  },
+                  "status": {
+                    "type": "string",
+                    "example": "available"
+                  }
+                }
+              },
+              "example": {
+                "name": "Fluffy",
+                "status": "available"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        }
+      }
+    },
+    "/pet/{petId}": {
+      "get": {
+        "tags": [
+          "pet"
+        ],
+        "summary": "Find pet by ID",
+        "operationId": "getPetById",
+        "parameters": [
+          {
+            "name": "petId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          }
+        }
+      }
+    },
+    "/store/order": {
+      "post": {
+        "tags": [
+          "store"
+        ],
+        "summary": "Place an order",
+        "operationId": "placeOrder",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "quantity": {
+                    "type": "integer",
+                    "example": 1
+                  },
+                  "shipDate": {
+                    "type": "string",
+                    "example": "2026-01-01T00:00:00Z"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          }
+        }
+      }
+    }
+  }
+}

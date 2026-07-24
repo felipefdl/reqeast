@@ -1,0 +1,18 @@
+"""Simple GraphQL API for testing imports."""
+type Query {
+  """Fetch a user by ID"""
+  user(id: ID!): User
+  """List users with optional limit"""
+  users(limit: Int = 10): [User!]!
+}
+
+type Mutation {
+  """Create a new user"""
+  createUser(name: String!, email: String!): User!
+}
+
+type User {
+  id: ID!
+  name: String!
+  email: String!
+}

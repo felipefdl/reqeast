@@ -1,0 +1,5 @@
+app_identifier "app.reqeast"
+# Set locally or via env (do not commit personal Apple ID):
+# apple_id ENV["FASTLANE_USER"]
+# team_id ENV["FASTLANE_TEAM_ID"]
+# itc_team_id ENV["FASTLANE_ITC_TEAM_ID"]

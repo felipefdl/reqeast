@@ -1,0 +1,118 @@
+{
+  "environments": [
+    {
+      "id": "e8522c1d-5ddd-4dd5-8112-3686318113ba",
+      "isActive": true,
+      "name": "Primary API",
+      "variables": [
+        {
+          "enabled": true,
+          "key": "base_url",
+          "value": "https://api.example.test/production"
+        },
+        {
+          "enabled": true,
+          "key": "environment",
+          "value": "production"
+        }
+      ]
+    },
+    {
+      "id": "6e4c2a08-6fd4-4fe6-a55e-2844c2de07f5",
+      "isActive": false,
+      "name": "Sandbox",
+      "variables": [
+        {
+          "enabled": true,
+          "key": "base_url",
+          "value": "https://sandbox.example.test"
+        }
+      ]
+    },
+    {
+      "id": "f849242b-2956-4020-b225-511046e14c25",
+      "isActive": false,
+      "name": "EU region",
+      "variables": [
+        {
+          "enabled": true,
+          "key": "base_url",
+          "value": "https://eu.example.test"
+        }
+      ]
+    }
+  ],
+  "folders": [],
+  "project": {
+    "id": "fc720297-fc9e-4eec-962e-c5f84d9ff3d7",
+    "name": "Multi-server API"
+  },
+  "requests": [
+    {
+      "folderId": null,
+      "http": {
+        "authApiKeyLocation": "header",
+        "authApiKeyName": "",
+        "authApiKeyValue": "",
+        "authOAuth2AuthURL": "",
+        "authOAuth2GrantType": "",
+        "authOAuth2Scopes": "",
+        "authOAuth2TokenURL": "",
+        "authPassword": "",
+        "authToken": "",
+        "authType": "none",
+        "authUsername": "",
+        "binaryFileName": "",
+        "bodyContent": "",
+        "bodyFormData": [],
+        "bodyFormDataEntries": [],
+        "bodyType": "none",
+        "headers": [],
+        "method": "GET",
+        "params": [],
+        "rawContentType": "text",
+        "url": "{{base_url}}/status"
+      },
+      "id": "0938dd87-9996-4121-9433-da54344c0880",
+      "name": "Health check",
+      "sortOrder": 0,
+      "specIdentity": {
+        "alternateKeys": [],
+        "primaryKey": "getStatus"
+      }
+    },
+    {
+      "folderId": null,
+      "http": {
+        "authApiKeyLocation": "header",
+        "authApiKeyName": "",
+        "authApiKeyValue": "",
+        "authOAuth2AuthURL": "",
+        "authOAuth2GrantType": "",
+        "authOAuth2Scopes": "",
+        "authOAuth2TokenURL": "",
+        "authPassword": "",
+        "authToken": "",
+        "authType": "none",
+        "authUsername": "",
+        "binaryFileName": "",
+        "bodyContent": "",
+        "bodyFormData": [],
+        "bodyFormDataEntries": [],
+        "bodyType": "none",
+        "headers": [],
+        "method": "GET",
+        "params": [],
+        "rawContentType": "text",
+        "url": "{{base_url}}/users"
+      },
+      "id": "770e481f-d9b5-41b1-9d74-28faf882fcea",
+      "name": "List users",
+      "sortOrder": 1,
+      "specIdentity": {
+        "alternateKeys": [],
+        "primaryKey": "listUsers"
+      }
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+新功能：gRPC。支援 unary 與 streaming RPC、server reflection、本機 proto 庫與十六進位訊息模式。Proto 套件透過 iCloud 同步。提供用於 unary 呼叫的 Send gRPC Request 捷徑。
+
+新功能：API 規格匯入、關聯同步與匯出。可從貼上、檔案、URL、多檔案套件或 Git 匯入 OpenAPI、Postman、Insomnia、Bruno、HAR、AsyncAPI 與 GraphQL SDL。將專案關聯到遠端規格，審閱變更，並在保留本機編輯的前提下套用更新。可匯出為 OpenAPI 3.1 或 Postman Collection v2.1。
+
+新功能：JSON 回應的 jq 篩選器。在回應檢視中篩選和轉換 JSON 正文。
+
+新功能：支援 9 種語言（英語、簡體中文、繁體中文、日語、法語、巴西葡萄牙語、西班牙語、韓語、德語）。
+
+改進 iCloud 同步可靠性與大型專案儲存。
