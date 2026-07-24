@@ -32,6 +32,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
+      # prost-build / tonic need `protoc` for the gRPC fixture server build.
+      - name: Install protobuf compiler
+        run: sudo apt-get update && sudo apt-get install -y protobuf-compiler
+
       # Pin to crate MSRV (Cargo.toml rust-version = "1.88"). Avoids newer clippy
       # lints (e.g. collapsible_if on 1.97) failing CI while local toolchains drift.
       - name: Install Rust toolchain
