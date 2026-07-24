@@ -54,7 +54,8 @@ jobs:
             os: ubuntu-latest
           - language: swift
             build-mode: manual
-            os: macos-latest
+            # Apple Silicon only. macos-latest can land on Intel; MACOS_ONLY builds aarch64.
+            os: macos-26
 
     steps:
       - name: Checkout
