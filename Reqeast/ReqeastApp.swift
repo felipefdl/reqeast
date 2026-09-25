@@ -231,7 +231,7 @@ struct ReqeastApp: App {
         // creates its own CKDatabaseSubscription and handles silent pushes
         // internally, so we do NOT need a didReceiveRemoteNotification handler.
         // Removing this (or the `remote-notification` UIBackgroundMode in
-        // Info.plist) breaks iCloud sync entirely. See CLAUDE.md > iCloud Sync.
+        // Info.plist) breaks iCloud sync entirely. See AGENTS.md > iCloud Sync.
         #if os(macOS)
         NSApplication.shared.registerForRemoteNotifications()
         #else

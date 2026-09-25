@@ -6,7 +6,7 @@
 		DO NOT REMOVE remote-notification. CKSyncEngine requires the Remote
 		Notifications entitlement to function at all. The engine registers its
 		own CKDatabaseSubscription and intercepts silent pushes internally.
-		Removing this key breaks iCloud sync entirely. See CLAUDE.md > iCloud Sync.
+		Removing this key breaks iCloud sync entirely. See AGENTS.md > iCloud Sync.
 	-->
 	<key>GitHubOAuthClientID</key>
 	<string>Iv1.8a61f03b3a7aba76</string>
